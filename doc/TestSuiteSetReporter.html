@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>TestSuite.setReporter - ArduinoUnit Library - ArduinoUnit Documentation</title>
+<link href="styles/styles.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1><a href="index.html"><img border="0" src="images/arduinounit.png"/></a> <span class="success">Arduino</span><span class="failure">Unit</span> Documentation</h1>
+
+<a href="reference.html">ArduinoUnit Library Reference</a>
+<h2>setReporter()</h2>
+<h3>Description</h3>
+<p>
+Sets a test suite reporter.
+</p>
+<h3>Syntax</h3>
+<code>
+suite.setReporter(reporter)
+</code>
+<h3>Parameters</h3>
+<p>
+<code>suite</code>: the test suite for which to set the reporter<br/>
+<code>reporter</code>: the reporter to set
+</p>
+<h3>Example</h3>
+<code>
+#include &lt;ArduinoUnit.h&gt;
+
+TestSuite suite;
+LcdReporter reporter;
+
+void setup() {
+  suite.setReporter(reporter);
+}
+
+void loop() {
+  suite.run();
+}
+</code>
+
+</body>
+</html>

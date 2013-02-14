@@ -1,0 +1,11 @@
+code {
+  white-space: pre;
+}
+
+.success {
+  color: #0F0;
+}
+
+.failure {
+  color: red;
+}

@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map For ArduinoUnit
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+TestSuite	KEYWORD1
+test	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+run	KEYWORD2
+assertTrue	KEYWORD2
+assertEquals	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+__test__	LITERAL1
+

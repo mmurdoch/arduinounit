@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>__test__ - ArduinoUnit Library - ArduinoUnit Documentation</title>
+<link href="styles/styles.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1><a href="index.html"><img border="0" src="images/arduinounit.png"/></a> <span class="success">Arduino</span><span class="failure">Unit</span> Documentation</h1>
+
+<a href="reference.html">ArduinoUnit Library Reference</a>
+<h2>__test__</h2>
+<h3>Description</h3>
+<p>
+The currently executing test. This can be used to create custom assertion
+functions in addition to the built-in
+<a href="assertTrue.html">assertTrue()</a> and
+<a href="assertEquals.html">assertEquals()</a> functions.
+</p>
+<h3>Example</h3>
+<code>
+#include &lt;ArduinoUnit.h&gt;
+
+TestSuite suite;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void assertStringsEqual(Test& __test__, const char* expected, const char* actual) {
+  assertEquals(strlen(expected), strlen(actual));
+  for (int i = 0; i < strlen(expected); i++) {
+    assertEquals(expected[i], actual[i]);
+  }
+}
+
+test(stringComparison) {
+  char charArray[8] = { 'A', 'r', 'd', 'u', 'i', 'o', '\0' };
+  const char* arduino = "Arduino";
+
+  assertStringsEqual(__test__, arduino, charArray);
+}
+
+void loop() {
+  suite.run();
+}
+</code>
+
+</body>
+</html>

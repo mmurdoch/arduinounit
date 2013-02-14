@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>TestSuite Constructor - ArduinoUnit Library - ArduinoUnit Documentation</title>
+<link href="styles/styles.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1><a href="index.html"><img border="0" src="images/arduinounit.png"/></a> <span class="success">Arduino</span><span class="failure">Unit</span> Documentation</h1>
+
+<a href="reference.html">ArduinoUnit Library Reference</a>
+<h2>TestSuite()</h2>
+<h3>Description</h3>
+<p>
+Creates a variable of type TestSuite.
+</p>
+<h3>Syntax</h3>
+<code>
+TestSuite()<br/>
+TestSuite(name)
+</code>
+<h3>Parameters</h3>
+<p>
+<code>name</code>: the name of the test suite (optional, defaults to empty string)
+</p>
+<h3>Example</h3>
+<code>
+#include &lt;ArduinoUnit.h&gt;
+
+TestSuite suite;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+  suite.run();
+}
+</code>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Writing a Custom Reporter - ArduinoUnit Documentation</title>
+<link href="styles/styles.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1><a href="index.html"><img border="0" src="images/arduinounit.png"/></a> <span class="success">Arduino</span><span class="failure">Unit</span> Documentation</h1>
+
+<h2>Writing a Custom Reporter</h2>
+<p>
+By default ArduinoUnit outputs test results to the serial port. This may be
+problematic if the code under test is also using the serial port, causing
+spurious test failures. To cater for this the ArduinoUnit library provides
+a <a href="Reporter.html"><code>Reporter</code></a> interface which can
+be implemented and the default serial reporter replaced.
+</p>
+
+<h3>Example</h3>
+<p>
+The following code demonstrates how to make use of an LCD display (16x2) and
+the built-in LiquidCrystal library to report test results. Due to the limited
+space it reports only the most important information. For example, the line
+number of the first failing test is reported.
+</p>
+<code>
+#include &lt;ArduinoUnit.h&gt;
+#include &lt;utility/Reporter.h&gt;
+#include &lt;LiquidCrystal.h&gt;
+
+class LcdReporter : public Reporter {
+public:
+  LcdReporter(int rsPin, int rwPin, int enablePin, int data4Pin, int data5Pin, int data6Pin, int data7Pin) :
+    lcd(rsPin, rwPin, enablePin, data4Pin, data5Pin, data6Pin, data7Pin) {
+  }
+
+  void begin(const char* name) {
+    failingLine = -1;
+  }
+
+  void reportFailure(const Test& test, int lineNumber) {
+    fail(lineNumber);
+  }
+
+  void reportEqualityFailure(const Test& test, int lineNumber, const char* expected, const char* actual) {
+    fail(lineNumber);
+  }
+
+  void reportComplete(const TestSuite& suite) {
+    lcd.clear();
+
+    if (suite.getFailureCount() == 0) {
+      lcd.print("Success");
+    } else {
+      lcd.print(suite.getFailureCount());
+      lcd.print(" failure");
+      if (multipleFailures(suite)) {
+        lcd.print("s");
+      }
+
+      lcd.setCursor(0, 1);
+
+      if (multipleFailures(suite)) {
+        lcd.print("first ");
+      }
+      lcd.print("on line ");
+      lcd.print(failingLine);
+    }
+  }
+
+private:
+  bool multipleFailures(const TestSuite& suite) {
+    return suite.getFailureCount() > 1;
+  }
+
+  void fail(int lineNumber) {
+    // Only record the first failure
+    if (failingLine == -1) {
+      failingLine = lineNumber;
+    }
+  }
+
+  LiquidCrystal lcd;
+  int failingLine;
+};
+
+TestSuite suite;
+
+// The Arduino must be connected to the LCD via the following 7 pins
+int rsPin = 12;
+int rwPin = 11;
+int enablePin = 10;
+int data4Pin = 5;
+int data5Pin = 4;
+int data6Pin = 3;
+int data7Pin = 2;
+LcdReporter lcdReporter(rsPin, rwPin, enablePin, data4Pin, data5Pin, data6Pin, data7Pin);
+
+void setup() {
+}
+
+test(first) {
+  assertTrue(false);
+}
+
+test(second) {
+  assertEquals(1, 2);
+}
+
+void loop() {
+  suite.setReporter(lcdReporter);
+  suite.run();
+}
+</code>
+
+</body>
+</html>

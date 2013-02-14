@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>assertTrue - ArduinoUnit Library - ArduinoUnit Documentation</title>
+<link href="styles/styles.css" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<h1><a href="index.html"><img border="0" src="images/arduinounit.png"/></a> <span class="success">Arduino</span><span class="failure">Unit</span> Documentation</h1>
+
+<a href="reference.html">ArduinoUnit Library Reference</a>
+<h2>assertTrue()</h2>
+<h3>Description</h3>
+<p>
+Asserts that a value is <code>true</code>.
+</p>
+<h3>Syntax</h3>
+<code>
+assertTrue(value)
+</code>
+<h3>Parameters</h3>
+<p>
+<code>value</code>: boolean value to check
+</p>
+<h3>Example</h3>
+<code>
+#include &lt;ArduinoUnit.h&gt;
+
+TestSuite suite;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+test(comparison) {
+  assertTrue(7 > 6);
+}
+
+void loop() {
+  suite.run();
+}
+</code>
+
+</body>
+</html>

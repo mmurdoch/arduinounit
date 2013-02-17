@@ -23,12 +23,7 @@ THE SOFTWARE.
 
 #include "Test.h"
 #include "TestSuite.h"
-
-#if (ARDUINO >= 100)
-#include <Arduino.h>
-#else
-#include <WProgram.h>
-#endif
+#include "ArduinoCompatibility.h"
 
 #include <HardwareSerial.h>
 

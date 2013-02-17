@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "utility/Test.h"
 #include "utility/TestSuite.h"
 #include "utility/SuiteAppender.h"
+#include "utility/FakeStream.h"
 
 /**
  * Defines a test function in the active test suite.

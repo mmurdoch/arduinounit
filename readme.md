@@ -1,4 +1,4 @@
-#Current Version: 1.6
+#Current Version: 1.7
 
 #Getting Started
 
@@ -131,6 +131,8 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
           }
 
 # Version History
+## Version 1.7 (XX XXXX 2013)
+
 ## Version 1.6 (17 February 2013)
 ### Features added:
 Fake stream for use in place of other streams which allows for injecting bytes to be read

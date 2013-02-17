@@ -1,3 +1,5 @@
+#Current Version: 1.6
+
 #Getting Started
 
 Create a directory called ArduinoUnit under `<arduino installation directory>\libraries`.
@@ -129,6 +131,10 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
           }
 
 # Version History
+## Version 1.6 (17 February 2013)
+### Features added:
+Fake stream for use in place of other streams which allows for injecting bytes to be read
+and intercepting bytes to be written.
 
 ## Version 1.5 (3 January 2013)
 ### Bugs fixed:
@@ -142,7 +148,7 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
 
 ## Version 1.4.2 (2 October 2011)
 ### Features added:
-Support for Arduino 1.0 environment (check for arduino version to include correct header)
+* Support for Arduino 1.0 environment (check for arduino version to include correct header)
 
 ## Version 1.4.1 (13 June 2011)
 ### Bugs fixed:

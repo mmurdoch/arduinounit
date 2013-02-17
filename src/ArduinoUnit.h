@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "utility/TestSuite.h"
 #include "utility/SuiteAppender.h"
 #include "utility/FakeStream.h"
+#include "utility/MemoryFree.h"
 
 /**
  * Defines a test function in the active test suite.

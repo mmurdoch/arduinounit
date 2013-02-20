@@ -333,7 +333,8 @@ testInSuite(nestedEqualityAssertionFailures, suite) {
 
 void assertStringsEqual(Test& __test__, const char* expected, const char* actual) {
     assertEquals(strlen(expected), strlen(actual));
-    for (int i = 0; i < strlen(expected); i++) {
+    for (size_t i = 0; i < strlen(expected); i++) {
         assertEquals(expected[i], actual[i]);
-    } 
+    }
 }
+

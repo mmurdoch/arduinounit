@@ -19,41 +19,60 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#include "FakeStream.h"
+/**
+ * Unit tests for FakeStream.
+ *
+ * @author Matthew Murdoch
+ */
+#include <ArduinoUnit.h>
 
-FakeStream::FakeStream() : _nextByte(-1) {
+TestSuite suite;
+
+void setup() {
+    Serial.begin(9600);
 }
 
-FakeStream::~FakeStream() {
+void loop() {
+    suite.run();
 }
 
-size_t FakeStream::write(uint8_t val) {
-    _bytesWritten += (char) val;
+test(fakeStreamInitializesToEndOfStream) {
+    FakeStream stream;
 
-    return size_t(1);
+    assertEquals(-1, stream.read());
 }
 
-void FakeStream::flush() {
+test(fakeStreamReadsNextByte) {
+    FakeStream stream;
+    
+    stream.nextByte(2);
+    
+    assertEquals(2, stream.read());
 }
 
-const String& FakeStream::bytesWritten() {
-    return _bytesWritten;
+test(fakeStreamPeeksNextByte) {
+    FakeStream stream;
+
+    stream.nextByte(3);
+
+    assertEquals(3, stream.peek());
 }
 
-void FakeStream::nextByte(byte b) {
-    _nextByte = b;
+test(fakeStreamRetainsByteAfterPeek) {
+    FakeStream stream;
+    stream.nextByte(1);
+
+    stream.peek();
+
+    assertEquals(1, stream.read());
 }
 
-int FakeStream::available()  {
-    return 1;
+test(fakeStreamRemovesByteAfterRead) {
+    FakeStream stream;
+    stream.nextByte(1);
+
+    stream.read();
+    
+    assertEquals(-1, stream.read());
 }
 
-int FakeStream::read() {
-    int b = _nextByte;
-	_nextByte = -1;
-    return b;
-}
-
-int FakeStream::peek() {
-    return _nextByte;
-}

@@ -34,7 +34,7 @@ class FakeStream : public Stream {
 public:
     /**
      * Creates a fake stream. Until nextByte() is called all bytes
-     * read will be zero.
+     * returned from read() or peek() will be -1 (end-of-stream).
      */
     FakeStream();
 
@@ -81,7 +81,7 @@ public:
     /**
      * Reads a byte, removing it from the stream.
      *
-     * @return the byte passed to nextByte() or zero if 
+     * @return the byte passed to nextByte() or -1 (end-of-stream) if 
      *         nextByte() has not been called
      */
     int read();
@@ -89,14 +89,14 @@ public:
     /**
      * Reads a byte without removing it from the stream.
      *
-     * @return the byte passed to nextByte() or zero if 
+     * @return the byte passed to nextByte() or -1 (end-of-stream) if 
      *         nextByte() has not been called
      */
     int peek();
 
 private:
     String _bytesWritten;
-    byte _nextByte;
+    int _nextByte;
 };
 
 #endif // FAKE_STREAM_H

@@ -24,7 +24,6 @@ THE SOFTWARE.
 
 #include "utility/Test.h"
 #include "utility/TestSuite.h"
-#include "utility/SuiteAppender.h"
 #include "utility/FakeStream.h"
 #include "utility/MemoryFree.h"
 
@@ -47,7 +46,6 @@ THE SOFTWARE.
     struct Test_##name : Test {\
         Test_##name(TestSuite& st, const char* nm, void (*testFunction)(Test&)) : Test(st, nm, testFunction) {}\
     } test_##name##_instance(suite, #name, test_##name);\
-    SuiteAppender test_##name##_appender(suite, test_##name##_instance);\
     void test_##name(Test& __test__)
 
 /**

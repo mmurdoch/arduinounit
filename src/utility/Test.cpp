@@ -21,6 +21,8 @@ THE SOFTWARE.
 */
 #include "Test.h"
 
+#include "TestSuite.h"
+
 Test::Test(TestSuite& suite_, const char* name_, void (*testFunction_)(Test&)) {
     suite = &suite_;
     name = name_;
@@ -28,4 +30,5 @@ Test::Test(TestSuite& suite_, const char* name_, void (*testFunction_)(Test&)) {
     // Default to true so that a test with no assertions doesn't cause failure
     successful = true;
     next = 0;
+    suite->add(*this);
 }

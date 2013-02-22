@@ -28,11 +28,6 @@ THE SOFTWARE.
 #include <string.h>
 #include <stdio.h>
 
-struct TestLink {
-    Test test;
-    TestLink* next;
-};
-
 TestSuite* TestSuite::activeSuite = NULL;
 
 TestSuite::TestSuite(const char* suiteName) :
@@ -44,12 +39,6 @@ TestSuite::TestSuite(const char* suiteName) :
 }
 
 TestSuite::~TestSuite() {
-    TestLink* current = head;
-    while (current != NULL) {
-        TestLink* next = current->next;
-        free(current);
-        current = next;
-    }
 }
 
 bool TestSuite::isActiveSuite() {
@@ -76,32 +65,11 @@ void TestSuite::setReporter(Reporter& reporter_) {
     reporter = &reporter_;
 }
 
-void TestSuite::add(const char* name, void (*testFunction)(Test&)) {
-    TestLink* newLink = (TestLink*) malloc(sizeof(TestLink));
-    if (newLink != NULL) {
-        newLink->test.suite = this;
-        newLink->test.testFunction = testFunction;
-        newLink->test.name = name;
-        // Default to true so that a test with no assertions doesn't cause failure
-        newLink->test.successful = true;
-        newLink->next = NULL;
-
-        TestLink** newTail;
-        if (head == NULL) {
-            newTail = &head;
-        } else {
-            TestLink* tail = head;
-            while (tail->next != NULL) {
-                tail = tail->next;
-            }
-            newTail = &(tail->next);
-        }
-
-        *newTail = newLink;
-        successCount++;
-    } else {
-        error = true;
-    }
+void TestSuite::add(Test& test) {
+    Test* previous = head;
+    head = &test;
+    head->next = previous;
+    successCount++;
 }
 
 int TestSuite::getTestCount() const {
@@ -124,9 +92,9 @@ bool TestSuite::run() {
     if (!completed) {
         reporter->begin(name);
 
-        TestLink* current = head;
+        Test* current = head;
         while (current != NULL) {
-            current->test.testFunction(current->test);
+            current->testFunction(*current);
             current = current->next;
         }
 
@@ -137,6 +105,7 @@ bool TestSuite::run() {
 
     return true;
 }
+
 bool TestSuite::hasCompleted() const {
     return completed;
 }

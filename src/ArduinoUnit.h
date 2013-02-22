@@ -44,7 +44,10 @@ THE SOFTWARE.
  */
 #define testInSuite(name, suite)\
     void test_##name(Test&);\
-    SuiteAppender test_##name##_appender(suite, #name, test_##name);\
+    struct Test_##name : Test {\
+        Test_##name(TestSuite& st, const char* nm, void (*testFunction)(Test&)) : Test(st, nm, testFunction) {}\
+    } test_##name##_instance(suite, #name, test_##name);\
+    SuiteAppender test_##name##_appender(suite, test_##name##_instance);\
     void test_##name(Test& __test__)
 
 /**

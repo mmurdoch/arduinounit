@@ -36,10 +36,9 @@ public:
      * Creates a test suite appender, appending a test to a test suite.
      *
      * @param suite suite to which to append test
-     * @param name name of test to append
-     * @param testFunction test function to append to suite
+     * @param test test to append
      */
-    SuiteAppender(TestSuite& suite, const char* name, void (*testFunction)(Test&));
+    SuiteAppender(TestSuite& suite, Test& test);
 };
 
 #endif // SUITE_APPENDER_H

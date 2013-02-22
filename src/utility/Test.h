@@ -30,10 +30,20 @@ class TestSuite;
  * @author Matthew Murdoch
  */
 struct Test {
+    /**
+     * Creates a test, appending it to a test suite.
+     *
+     * @param suite suite to which to append test
+     * @param name test name
+     * @param testFunction the body of the test
+     */
+    Test(TestSuite& suite_, const char* name_, void (*testFunction_)(Test&));
+
     TestSuite* suite;
     void (*testFunction)(Test&);
     const char* name;
     bool successful;
+    Test* next;
 };
 
 #endif // TEST_H

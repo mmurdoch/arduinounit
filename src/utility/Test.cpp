@@ -19,10 +19,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#include "SuiteAppender.h"
+#include "Test.h"
 
-#include "TestSuite.h"
-
-SuiteAppender::SuiteAppender(TestSuite& suite, Test& test) {
-    suite.add(test);
+Test::Test(TestSuite& suite_, const char* name_, void (*testFunction_)(Test&)) {
+    suite = &suite_;
+    name = name_;
+    testFunction = testFunction_;
+    // Default to true so that a test with no assertions doesn't cause failure
+    successful = true;
+    next = 0;
 }

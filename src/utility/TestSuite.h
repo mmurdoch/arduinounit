@@ -23,7 +23,6 @@ THE SOFTWARE.
 #define TEST_SUITE_H
 
 struct Test;
-struct TestLink;
 class Reporter;
 
 /**
@@ -92,10 +91,9 @@ public:
     /**
      * Adds a test to this suite.
      *
-     * @param name name of test to add
-     * @param testFunction test function to add
+     * @param test test to add
      */
-    void add(const char* name, void (*testFunction)(Test&));
+    void add(Test& test);
 
     /**
      * Runs this test suite. If this suite has already run calling
@@ -161,7 +159,7 @@ private:
     static TestSuite* activeSuite;
 
     const char* name;
-    TestLink* head;
+    Test* head;
     int successCount;
     int failureCount;
     bool completed;

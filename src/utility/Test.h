@@ -29,7 +29,8 @@ class TestSuite;
  *
  * @author Matthew Murdoch
  */
-struct Test {
+class Test {
+public:
     /**
      * Creates a test, appending it to a test suite.
      *
@@ -40,8 +41,11 @@ struct Test {
     Test(TestSuite& suite_, const char* name_, void (*testFunction_)(Test&));
 
     TestSuite* suite;
-    void (*testFunction)(Test&);
     const char* name;
+
+private:
+    friend class TestSuite;
+    void (*testFunction)(Test&);
     bool successful;
     Test* next;
 };

@@ -163,7 +163,6 @@ private:
     int successCount;
     int failureCount;
     bool completed;
-    bool error;
     Reporter* reporter;
 };
 

@@ -31,7 +31,7 @@ THE SOFTWARE.
 TestSuite* TestSuite::activeSuite = NULL;
 
 TestSuite::TestSuite(const char* suiteName) :
-    name(suiteName), head(NULL), successCount(0), failureCount(0), completed(false), error(false) {
+    name(suiteName), head(NULL), successCount(0), failureCount(0), completed(false) {
 
     setReporter(serialReporter);
 
@@ -85,10 +85,6 @@ int TestSuite::getSuccessCount() const {
 }
 
 bool TestSuite::run() {
-    if (error) {
-        return false;
-    }
-
     if (!completed) {
         reporter->begin(name);
 

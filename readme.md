@@ -131,22 +131,27 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
           }
 
 # Version History
-## Version 1.7 (XX XXXX 2013)
+## Version 1.7 (24 February 2013)
+### Features added:
+* Basic support for memory leak checking (partial support for issue #4)
+* Issue #6 - Allow end-of-stream to be configured in FakeStream
+* Issue #9 - Remove use of malloc in test initialization
+
+### Bugs fixed:
+* Issue #7 - FakeStream does not initialize to end-of-stream (-1)
+* Issue #8 - FakeStream does not remove a configured byte when read() is called
 
 ## Version 1.6 (17 February 2013)
 ### Features added:
-Fake stream for use in place of other streams which allows for injecting bytes to be read
-and intercepting bytes to be written.
+* Fake stream for use in place of other streams which allows for injecting bytes to be read
+and intercepting bytes to be written
 
 ## Version 1.5 (3 January 2013)
 ### Bugs fixed:
-  * Issue 4 - Added release notes for version 1.4.2
-  * Issue 5 - SerialReporter fails for baud values above 9600.
-    Note that the fix for this is a *breaking change* and requires
-    all arduinounit sketches using the default serial reporting to
-    have `Serial.begin(<baud_rate>)` added in their `setup()` function
-  * Issue 6 - Line numbers are being incorrectly reported for failing assertions on Arduino 1.0.3
-  * Issue 7 - ArduinoUnit unit tests print garbage output indefinitely
+* Issue 4 (on googlecode) - Added release notes for version 1.4.2
+* Issue 5 (on googlecode) - SerialReporter fails for baud values above 9600. Note that the fix for this is a *breaking change* and requires all arduinounit sketches using the default serial reporting to have `Serial.begin(<baud_rate>)` added in their `setup()` function
+* Issue 6 (on googlecode) - Line numbers are being incorrectly reported for failing assertions on Arduino 1.0.3
+* Issue 7 (on googlecode) - ArduinoUnit unit tests print garbage output indefinitely
 
 ## Version 1.4.2 (2 October 2011)
 ### Features added:
@@ -154,8 +159,8 @@ and intercepting bytes to be written.
 
 ## Version 1.4.1 (13 June 2011)
 ### Bugs fixed:
-* Issue 2 - Compilation error on Arduino 0022
-* Issue 3 - Incomplete MIT license terms
+* Issue 2 (on googlecode) - Compilation error on Arduino 0022
+* Issue 3 (on googlecode) - Incomplete MIT license terms
 
 ## Version 1.4 (28 June 2009)
 ### Features added:

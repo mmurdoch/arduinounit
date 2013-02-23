@@ -40,6 +40,10 @@ const String& FakeStream::bytesWritten() {
     return _bytesWritten;
 }
 
+void FakeStream::setToEndOfStream() {
+    _nextByte = -1;
+}
+
 void FakeStream::nextByte(byte b) {
     _nextByte = b;
 }

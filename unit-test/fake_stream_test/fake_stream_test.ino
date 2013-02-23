@@ -76,3 +76,11 @@ test(fakeStreamRemovesByteAfterRead) {
     assertEquals(-1, stream.read());
 }
 
+test(fakeStreamCanBeSetToEndOfStream) {
+    FakeStream stream;
+    
+    stream.setToEndOfStream();
+    
+    assertEquals(-1, stream.read());
+}
+

@@ -63,7 +63,12 @@ public:
      * @return the bytes written
      */
     const String& bytesWritten();
-
+    
+    /**
+     * Sets the next value to be read via read() or peek() to -1 (end-of-stream).
+     */
+    void setToEndOfStream();
+	
     /**
      * Sets the value of the next byte to be read via read() or peek().
      *
@@ -82,7 +87,7 @@ public:
      * Reads a byte, removing it from the stream.
      *
      * @return the byte passed to nextByte() or -1 (end-of-stream) if 
-     *         nextByte() has not been called
+     *         nextByte() has not been called or setToEndOfStream() has been called
      */
     int read();
 
@@ -90,7 +95,7 @@ public:
      * Reads a byte without removing it from the stream.
      *
      * @return the byte passed to nextByte() or -1 (end-of-stream) if 
-     *         nextByte() has not been called
+     *         nextByte() has not been called or setToEndOfStream() has been called
      */
     int peek();
 

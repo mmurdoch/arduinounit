@@ -7,13 +7,15 @@ command> max_verbosity 11111111
 command> min_verbosity 00100001
 command> run
 test assert_ints skipped.
-test assert_strings skipped.0:1: pass assert (x=1) == (0x1=1)
-arduino_unit_test.ino:131:1: pass assert (x=0) ert (x=0) == (0x1=1)
-arduino_unit_test.ino:130:1: pass assert (x=1) == (0x1=1)
-arduino_unit_test.ino:131:1: pass assert (x=0) == (0x0=0)
-arduino_unit_test.ino:131:1: fail assert (x=1) == (0x0=0)
-test assert_bools assed.
-test fails failed.
+test assert_strings skipped.
+test meta skipped.
+test overall skipped.
+firmware.ino:148:1: fail assert (x=0) == (0x1=1)
+firmware.ino:148:1: pass assert (x=1) == (0x1=1)
+firmware.ino:149:1: pass assert (x=0) == (0x0=0)
+firmware.ino:149:1: fail assert (x=1) == (0x0=0)
+test assert_bools passed.
 test passes passed.
 test skips skipped.
+test fails failed.
 test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).

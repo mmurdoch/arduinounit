@@ -6,6 +6,6 @@ command> include assert_bools
 command> max_verbosity 00010001
 command> min_verbosity 00010001
 command> run
-arduino_unit_test.ino:130:1: fail assert (x=0) == (0x1=1)
-arduino_unit_test.ino:131:1: fail assert (x=1) == (0x0=0)
+firmware.ino:148:1: fail assert (x=0) == (0x1=1)
+firmware.ino:149:1: fail assert (x=1) == (0x0=0)
 test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).

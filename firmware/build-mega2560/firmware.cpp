@@ -45,7 +45,7 @@ bool cmd(const char *s)
 {
   int len = strlen(s);
   return (strncmp(line,s,len) == 0) &&
-    (line[len+1] == ' ' || line[len+1] == 0);
+    (line[len] == ' ' || line[len] == 0);
 }
 
 char *arg()
@@ -81,7 +81,7 @@ void process()
     return;
   }
   if (cmd("min_verbosity")) { 
-    Test::max_verbosity = binary(arg());
+    Test::min_verbosity = binary(arg());
     return;
   }
   if (cmd("run")) {
@@ -97,7 +97,7 @@ void process()
 
 void setup()
 {
-  Serial.begin(38400L);
+  Serial.begin(9600);
   motd();
   while (configuring) {
     getline();

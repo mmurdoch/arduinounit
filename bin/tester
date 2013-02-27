@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::SerialPort;
+
+sub find
+{
+  my ($end)=@_;
+
+  my $found=0;
+  my $len=length($end);
+  our $port;
+  while (!$found) {
+    my $out = "";
+    for (;;) {
+      (my $one,my $c)=$port->read(1);
+      if ($one == 0) { next; }
+      if ($one != 1) { last; }
+      if ($c eq "\n" || $c eq "\r") { last; }
+      $out .= $c;
+      if (substr($out,-$len,$len) eq $end) { $found = 1; last; }
+    }
+  }
+}
+
+my $eof = 0;
+sub line
+{
+  our $eof;
+  our $port;
+  my $out = "";
+  if ($eof) { return ""; }
+  for (;;) {
+    (my $one,my $c)=$port->read(1);
+    if ($one == 0 || $c eq "\0" || $c eq "\r") { next; }
+    if ($c eq "\n") { last; }
+    $out .= $c;
+  }
+  $eof = ($out =~ m/^test summary/);
+
+  chomp $out;
+  chomp $out;
+
+  return $out;
+}
+
+sub port_open
+{
+  my ($dev,$baud)=@_;
+  our $port;
+  
+  $port = Device::SerialPort->new($dev)
+      or die "Unable to open $dev: $!\n";
+  $port->baudrate($baud);
+  return $port;
+}
+
+
+sub port_reset
+{
+  our $port;
+  $port->pulse_dtr_on(0.100);
+}
+
+sub port_clear
+{
+  our $port;
+  $port->purge_all;
+}
+
+
+sub port_command
+{
+  my ($command)=@_;
+  our $port;
+  find("command> ");
+  $port->write($command . "\r");
+  my $skip = length($command)+2;
+  while ($skip > 0) {
+      my ($one,$c) = $port->read(1);
+      $skip = $skip - $one;
+  }
+}
+
+port_open($ARGV[0],$ARGV[1]);
+port_reset();
+
+my $line=0;
+open(IN,"<$ARGV[2]");
+
+while (<IN>) {
+  chomp;
+  if (m/^command> (.*)$/) {
+    my $command=$1;
+    port_command($command);
+    if ($command eq "test") { last; }
+  }
+  print "$_\n";
+  ++$line;
+}
+
+my $error = 0;
+
+while (<IN>) {
+  my $t=$_;
+  my $s=line();
+
+  chomp $t;
+  chomp $t;
+
+  my $ok = 1;
+  if ($t =~ m /\*/) {
+      $t =~ s/\*/\.\*/g;
+      $ok = $s=~ m/^$t$/;
+  } else {
+      $ok = ($s eq $t);
+  }
+
+  if (! $ok) {
+      $error = 1;
+      print "test has '$t', but got '$s' on line $line\n";
+  }
+  print "$s\n";
+  ++$line;
+}
+
+if ($error) {
+  print "output is not the same as input.";
+}
+exit $error;

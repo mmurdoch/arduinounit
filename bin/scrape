@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $port = `./bin/port`; chomp $port;
+if ($? != 0) {
+    print "Could not find arduino serial port.\n";
+    exit(1);
+}
+
+my $baud = `./bin/baud`; chomp $baud;
+if ($? != 0) {
+    print "Could not determine baud rate of test program.\n";
+    exit(1);
+}
+
+foreach my $test (@ARGV)
+{
+  next if ($test =~ m/(\.out|\.test|-|~|#)$/);
+  next if ($test =~ m/^#|^\.#/);  
+
+  open OLDOUT,     ">&STDOUT" or die "Can't dup STDOUT: $!";
+  open OLDERR,     ">&STDERR" or die "Can't dup STDERR: $!";
+
+  open STDOUT, ">$test.out" or die "Can't redirect STDOUT: $!";
+  open STDERR, ">&STDOUT"     or die "Can't dup STDOUT: $!";
+
+  select STDERR; $| = 1;      # make unbuffered
+  select STDOUT; $| = 1;      # make unbuffered
+
+  system("./bin/scraper",$port,$baud,$test);
+
+  open STDOUT, ">&", OLDOUT or die "Can't dup OLDOUT: $!";
+  open STDERR, ">&", OLDERR or die "Can't dup OLDERR: $!";
+
+  print "$test scraped\n";
+}

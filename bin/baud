@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+# find the first baud setting in the source file
+
+our $src="./firmware/firmware.ino";
+our @bauds = ();
+
+open(IN,"<$src");
+while (<IN>) {
+ if (m/Serial.begin\(([0-9]+)L?\)/) {
+   push(@bauds,$1);
+ }
+}
+close(IN);
+
+if ($#bauds >= 0) {
+  print "$bauds[0]\n";
+  exit 0;
+} else {
+  exit 1;
+}

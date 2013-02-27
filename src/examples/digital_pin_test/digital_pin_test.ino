@@ -1,3 +1,7 @@
+//
+//
+#line 1 "digital_pin_test.ino"
+
 /*
 Copyright (c) 2009-2013 Matthew Murdoch
 
@@ -38,8 +42,6 @@ THE SOFTWARE.
  */
 #include <ArduinoUnit.h>
 
-TestSuite suite;
-
 void setup() {
     Serial.begin(9600);
 }
@@ -49,7 +51,7 @@ void setup() {
  * It tests two cycles of a HIGH then a LOW level to ensure all transitions
  * (HIGH to LOW and LOW to HIGH are covered).
  */
-void testOutputToInput(Test& __test__, int out, int in) {
+void testOutputToInput(int out, int in) {
     pinMode(out, OUTPUT);
     pinMode(in, INPUT);
 
@@ -69,33 +71,33 @@ void testOutputToInput(Test& __test__, int out, int in) {
  * Tests two connected digital pins, first with one as an output and the other
  * as an input, then vice versa.
  */
-void testConnectedPins(Test& __test__, int pinOne, int pinTwo) {
-    testOutputToInput(__test__, pinOne, pinTwo);
-    testOutputToInput(__test__, pinTwo, pinOne);    
+void testConnectedPins(int pinOne, int pinTwo) {
+    testOutputToInput(pinOne, pinTwo);
+    testOutputToInput(pinTwo, pinOne);    
 }
 
 test(pins2And3) {
-    testConnectedPins(__test__, 2, 3);
+    testConnectedPins(2, 3);
 }
 
 test(pins4And5) {
-    testConnectedPins(__test__, 4, 5);
+    testConnectedPins(4, 5);
 }
 
 test(pins6And7) {
-    testConnectedPins(__test__, 6, 7);
+    testConnectedPins(6, 7);
 }
 
 test(pins8And9) {
-    testConnectedPins(__test__, 8, 9);
+    testConnectedPins(8, 9);
 }
 
 test(pins10And11) {
-    testConnectedPins(__test__, 10, 11);
+    testConnectedPins(10, 11);
 }
 
 test(pins12And13) {
-    testConnectedPins(__test__, 12, 13);
+    testConnectedPins(12, 13);
 }
 
 void loop() {

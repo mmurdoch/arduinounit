@@ -1,0 +1,11 @@
+command> exclude *
+command> include passes
+command> include fails
+command> include skips
+command> include assert_bools
+command> max_verbosity 00000101
+command> min_verbosity 00000101
+command> run
+test assert_bools passed.
+test passes passed.
+test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).

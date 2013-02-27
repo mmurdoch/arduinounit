@@ -1,0 +1,19 @@
+command> exclude *
+command> include passes
+command> include fails
+command> include skips
+command> include assert_bools
+command> max_verbosity 11111111
+command> min_verbosity 00000001
+command> run
+test assert_ints skipped.
+test assert_strings skipped.
+test meta sert (x=1) == (0x0=0)
+test assert_bools passed.
+.ino:130:1: fail assert (x=0) == (0x1=1)
+arduino_unit_test.ino:131:1: fail assert (x=1) == (0x0=0)
+test assert_bools passed.
+test fails failed.
+test passes passed.
+test skips skipped.
+test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).

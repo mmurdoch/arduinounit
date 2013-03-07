@@ -59,11 +59,11 @@ Here are the basic files and folders
 * Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
   Download and type
-
+  <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
       sudo python setup.py install
-
+  </pre>
 * Install Scons (scons.org).
 
   The MSI failed for me in windows.  Get the tar file and install as 

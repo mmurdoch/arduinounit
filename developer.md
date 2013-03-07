@@ -47,7 +47,7 @@ Here are the basic files and folders
 
 * Install Git
 
-  - Windows: Instal the git-bash tool.
+  - Windows: Install the git-bash tool.
 
   - OS X Install XCode and choose to install command line tools.
 

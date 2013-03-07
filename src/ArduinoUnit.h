@@ -8,6 +8,16 @@
 
 #include <stdint.h>
 #include <Print.h>
+
+#if ARDUINO >= 100 && ARDUINO < 103
+#undef F
+#undef PSTR
+#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
+
+#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
+
+#endif
+
 #include <utility/FakeStream.h>
 #include <utility/MemoryFree.h>
 

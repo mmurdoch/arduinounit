@@ -10,16 +10,16 @@ How to build, test, and extend ArduinoUnit 2.0.
 
 Here are the basic files and folders
 
-* readme.md --- general user's guide
-* porting-guide.md --- porting from 1.0 to 2.0
-* developer.md --- starting guide for someone extending ArduinoUnit.
-* src --- content of ArduinoUnit that should be copied to the user or
+* `readme.md` --- general user's guide
+* `porting-guide.md` --- porting from 1.0 to 2.0
+* `developer.md` --- starting guide for someone extending ArduinoUnit.
+* `src` --- content of ArduinoUnit that should be copied to the user or
           system-wide arduino libraries folder.
-* firmware --- the firmware to test the functionality of the
+* `firmware` --- the firmware to test the functionality of the
           the library (tested on mega2560).
-* tests --- various tests, the output from these tests, and the result
+* `tests` --- various tests, the output from these tests, and the result
             of comparing these against known results.
-* bin --- helper files & scripts.
+* `bin` --- helper files & scripts.
 
 ##Setup
 
@@ -58,7 +58,7 @@ Here are the basic files and folders
 
 * Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
-  Download and type
+  Download and type:
   <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
@@ -78,36 +78,36 @@ Here are the basic files and folders
 * Build and upload the test code in the firmware folder
 
   On windows:
-
+  <pre>
       cd firmware
       scons.py
       scons.py upload
-
+  </pre>
   Elsewhere:
-
+  <pre>
       cd firmware
       scons
       scons upload
-
+  </pre>
 * Run the testing firmware
 
   The firmware is interactive, so you can change test configurations
   before running the test suite.  You can run the arduino monitor at
   19200 baud to see the output.  For example
-
+  <pre>
       command> run
       ...
       test overall passed.
       test summary: 6 passed, 1 failed, and 1 skipped, out of 8 test(s).
-
+  </pre>
   or
-
+  <pre>
       command> exclude *
       command> include assert*
       command> min_verbosity 00111111
       command> run
       ...
-
+  </pre>
   You can use the prompted commands to change the test set and the verbosity
   of the tests.
 

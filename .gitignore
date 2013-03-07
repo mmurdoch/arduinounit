@@ -213,3 +213,11 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+# arduino-make
+firmware/build-*/*.d
+firmware/build-*/*.o
+
+# arscons
+firmware/arscons.json
+

@@ -1,4 +1,3 @@
 {
-  SKETCHBOOK_HOME : "~/Documents/Arduino"
+  "ARDUINO_BOARD" : "mega2560"
 }
-

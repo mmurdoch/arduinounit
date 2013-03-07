@@ -90,6 +90,7 @@ def getUsbTty(rx):
 AVR_BIN_PREFIX = None
 AVRDUDE_CONF = None
 
+print "platform: " + platform
 if platform == 'darwin':
     # For MacOS X, pick up the AVR tools from within Arduino.app
     ARDUINO_HOME        = resolve_var('ARDUINO_HOME',
@@ -129,10 +130,6 @@ if not ARDUINO_HOME:
 if not ARDUINO_BOARD:
     print 'ARDUINO_BOARD must be defined.'
     raise KeyError('ARDUINO_BOARD')
-
-if not ARDUINO_PORT:
-    print 'ARDUINO_PORT must be defined.'
-    raise KeyError('ARDUINO_PORT')
 
 ARDUINO_CONF = path.join(ARDUINO_HOME, 'hardware/arduino/boards.txt')
 # check given board name, ARDUINO_BOARD is valid one

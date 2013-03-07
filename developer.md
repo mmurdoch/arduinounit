@@ -29,7 +29,7 @@ Here are the basic files and folders
   - OS X: already installed.
   - Linux: already installed.
 
-  Typing python -v at the command prompt should give version information
+  Typing `python -v` at the command prompt should give version information
   about python.
 
 * Install Arduino IDE
@@ -51,9 +51,9 @@ Here are the basic files and folders
 
   - OS X Install XCode and choose to install command line tools.
 
-  - Linux sudo apt-get install git or sudo yum install git-core
+  - Linux `sudo apt-get install git` or `sudo yum install git-core`
 
-  From here on out, I will assume you are working from the git-bash
+  From here on, I will assume you are working from the git-bash
   shell in windows, or a bash command prompt.
 
 * Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
@@ -69,8 +69,7 @@ Here are the basic files and folders
   The MSI failed for me in windows.  Get the tar file and install as 
   pyserial above.
 
-
-* Copy firmware/arscons.json.{win,osx,linux} to firmware/arscons.json
+* Copy `firmware/arscons.json.{win,osx,linux}` to `firmware/arscons.json`
   and edit for local settings
 
   A leading tile (~) in ARDUINO_HOME, AVR_HOME, and SKETCHBOOK_HOME is

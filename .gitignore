@@ -220,6 +220,9 @@ firmware/build-*/*.o
 
 # arscons
 firmware/arscons.json
+firmware/firmware.hex
+firmware/firmware.sym
+firmware/.sconsign.dblite
 
 # test output
 tests/*.out
@@ -228,3 +231,4 @@ tests/*.out
 *~
 \#*
 \.#*
+

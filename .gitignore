@@ -223,3 +223,8 @@ firmware/arscons.json
 
 # test output
 tests/*.out
+
+# emacs
+*~
+\#*
+\.#*

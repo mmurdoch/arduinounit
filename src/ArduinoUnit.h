@@ -18,6 +18,18 @@
 
 #endif
 
+#if ARDUINO >= 100
+// this is still an outstanding bug
+// this does not generate incorrect code, but generates a lot of
+// incorrect warnings...
+// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
+#ifdef PROGMEM
+#undef PROGMEM
+#define PROGMEM __attribute__((section(".progmem.data")))
+#endif
+
+#endif
+
 #include <utility/FakeStream.h>
 #include <utility/MemoryFree.h>
 
@@ -369,6 +381,9 @@ class Test
   */
   static Test* current;
 
+  /** the name of this test */
+  String name;
+
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 
     output = false;
@@ -385,9 +400,6 @@ class Test
     if (output) { OUTPUT to Test::out }
   */
   uint8_t verbosity;
-
-  /** the name of this test */
-  String name;
 
   /** Set state to DONE_PASS.  This does not exit the code early.  But after
       the loop() terminates, the test will be resolved and removed from the

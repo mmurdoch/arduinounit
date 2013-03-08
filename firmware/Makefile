@@ -38,7 +38,8 @@ ifeq ($(UNAME), Darwin)
   DOXYGEN=doxygen
 endif
 
-BOARD_TAG=mega2560
+# BOARD_TAG=mega2560
+BOARD_TAG=uno
 ARDMK_DIR=..
 
 MONITOR_BAUDRATE=$(shell cd ..; ./bin/baud)

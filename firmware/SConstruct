@@ -90,12 +90,12 @@ def getUsbTty(rx):
 AVR_BIN_PREFIX = None
 AVRDUDE_CONF = None
 
-print "platform: " + platform
 if platform == 'darwin':
     # For MacOS X, pick up the AVR tools from within Arduino.app
     ARDUINO_HOME        = resolve_var('ARDUINO_HOME',
                                       '/Applications/Arduino.app/Contents/Resources/Java')
-    ARDUINO_PORT        = resolve_var('ARDUINO_PORT', getUsbTty('/dev/tty.usbserial*'))
+    ARDUINO_PORT        = resolve_var('ARDUINO_PORT', '/dev/cu.usb*')
+    ARDUINO_PORT        = getUsbTty(ARDUINO_PORT)
     SKETCHBOOK_HOME     = resolve_var('SKETCHBOOK_HOME', '~/Documents/Arduino')
     AVR_HOME            = resolve_var('AVR_HOME',
                                       path.join(ARDUINO_HOME, 'hardware/tools/avr/bin'))
@@ -110,7 +110,8 @@ elif platform == 'win32':
 else:
     # For Ubuntu Linux (9.10 or higher)
     ARDUINO_HOME        = resolve_var('ARDUINO_HOME', '/usr/share/arduino/')
-    ARDUINO_PORT        = resolve_var('ARDUINO_PORT', getUsbTty('/dev/ttyUSB*'))
+    ARDUINO_PORT        = resolve_var('ARDUINO_PORT', '/dev/ttyUSB*')
+    ARDUINO_PORT        = getUsbTty(ARDUINO_PORT)
     SKETCHBOOK_HOME     = resolve_var('SKETCHBOOK_HOME', '~/Documents/Arduino')
     AVR_HOME            = resolve_var('AVR_HOME', '')
 
@@ -122,6 +123,8 @@ ARDUINO_BOARD   = resolve_var('ARDUINO_BOARD','')
 ARDUINO_VER     = resolve_var('ARDUINO_VER', 0) # Default to 0 if nothing is specified
 RST_TRIGGER     = resolve_var('RST_TRIGGER', None) # use built-in pulseDTR() by default
 EXTRA_LIB       = resolve_var('EXTRA_LIB', None) # handy for adding another arduino-lib dir
+
+print "PORT: " + ARDUINO_PORT
 
 if not ARDUINO_HOME:
     print 'ARDUINO_HOME must be defined.'

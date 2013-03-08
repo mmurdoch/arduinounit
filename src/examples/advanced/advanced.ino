@@ -18,7 +18,7 @@ class MyTestOnce : public TestOnce
 public:
   // constructor must name test
 
-  MyTestOnce(const __FlashStringHelper *name) 
+  MyTestOnce(const char *name) 
   : TestOnce(name) 
   {
     // lightweight constructor, since
@@ -46,15 +46,15 @@ public:
   }
 };
 
-MyTestOnce myTestOnce1(F("myTestOnce1"));
-MyTestOnce myTestOnce2(F("myTestOnce2"));
-MyTestOnce myTestOnce3(F("myTestOnce3"));
+MyTestOnce myTestOnce1("myTestOnce1");
+MyTestOnce myTestOnce2("myTestOnce2");
+MyTestOnce myTestOnce3("myTestOnce3");
 
 class MyTest : public Test
 {
 public:
   uint16_t when;
-  MyTest(const FlashStringHelper *name) 
+  MyTest(const char *name) 
   : Test(name)
   {
     when = random(100,200);
@@ -70,9 +70,9 @@ public:
   }  
 };
 
-MyTest myTest1(F("myTest1"));
-MyTest myTest2(F("myTest2"));
-MyTest myTest3(F("myTest3"));
+MyTest myTest1("myTest1");
+MyTest myTest2("myTest2");
+MyTest myTest3("myTest3");
 
 void setup()
 {

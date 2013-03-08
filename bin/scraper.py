@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 
 import sys
-import pexpect
+if sys.platform == 'win32':
+  import winpexpect
+else:
+  import winpexpect
 import re
 import time
 
-px = pexpect.spawn('./bin/build reset monitor')
+
+if sys.platform == 'win32':
+  px = winpexpect.spawn('./bin/build reset monitor')
+else:
+  px = pexpect.spawn('./bin/build reset monitor')
+
 time.sleep(3.00)
 px.timeout = 2
 

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # figure out how to run scons...
 if type -P -t scons.py > /dev/null

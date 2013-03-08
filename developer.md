@@ -56,7 +56,7 @@ Here are the basic files and folders
   From here on, I will assume you are working from the git-bash
   shell in windows, or a bash command prompt.
 
-* Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
+* Istall pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
   Download tar.gz file and type:
   <pre>
@@ -65,12 +65,21 @@ Here are the basic files and folders
       sudo python setup.py install
   </pre>
 
-* Install pexpect 2.3 (http://www.noah.org/wiki/Pexpect#topip.py)
+* On unix (osx/linux) install pexpect 2.3 (http://www.noah.org/wiki/Pexpect#topip.py)
 
   Download tar.gz file and type:
   <pre>
       tar zxf pexpect-2.3.tar.gz
       cd pexpect-2.3
+      sudo python setup.py install
+  </pre>
+
+* On windows install winpexpect (https://bitbucket.org/geertj/winpexpect/downloads)
+
+  Download tar.gz file and type:
+  <pre>
+      tar zxf geertj-winpexpect*.tar.gz
+      cd geertj-winpexpect*
       sudo python setup.py install
   </pre>
 

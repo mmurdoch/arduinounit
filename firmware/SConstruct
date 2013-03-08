@@ -450,4 +450,13 @@ AlwaysBuild(upload)
 # Clean build directory
 envArduino.Clean('all', 'build/')
 
+# Monitor 
+monitor_cmd = 'python -m serial.tools.miniterm -b %s %s' % (resolve_var('ARDUINO_BAUD',9600), ARDUINO_PORT)
+monitor = envArduino.Alias('monitor', '', [monitor_cmd])
+AlwaysBuild(monitor)
+
+# Reset 
+reset = envArduino.Alias('reset', '', [reset_cmd])
+AlwaysBuild(reset)
+
 # vim: et sw=4 fenc=utf-8:

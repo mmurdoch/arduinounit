@@ -58,12 +58,22 @@ Here are the basic files and folders
 
 * Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
-  Download and type:
+  Download tar.gz file and type:
   <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
       sudo python setup.py install
   </pre>
+
+* Install pexpect 2.3 (http://www.noah.org/wiki/Pexpect#topip.py)
+
+  Download tar.gz file and type:
+  <pre>
+      tar zxf pexpect-2.3.tar.gz
+      cd pexpect-2.3
+      sudo python setup.py install
+  </pre>
+
 * Install Scons (scons.org).
 
   The MSI failed for me in windows.  Get the tar file and install as 
@@ -75,20 +85,14 @@ Here are the basic files and folders
   A leading tile (~) in ARDUINO_HOME, AVR_HOME, and SKETCHBOOK_HOME is
   replaced by the user's home directory.
 
-* Build and upload the test code in the firmware folder
+* Build, upload, and monitor the test code in the project root folder
 
-  On windows:
-  <pre>
-      cd firmware
-      scons.py
-      scons.py upload
-  </pre>
-  Elsewhere:
-  <pre>
-      cd firmware
-      scons
-      scons upload
-  </pre>
+  <pre>
+    ./bin/build 
+    ./bin/build upload
+    ./bin/build monitor
+  </pre>
+
 * Run the testing firmware
 
   The firmware is interactive, so you can change test configurations
@@ -110,6 +114,11 @@ Here are the basic files and folders
   </pre>
   You can use the prompted commands to change the test set and the verbosity
   of the tests.
+
+  You can automatically run a set of tests using 
+  <pre>
+    ./bin/test tests/*.in
+  </pre>
 
 ##License
 

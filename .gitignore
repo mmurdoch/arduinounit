@@ -221,3 +221,5 @@ firmware/build-*/*.o
 # arscons
 firmware/arscons.json
 
+# test output
+tests/*.out

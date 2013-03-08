@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #line 2 "firmware.ino"
 #include <ArduinoUnit.h>
 
@@ -23,7 +24,7 @@ void getline()
   for (;;) {
     while (!Serial.available()) { }
     c=Serial.read();
-    if (c <= 0 || c == '\r') { continue; }
+    if (c <= 0) { continue; }
     if (c == 127 /* delete  */) { 
       if (i > 0) { 
 	Serial.print(F("\010 \010")); // erase char on terminal
@@ -31,7 +32,7 @@ void getline()
       }
       continue;
     }
-    if (c == '\n') break;
+    if (c == '\n' || c == '\r') break;
     Serial.print((char)c);
     if (i < sizeof(line)) line[i]=c;
     ++i;

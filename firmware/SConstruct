@@ -449,9 +449,9 @@ AlwaysBuild(upload)
 
 # Clean build directory
 envArduino.Clean('all', 'build/')
-
+os.system('bash -c echo $PATH')
 # Monitor 
-monitor_cmd = 'python -m serial.tools.miniterm -b %s %s' % (resolve_var('ARDUINO_BAUD',9600), ARDUINO_PORT)
+monitor_cmd = '"%s" -m serial.tools.miniterm -b %s %s' % (resolve_var('PYTHON','python'),resolve_var('ARDUINO_BAUD',9600), ARDUINO_PORT)
 monitor = envArduino.Alias('monitor', '', [monitor_cmd])
 AlwaysBuild(monitor)
 

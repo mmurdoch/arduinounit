@@ -4,7 +4,7 @@ import sys
 if sys.platform == 'win32':
   import winpexpect
 else:
-  import winpexpect
+  import pexpect
 import re
 import time
 

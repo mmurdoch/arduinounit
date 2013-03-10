@@ -105,8 +105,9 @@ Here are the basic files and folders
 * Run the testing firmware
 
   The firmware is interactive, so you can change test configurations
-  before running the test suite.  You can run the arduino monitor at
-  19200 baud to see the output.  For example
+  before running the test suite.  You can run the arduino serial monitor
+  at 9600 baud and line endings set to either 'Newline' or 'Both NL & CR'
+  to see the output.  For example:
   <pre>
       command> run
       ...

@@ -94,6 +94,14 @@ Here are the basic files and folders
   A leading tile (~) in ARDUINO_HOME, AVR_HOME, and SKETCHBOOK_HOME is
   replaced by the user's home directory.
 
+  In windows, the arscons.json must have the location of the python
+  interpreter (PYTHON) and the bash shell from Git (GIT_BASH).
+  Right-clicking on the
+  git-bash icon and choosing "properties" should give you the proper
+  value for the "GIT_BASH" configuration.  The default location of
+  ActiveState's python is "C:/Python27/python.exe".  Use unix-style
+  path separators (/) in paths.
+
 * Build, upload, and monitor the test code in the project root folder
 
   <pre>

@@ -1,6 +1,7 @@
 {
+  "PYTHON" : "C:/Python27/python.exe",
+  "GIT_BASH" : "C:/Program Files (x86)/Git/bin/sh.exe",
   "ARDUINO_HOME" : "C:/Arduino103",
-  "ARDUINO_PORT" : "com4:",
-  "SKETCHBOOK_HOME" : "~/Documents/Arduino",
+  "ARDUINO_PORT" : "COM3",
   "ARDUINO_BOARD" : "mega2560"
 }

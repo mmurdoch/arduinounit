@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 
 import sys
-if sys.platform == 'win32':
-  import winpexpect
-else:
-  import pexpect
 import re
 import time
 
 
 if sys.platform == 'win32':
-  px = winpexpect.spawn('./bin/build reset monitor')
+  import json
+  import winpexpect
+  winconfig = json.load(open('./firmware/arscons.json'))
+  px = winpexpect.winspawn('"' + winconfig.get('GIT_BASH','bash')+'" ./bin/build reset monitor')
 else:
+  import pexpect
   px = pexpect.spawn('./bin/build reset monitor')
 
 time.sleep(3.00)

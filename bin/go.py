@@ -55,94 +55,98 @@ class Go:
     def upload(self):
         self.scons('upload')
 
-    def _expect(self):
-        if sys.platform == 'win32':
-            import winpexpect
-            px = winpexpect.winspawn(
-                '"' + sys.executable + '"' + ' ' + 
-                '"' + sys.argv[0] + '"' + 
-                ' ' + 'monitor')
-        else:
-            import pexpect
-            px = pexpect.spawn(
-                '"' + sys.executable + '"' + ' ' + 
-                '"' + sys.argv[0] + '"' + 
-                ' ' + 'monitor')
-        return px
+    def _serial(self):
+        dev=serial.Serial(
+            port=self.config.port(),
+            baudrate=self.config.baud(),
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            timeout=0.250,
+            xonxoff=0,
+            rtscts=0,
+            interCharTimeout=0.100)
+        try:
+            buf = ''
 
-    def _scrape(self,input=sys.stdin,output=sys.stdout):
-        px=self._expect()
-
-        commands = re.compile('^command> (.*)$')
-        command = ''
-        while command != 'run':
-            line=input.readline()
-            if not line:
-                break
-            line=line.rstrip()
-            result=commands.match(line)
-            if result:
-                command = result.group(1)
-                px.expect('command> ')
-                px.send(command+'\n')
-            yield line
-
-        px.readline()
-        ends = re.compile('^test summary')
-
-        while not px.eof():
-            line=px.readline()
-            line = line.rstrip()
-            yield line
-            if ends.match(line):
-                break
+            while True:
+                buf += dev.read(dev.inWaiting())
+                if (buf.find('\n') == -1) and (not buf.endswith('command> ')):
+                    buf += dev.read(65535)
+                eol = buf.find('\n')
+                if eol == -1:
+                    eol = len(buf)-1
+                out = buf[0:eol+1]
+                buf = buf[eol+1:]
+                inp=(yield out)
+                if inp != None:
+                    dev.write(inp)
+        finally:
+            dev.close()
 
     def run(self,input=sys.stdin,output=sys.stdout):
-        px=self._expect()
-
         commands = re.compile('^command> (.*)$')
         command = ''
+        dev = self._serial()
+
         while command != 'run':
             line=input.readline()
-            if not line:
-                break
             line=line.rstrip()
             result=commands.match(line)
             if result:
                 command = result.group(1)
-                px.expect('command> ')
-                px.send(command+'\n')
+                while dev.next() != 'command> ':
+                    pass
+                dev.send(command+'\n')
+
             print >>output, line
 
-        px.readline()
         ends = re.compile('^test summary')
 
-        while not px.eof():
-            line=px.readline()
+        while True:
+            line=dev.next()
             line = line.rstrip()
             print >>output, line
             if ends.match(line):
                 break
 
+        dev.close()
+
     def test(self,input=sys.stdin,output=sys.stdout):
-        commands = re.compile('^command> (.*)$')
-        running = 0
         count = 0
         ok = 1
 
-        for line in self._scrape(input,output):
+        commands = re.compile('^command> (.*)$')
+        command = ''
+        dev = self._serial()
+
+        while command != 'run':
+            expected=input.readline()
+            expected=expected.rstrip()
             count=count+1
-            if not running:
-                result=commands.match(line)
-                if result and result.group(1) == 'run':
-                    running = 1
-            else:
-                expected=input.readline()
-                expected=expected.rstrip()
-                if (expected != line):
-                    print >>output, 'expected "' + expected + '" on line ' + str(count)
-                    print >>output, '     got "' + line     + '" instead'
-                    ok = 0
+            result=commands.match(expected)
+            if result:
+                command = result.group(1)
+                while dev.next() != 'command> ':
+                    pass
+                dev.send(command+'\n')
+
+        ends = re.compile('^test summary')
+
+        while True:
+            expected=input.readline()
+            expected=expected.rstrip()
+            count=count+1
+            line=dev.next()
+            line=line.rstrip()
+            if (expected != line):
+                print >>output, 'expected "' + expected + '" on line ' + str(count)
+                print >>output, '     got "' + line     + '" instead'
+                ok = 0
+            if ends.match(line):
+                break
+
+        dev.close()
 
         if ok:
             print >>output, 'meta test passed.'
@@ -165,6 +169,7 @@ class Go:
             else:
                 bad = bad + 1
             input.close()
+
         print 'meta test summary: ' + str(ok) + ' passed and ' + \
             str(bad) + ' failed, out of ' + str(ok+bad) + ' test(s)'
 

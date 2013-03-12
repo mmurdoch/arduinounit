@@ -16,12 +16,11 @@ doc :
 
 .PHONY: test
 test :
-	$(MAKE) -C firmware upload
-	./bin/test tests/*
+	./bin/go compile upload test
 
 .PHONY: firmware
 firmware:
-	$(MAKE) -C firmware all
+	./bin/go compile
 
 .PHONY: install
 install : 

@@ -55,7 +55,7 @@ class Go:
     def upload(self):
         self.scons('upload')
 
-    def expect(self):
+    def _expect(self):
         if sys.platform == 'win32':
             import winpexpect
             px = winpexpect.winspawn(
@@ -71,24 +71,21 @@ class Go:
         return px
 
     def _scrape(self,input=sys.stdin,output=sys.stdout):
-        px=self.expect()
+        px=self._expect()
 
         commands = re.compile('^command> (.*)$')
-
-        while 1:
+        command = ''
+        while command != 'run':
             line=input.readline()
             if not line:
                 break
             line=line.rstrip()
-            yield line
-
             result=commands.match(line)
             if result:
                 command = result.group(1)
                 px.expect('command> ')
-                px.sendline(command)
-                if command == 'run':
-                    break
+                px.send(command+'\n')
+            yield line
 
         px.readline()
         ends = re.compile('^test summary')
@@ -101,8 +98,31 @@ class Go:
                 break
 
     def run(self,input=sys.stdin,output=sys.stdout):
-        for line in self._scrape(input,output):
-            print >>output,line
+        px=self._expect()
+
+        commands = re.compile('^command> (.*)$')
+        command = ''
+        while command != 'run':
+            line=input.readline()
+            if not line:
+                break
+            line=line.rstrip()
+            result=commands.match(line)
+            if result:
+                command = result.group(1)
+                px.expect('command> ')
+                px.send(command+'\n')
+            print >>output, line
+
+        px.readline()
+        ends = re.compile('^test summary')
+
+        while not px.eof():
+            line=px.readline()
+            line = line.rstrip()
+            print >>output, line
+            if ends.match(line):
+                break
 
     def test(self,input=sys.stdin,output=sys.stdout):
         commands = re.compile('^command> (.*)$')

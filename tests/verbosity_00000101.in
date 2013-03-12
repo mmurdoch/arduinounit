@@ -1,3 +1,10 @@
+test overall and phase should always pass.
+interactive tester commands:
+  include <pattern>
+  exclude <pattern>
+  min_verbosity <binary number>
+  max_verbosity <binary number>
+  run
 command> exclude *
 command> include passes
 command> include fails
@@ -8,4 +15,6 @@ command> min_verbosity 00000101
 command> run
 test assert_bools passed.
 test passes passed.
-test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).
+test phase passed.
+test overall passed.
+test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

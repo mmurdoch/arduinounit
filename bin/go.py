@@ -62,10 +62,10 @@ class Go:
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            timeout=0.250,
+            timeout=0.050,
             xonxoff=0,
             rtscts=0,
-            interCharTimeout=0.100)
+            interCharTimeout=0.010)
         try:
             buf = ''
 
@@ -95,16 +95,24 @@ class Go:
             result=commands.match(line)
             if result:
                 command = result.group(1)
-                while dev.next() != 'command> ':
-                    pass
+                while 1:
+                    line=dev.next()
+                    if line == '':
+                        continue
+                    if line == 'command> ': 
+                        break
+                    line=line.rstrip()                    
+                    print >>output,line
                 dev.send(command+'\n')
-
-            print >>output, line
+                print >>output,'command> ' + command
 
         ends = re.compile('^test summary')
 
-        while True:
-            line=dev.next()
+        while 1:
+            while 1:
+                line=dev.next()
+                if line != '':
+                    break
             line = line.rstrip()
             print >>output, line
             if ends.match(line):
@@ -133,11 +141,14 @@ class Go:
 
         ends = re.compile('^test summary')
 
-        while True:
+        while 1:
             expected=input.readline()
             expected=expected.rstrip()
             count=count+1
-            line=dev.next()
+            while 1:
+                line=dev.next()
+                if line != '':
+                    break
             line=line.rstrip()
             if (expected != line):
                 print >>output, 'expected "' + expected + '" on line ' + str(count)

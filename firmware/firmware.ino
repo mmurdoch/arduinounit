@@ -3,10 +3,13 @@
 
 char line[80];
 bool configuring = true;
+unsigned long time = 0;
+unsigned long startTime = 0;
+int phase = 0;
 
 void motd()
 {
-  Serial.println(F("The overall test should pass..."));
+  Serial.println(F("test overall and phase should always pass."));
   Serial.println(F("interactive tester commands:"));
   Serial.println(F("  include <pattern>"));
   Serial.println(F("  exclude <pattern>"));
@@ -102,35 +105,19 @@ void setup()
     getline();
     process();
   }
+  phase=0;
+
+  Test::include("phase");
+  Test::include("overall");
+  startTime = millis();
 }
 
 void loop()
 {
+  time = millis()-startTime;
   Test::run();
 }
 
-// simple ongoing tests:
-
-testing(passes)
-{
-  if (millis() > 1000) {
-    pass();
-  }
-}
-
-testing(fails)
-{
-  if (millis() > 1000) {
-    fail();
-  }
-}
-
-testing(skips)
-{
-  if (millis() > 1000) {
-    skip();
-  }
-}
 
 // all boolean asserts
 
@@ -255,6 +242,29 @@ test(assert_strings)
   }
 }
 
+// simple ongoing tests:
+
+testing(passes)
+{
+  if (phase == 2 && time > 250) {
+    pass();
+  }
+}
+
+testing(fails)
+{
+  if (phase == 2 && time > 500) {
+    fail();
+  }
+}
+
+testing(skips)
+{
+  if (phase == 2 && time > 750) {
+    skip();
+  }
+}
+
 // meta-test checks
 
 bool metacheck(int t, int c)
@@ -366,12 +376,10 @@ void metaassert(int t, int c)
   }
 }
 
+int metaNextPhase = 1;
 testing(meta)
 {
-  static unsigned long timeout = 0;
-  if (millis() >= timeout) {
-    timeout = millis() + 500;
-    
+  if (phase == metaNextPhase) {
     for (int t=0; t<3; ++t) {
       for (int c=0; c<8; ++c) {
 	metaassert(t,c);
@@ -383,10 +391,38 @@ testing(meta)
 	state = LOOPING;
       }
     }
-
-    if (timeout >= 2000) pass();
+    if (phase == 1) metaNextPhase = 3;
+    else pass();
   }
 }
+
+testing(phase)
+{
+  bool done = true;
+  switch(phase) {
+  case 0:
+    done = done && checkTestDone(assert_bools);
+    done = done && checkTestDone(assert_ints);
+    done = done && checkTestDone(assert_strings);
+    break;
+  case 1:
+    done = done && (checkTestDone(meta) || (metaNextPhase == 3));
+    break;
+  case 2:
+    done = done && (time > 1000);
+    break;
+  case 3:
+    done = done && checkTestDone(meta);
+    break;
+  case 4:
+    pass();
+    break;
+  }
+  if (done) {
+    ++phase;
+    startTime = millis();
+  }
+}    
 
 testing(overall)
 {

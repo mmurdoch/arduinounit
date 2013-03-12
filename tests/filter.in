@@ -1,3 +1,10 @@
+test overall and phase should always pass.
+interactive tester commands:
+  include <pattern>
+  exclude <pattern>
+  min_verbosity <binary number>
+  max_verbosity <binary number>
+  run
 command> max_verbosity 00111111
 command> min_verbosity 00111111
 command> exclude *
@@ -9,57 +16,62 @@ command> run
 test assert_bools skipped.
 test assert_ints skipped.
 test assert_strings skipped.
-test overall skipped.
-firmware.ino:320:1: fail assert (test_passes_instance.state=1) >= (Test::DONE_SKIP=2)
-firmware.ino:326:1: pass assert (test_passes_instance.state=1) < (Test::DONE_SKIP=2)
-firmware.ino:332:1: fail assert (test_passes_instance.state=1) == (Test::DONE_PASS=3)
-firmware.ino:338:1: pass assert (test_passes_instance.state=1) != (Test::DONE_PASS=3)
-firmware.ino:344:1: fail assert (test_passes_instance.state=1) == (Test::DONE_FAIL=4)
-firmware.ino:350:1: pass assert (test_passes_instance.state=1) != (Test::DONE_FAIL=4)
-firmware.ino:356:1: fail assert (test_passes_instance.state=1) == (Test::DONE_SKIP=2)
-firmware.ino:362:1: pass assert (test_passes_instance.state=1) != (Test::DONE_SKIP=2)
-firmware.ino:321:1: fail assert (test_fails_instance.state=1) >= (Test::DONE_SKIP=2)
-firmware.ino:327:1: pass assert (test_fails_instance.state=1) < (Test::DONE_SKIP=2)
-firmware.ino:333:1: fail assert (test_fails_instance.state=1) == (Test::DONE_PASS=3)
-firmware.ino:339:1: pass assert (test_fails_instance.state=1) != (Test::DONE_PASS=3)
-firmware.ino:345:1: fail assert (test_fails_instance.state=1) == (Test::DONE_FAIL=4)
-firmware.ino:351:1: pass assert (test_fails_instance.state=1) != (Test::DONE_FAIL=4)
-firmware.ino:357:1: fail assert (test_fails_instance.state=1) == (Test::DONE_SKIP=2)
-firmware.ino:363:1: pass assert (test_fails_instance.state=1) != (Test::DONE_SKIP=2)
-firmware.ino:322:1: fail assert (test_skips_instance.state=1) >= (Test::DONE_SKIP=2)
-firmware.ino:328:1: pass assert (test_skips_instance.state=1) < (Test::DONE_SKIP=2)
-firmware.ino:334:1: fail assert (test_skips_instance.state=1) == (Test::DONE_PASS=3)
-firmware.ino:340:1: pass assert (test_skips_instance.state=1) != (Test::DONE_PASS=3)
-firmware.ino:346:1: fail assert (test_skips_instance.state=1) == (Test::DONE_FAIL=4)
-firmware.ino:352:1: pass assert (test_skips_instance.state=1) != (Test::DONE_FAIL=4)
-firmware.ino:358:1: fail assert (test_skips_instance.state=1) == (Test::DONE_SKIP=2)
-firmware.ino:364:1: pass assert (test_skips_instance.state=1) != (Test::DONE_SKIP=2)
+firmware.ino:330:1: fail assert (test_passes_instance.state=1) >= (Test::DONE_SKIP=2)
+firmware.ino:336:1: pass assert (test_passes_instance.state=1) < (Test::DONE_SKIP=2)
+firmware.ino:342:1: fail assert (test_passes_instance.state=1) == (Test::DONE_PASS=3)
+firmware.ino:348:1: pass assert (test_passes_instance.state=1) != (Test::DONE_PASS=3)
+firmware.ino:354:1: fail assert (test_passes_instance.state=1) == (Test::DONE_FAIL=4)
+firmware.ino:360:1: pass assert (test_passes_instance.state=1) != (Test::DONE_FAIL=4)
+firmware.ino:366:1: fail assert (test_passes_instance.state=1) == (Test::DONE_SKIP=2)
+firmware.ino:372:1: pass assert (test_passes_instance.state=1) != (Test::DONE_SKIP=2)
+firmware.ino:331:1: fail assert (test_fails_instance.state=1) >= (Test::DONE_SKIP=2)
+firmware.ino:337:1: pass assert (test_fails_instance.state=1) < (Test::DONE_SKIP=2)
+firmware.ino:343:1: fail assert (test_fails_instance.state=1) == (Test::DONE_PASS=3)
+firmware.ino:349:1: pass assert (test_fails_instance.state=1) != (Test::DONE_PASS=3)
+firmware.ino:355:1: fail assert (test_fails_instance.state=1) == (Test::DONE_FAIL=4)
+firmware.ino:361:1: pass assert (test_fails_instance.state=1) != (Test::DONE_FAIL=4)
+firmware.ino:367:1: fail assert (test_fails_instance.state=1) == (Test::DONE_SKIP=2)
+firmware.ino:373:1: pass assert (test_fails_instance.state=1) != (Test::DONE_SKIP=2)
+firmware.ino:332:1: fail assert (test_skips_instance.state=1) >= (Test::DONE_SKIP=2)
+firmware.ino:338:1: pass assert (test_skips_instance.state=1) < (Test::DONE_SKIP=2)
+firmware.ino:344:1: fail assert (test_skips_instance.state=1) == (Test::DONE_PASS=3)
+firmware.ino:350:1: pass assert (test_skips_instance.state=1) != (Test::DONE_PASS=3)
+firmware.ino:356:1: fail assert (test_skips_instance.state=1) == (Test::DONE_FAIL=4)
+firmware.ino:362:1: pass assert (test_skips_instance.state=1) != (Test::DONE_FAIL=4)
+firmware.ino:368:1: fail assert (test_skips_instance.state=1) == (Test::DONE_SKIP=2)
+firmware.ino:374:1: pass assert (test_skips_instance.state=1) != (Test::DONE_SKIP=2)
 test passes passed.
-test skips skipped.
 test fails failed.
-firmware.ino:320:1: pass assert (test_passes_instance.state=3) >= (Test::DONE_SKIP=2)
-firmware.ino:326:1: fail assert (test_passes_instance.state=3) < (Test::DONE_SKIP=2)
-firmware.ino:332:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
-firmware.ino:338:1: fail assert (test_passes_instance.state=3) != (Test::DONE_PASS=3)
-firmware.ino:344:1: fail assert (test_passes_instance.state=3) == (Test::DONE_FAIL=4)
-firmware.ino:350:1: pass assert (test_passes_instance.state=3) != (Test::DONE_FAIL=4)
-firmware.ino:356:1: fail assert (test_passes_instance.state=3) == (Test::DONE_SKIP=2)
-firmware.ino:362:1: pass assert (test_passes_instance.state=3) != (Test::DONE_SKIP=2)
-firmware.ino:321:1: pass assert (test_fails_instance.state=4) >= (Test::DONE_SKIP=2)
-firmware.ino:327:1: fail assert (test_fails_instance.state=4) < (Test::DONE_SKIP=2)
-firmware.ino:333:1: fail assert (test_fails_instance.state=4) == (Test::DONE_PASS=3)
-firmware.ino:339:1: pass assert (test_fails_instance.state=4) != (Test::DONE_PASS=3)
-firmware.ino:345:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
-firmware.ino:351:1: fail assert (test_fails_instance.state=4) != (Test::DONE_FAIL=4)
-firmware.ino:357:1: fail assert (test_fails_instance.state=4) == (Test::DONE_SKIP=2)
-firmware.ino:363:1: pass assert (test_fails_instance.state=4) != (Test::DONE_SKIP=2)
-firmware.ino:322:1: pass assert (test_skips_instance.state=2) >= (Test::DONE_SKIP=2)
-firmware.ino:328:1: fail assert (test_skips_instance.state=2) < (Test::DONE_SKIP=2)
-firmware.ino:334:1: fail assert (test_skips_instance.state=2) == (Test::DONE_PASS=3)
-firmware.ino:340:1: pass assert (test_skips_instance.state=2) != (Test::DONE_PASS=3)
-firmware.ino:346:1: fail assert (test_skips_instance.state=2) == (Test::DONE_FAIL=4)
-firmware.ino:352:1: pass assert (test_skips_instance.state=2) != (Test::DONE_FAIL=4)
-firmware.ino:358:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
-firmware.ino:364:1: fail assert (test_skips_instance.state=2) != (Test::DONE_SKIP=2)
+test skips skipped.
+firmware.ino:330:1: pass assert (test_passes_instance.state=3) >= (Test::DONE_SKIP=2)
+firmware.ino:336:1: fail assert (test_passes_instance.state=3) < (Test::DONE_SKIP=2)
+firmware.ino:342:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
+firmware.ino:348:1: fail assert (test_passes_instance.state=3) != (Test::DONE_PASS=3)
+firmware.ino:354:1: fail assert (test_passes_instance.state=3) == (Test::DONE_FAIL=4)
+firmware.ino:360:1: pass assert (test_passes_instance.state=3) != (Test::DONE_FAIL=4)
+firmware.ino:366:1: fail assert (test_passes_instance.state=3) == (Test::DONE_SKIP=2)
+firmware.ino:372:1: pass assert (test_passes_instance.state=3) != (Test::DONE_SKIP=2)
+firmware.ino:331:1: pass assert (test_fails_instance.state=4) >= (Test::DONE_SKIP=2)
+firmware.ino:337:1: fail assert (test_fails_instance.state=4) < (Test::DONE_SKIP=2)
+firmware.ino:343:1: fail assert (test_fails_instance.state=4) == (Test::DONE_PASS=3)
+firmware.ino:349:1: pass assert (test_fails_instance.state=4) != (Test::DONE_PASS=3)
+firmware.ino:355:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
+firmware.ino:361:1: fail assert (test_fails_instance.state=4) != (Test::DONE_FAIL=4)
+firmware.ino:367:1: fail assert (test_fails_instance.state=4) == (Test::DONE_SKIP=2)
+firmware.ino:373:1: pass assert (test_fails_instance.state=4) != (Test::DONE_SKIP=2)
+firmware.ino:332:1: pass assert (test_skips_instance.state=2) >= (Test::DONE_SKIP=2)
+firmware.ino:338:1: fail assert (test_skips_instance.state=2) < (Test::DONE_SKIP=2)
+firmware.ino:344:1: fail assert (test_skips_instance.state=2) == (Test::DONE_PASS=3)
+firmware.ino:350:1: pass assert (test_skips_instance.state=2) != (Test::DONE_PASS=3)
+firmware.ino:356:1: fail assert (test_skips_instance.state=2) == (Test::DONE_FAIL=4)
+firmware.ino:362:1: pass assert (test_skips_instance.state=2) != (Test::DONE_FAIL=4)
+firmware.ino:368:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
+firmware.ino:374:1: fail assert (test_skips_instance.state=2) != (Test::DONE_SKIP=2)
 test meta passed.
-test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).
+test phase passed.
+firmware.ino:431:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
+firmware.ino:432:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
+firmware.ino:433:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
+firmware.ino:437:1: pass assert (test_meta_instance.state=3) == (Test::DONE_PASS=3)
+test overall passed.
+test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

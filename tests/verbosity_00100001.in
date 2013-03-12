@@ -1,3 +1,10 @@
+test overall and phase should always pass.
+interactive tester commands:
+  include <pattern>
+  exclude <pattern>
+  min_verbosity <binary number>
+  max_verbosity <binary number>
+  run
 command> exclude *
 command> include passes
 command> include fails
@@ -6,6 +13,10 @@ command> include assert_bools
 command> max_verbosity 00100001
 command> min_verbosity 00100001
 command> run
-firmware.ino:148:1: pass assert (x=1) == (0x1=1)
-firmware.ino:149:1: pass assert (x=0) == (0x0=0)
-test summary: 2 passed, 1 failed, and 5 skipped, out of 8 test(s).
+firmware.ino:135:1: pass assert (x=1) == (0x1=1)
+firmware.ino:136:1: pass assert (x=0) == (0x0=0)
+firmware.ino:431:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
+firmware.ino:432:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
+firmware.ino:433:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
+firmware.ino:434:1: pass assert (test_assert_bools_instance.state=3) == (Test::DONE_PASS=3)
+test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

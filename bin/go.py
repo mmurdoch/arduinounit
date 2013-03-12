@@ -16,7 +16,7 @@ class Go:
 
     def monitor(self):
         import serial.tools.miniterm
-
+        print 'monitor: type ^] to exit...'
         console=serial.tools.miniterm.Miniterm(
             port=self.config.port(),
             baudrate=self.config.baud(),
@@ -24,7 +24,6 @@ class Go:
             rtscts=False,
             xonxoff=False)
 
-        console.join(True)
         console.start()
         console.join()
 
@@ -44,7 +43,6 @@ class Go:
         if target:
             args.append(target)
 
-        print "args: " + str(args)
         proc = subprocess.Popen(args)
         proc.communicate()
 
@@ -54,10 +52,9 @@ class Go:
     def upload(self):
         self.scons('upload')
 
-    def clean(self):
-        self.scons('clean')
-
     def expect(self):
+        import sys
+
         if sys.platform == 'win32':
             import winpexpect
             import sys
@@ -75,6 +72,9 @@ class Go:
         return px
 
     def _scrape(self):
+        import sys
+        import re
+
         px=self.expect()
 
         commands = re.compile('^command> (.*)$')
@@ -109,6 +109,7 @@ class Go:
             print line
 
     def test(self):
+        import re
         commands = re.compile('^command> (.*)$')
         running = 0
         line = 0
@@ -135,6 +136,10 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))
     os.chdir("..")
 
+    #defaults to 'C:\Users\home\Roaming\AppData' !!
+    if sys.platform == 'win32':
+        os.environ['HOME']=os.environ['HOMEDRIVE'] + os.environ['HOMEPATH']
+
     cfg = config.Config()
     go = Go(cfg)
 
@@ -151,8 +156,6 @@ def main():
             go.compile()
         if arg == 'upload':
             go.upload()
-        if arg == 'clean':
-            go.clean()
         if arg == 'port?':
             print cfg.port()
         if arg == 'baud?':

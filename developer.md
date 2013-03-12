@@ -56,30 +56,12 @@ Here are the basic files and folders
   From here on, I will assume you are working from the git-bash
   shell in windows, or a bash command prompt.
 
-* Istall pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
+* Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
   Download tar.gz file and type:
   <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
-      sudo python setup.py install
-  </pre>
-
-* On unix (osx/linux) install pexpect 2.3 (http://www.noah.org/wiki/Pexpect#topip.py)
-
-  Download tar.gz file and type:
-  <pre>
-      tar zxf pexpect-2.3.tar.gz
-      cd pexpect-2.3
-      sudo python setup.py install
-  </pre>
-
-* On windows install winpexpect (https://bitbucket.org/geertj/winpexpect/downloads)
-
-  Download tar.gz file and type:
-  <pre>
-      tar zxf geertj-winpexpect*.tar.gz
-      cd geertj-winpexpect*
       sudo python setup.py install
   </pre>
 
@@ -94,20 +76,15 @@ Here are the basic files and folders
   A leading tile (~) in ARDUINO_HOME, AVR_HOME, and SKETCHBOOK_HOME is
   replaced by the user's home directory.
 
-  In windows, the arscons.json must have the location of the python
-  interpreter (PYTHON) and the bash shell from Git (GIT_BASH).
-  Right-clicking on the
-  git-bash icon and choosing "properties" should give you the proper
-  value for the "GIT_BASH" configuration.  The default location of
-  ActiveState's python is "C:/Python27/python.exe".  Use unix-style
-  path separators (/) in paths.
-
-* Build, upload, and monitor the test code in the project root folder
+* Build, upload, monitor, run and test from the project root folder
 
   <pre>
-    ./bin/build 
-    ./bin/build upload
-    ./bin/build monitor
+    ./bin/go compile
+    ./bin/go upload
+    ./bin/go monitor
+    ./bin/go run < tests/<some-test>.in
+    ./bin/go test < tests/<some-test>.in
+    ./bin/go tests
   </pre>
 
 * Run the testing firmware
@@ -132,11 +109,6 @@ Here are the basic files and folders
   </pre>
   You can use the prompted commands to change the test set and the verbosity
   of the tests.
-
-  You can automatically run a set of tests using 
-  <pre>
-    ./bin/test tests/*.in
-  </pre>
 
 ##License
 

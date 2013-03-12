@@ -3,9 +3,14 @@
 class Config:
     def __init__(self):
         import json
+        import os
+        
+        file = os.path.join(
+            os.path.dirname(__file__),
+            '../firmware/arscons.json')
 
         try:
-            self.config = json.load(open('firmware/arscons.json'))
+            self.config = json.load(open(file))
         except IOError:
             self.config = None
 

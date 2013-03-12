@@ -1,13 +1,19 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import glob
+import time
 import config
+import serial
+import subprocess
 
 class Go:
     def __init__(self, config):
         self.config = config
  
     def reset(self):
-        import serial
-        import time
-
         dev = serial.Serial(self.config.port())
         dev.setDTR(1)
         time.sleep(0.250)
@@ -28,9 +34,6 @@ class Go:
         console.join()
 
     def scons(self,target=None):
-        import sys
-        import subprocess
-
         args=self.config.find("scons.py")
         if args != None:
             args = [sys.executable,args]
@@ -38,7 +41,7 @@ class Go:
             args = ["scons"]
 
         args.append("-C")
-        args.append("firmware")
+        args.append(os.path.join(os.path.dirname(__file__),'../firmware'))
 
         if target:
             args.append(target)
@@ -53,34 +56,27 @@ class Go:
         self.scons('upload')
 
     def expect(self):
-        import sys
-
         if sys.platform == 'win32':
             import winpexpect
-            import sys
             px = winpexpect.winspawn(
                 '"' + sys.executable + '"' + ' ' + 
                 '"' + sys.argv[0] + '"' + 
                 ' ' + 'monitor')
         else:
             import pexpect
-            import sys
             px = pexpect.spawn(
                 '"' + sys.executable + '"' + ' ' + 
                 '"' + sys.argv[0] + '"' + 
                 ' ' + 'monitor')
         return px
 
-    def _scrape(self):
-        import sys
-        import re
-
+    def _scrape(self,input=sys.stdin,output=sys.stdout):
         px=self.expect()
 
         commands = re.compile('^command> (.*)$')
 
         while 1:
-            line=sys.stdin.readline()
+            line=input.readline()
             if not line:
                 break
             line=line.rstrip()
@@ -104,39 +100,56 @@ class Go:
             if ends.match(line):
                 break
 
-    def run(self):
-        for line in self._scrape():
-            print line
+    def run(self,input=sys.stdin,output=sys.stdout):
+        for line in self._scrape(input,output):
+            print >>output,line
 
-    def test(self):
-        import re
+    def test(self,input=sys.stdin,output=sys.stdout):
         commands = re.compile('^command> (.*)$')
         running = 0
-        line = 0
+        count = 0
+        ok = 1
 
-        for line in self._scrape():
-            line=line+1
+        for line in self._scrape(input,output):
+            count=count+1
             if not running:
                 result=commands.match(line)
                 if result and result.group(1) == 'run':
                     running = 1
             else:
-                expected=sys.stdin.readline()
+                expected=input.readline()
                 expected=expected.rstrip()
                 if (expected != line):
-                    print 'expected "' + expected + '" on line ' + str(count)
-                    print '     got "' + line     + '" instead'
-                    raise AssertionError
-        return true
+                    print >>output, 'expected "' + expected + '" on line ' + str(count)
+                    print >>output, '     got "' + line     + '" instead'
+                    ok = 0
+
+        if ok:
+            print >>output, 'meta test passed.'
+        else:
+            print >>output, 'meta test failed.'
+        return ok
+
+    def tests(self,pattern='$0/../../tests/*.in'):
+        pattern=pattern.replace('$0/../',os.path.dirname(__file__)+os.path.sep)
+        filenames = glob.glob(pattern)
+
+        ok = 0
+        bad = 0
+
+        for filename in filenames:
+            print 'testing ' + filename
+            input=open(filename,'r')
+            if self.test(input):
+                ok = ok + 1
+            else:
+                bad = bad + 1
+            input.close()
+        print 'meta test summary: ' + str(ok) + ' passed and ' + \
+            str(bad) + ' failed, out of ' + str(ok+bad) + ' test(s)'
 
 def main():
-    import sys
-    import os
-
-    os.chdir(os.path.dirname(sys.argv[0]))
-    os.chdir("..")
-
-    #defaults to 'C:\Users\home\Roaming\AppData' !!
+    # in win32, HOME defaults to 'C:\Users\home\Roaming\AppData' !!
     if sys.platform == 'win32':
         os.environ['HOME']=os.environ['HOMEDRIVE'] + os.environ['HOMEPATH']
 
@@ -152,6 +165,8 @@ def main():
             go.run()
         if arg == 'test':
             go.test()
+        if arg == 'tests':
+            go.tests()
         if arg == 'compile':
             go.compile()
         if arg == 'upload':

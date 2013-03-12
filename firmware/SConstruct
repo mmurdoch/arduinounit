@@ -197,6 +197,7 @@ if EXTRA_LIB:
 if SKETCHBOOK_HOME:
     ARDUINO_LIBS.append(path.join(SKETCHBOOK_HOME, 'libraries'))
 
+print 'ARDUINO_LIBS: ' + str(ARDUINO_LIBS)
 
 # Override MCU and F_CPU
 MCU = ARGUMENTS.get('MCU', getBoardConf('build.mcu'))

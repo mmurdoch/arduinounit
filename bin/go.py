@@ -62,10 +62,10 @@ class Go:
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            timeout=0.050,
+            timeout=2.00,
             xonxoff=0,
             rtscts=0,
-            interCharTimeout=0.010)
+            interCharTimeout=0.100)
         try:
             buf = ''
 

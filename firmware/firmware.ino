@@ -21,7 +21,7 @@ void motd()
 void getline()
 {
   int c = 0;
-  int i = 0;
+  size_t i = 0;
   Serial.print(F("command> "));
   for (;;) {
     while (!Serial.available()) { }
@@ -127,6 +127,7 @@ bool checkcase(bool x, int c)
   case 0: return x;
   case 1: return !x;
   }
+  return false;
 }
 
 void testcase(bool x,int c)
@@ -165,6 +166,7 @@ bool checkcase(int x, int y, int c)
   case 4: return x >= y;
   case 5: return x > y;
   }
+  return false;
 }
 
 void testcase(int x, int y, int c)
@@ -211,6 +213,7 @@ bool checkcase(const char *x, const char *y, int c)
   case 4: return strcmp(x,y) >= 0;
   case 5: return strcmp(x,y) > 0;
   }
+  return false;
 }
 
 void testcase(const char *x, const char *y, int c)

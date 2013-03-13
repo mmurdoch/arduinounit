@@ -19,10 +19,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#ifndef FAKE_STREAM_H
-#define FAKE_STREAM_H
+#pragma once
 
-#include "ArduinoCompatibility.h"
+#include "Arduino.h"
 
 /**
  * A fake stream which can be used in place of other streams
@@ -68,7 +67,7 @@ public:
      * Sets the next value to be read via read() or peek() to -1 (end-of-stream).
      */
     void setToEndOfStream();
-	
+        
     /**
      * Sets the value of the next byte to be read via read() or peek().
      *
@@ -104,4 +103,3 @@ private:
     int _nextByte;
 };
 
-#endif // FAKE_STREAM_H

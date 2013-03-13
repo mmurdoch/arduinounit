@@ -39,7 +39,7 @@ Open a sketch in arduino and click `Sketch | Import Library... | ArduinoUnit` to
 For example, try this simple unit testing sketch:
 
 ```
-#line 2 "sketch"
+#line 2 "sketch.ino"
 #include <ArduinoUnit.h>
 
 test(ok) 
@@ -263,7 +263,7 @@ public:
 class MyTestOnce : public TestOnce
 {
 public:
-  MyTestOnce(const __FlashStringHelper *name) : TestOnce(name) {
+  MyTestOnce(const char *name) : TestOnce(name) {
   // same as MyTest
   }
   void setup() {
@@ -280,8 +280,8 @@ public:
 MyTest myTest1(F("myTest1"));
 MyTest myTest2(F("myTest2"));
 
-MyTestOnce myTestOnce1(F("myTestOnce1"));
-MyTestOnce myTestOnce2(F("myTestOnce2"));
+MyTestOnce myTestOnce1("myTestOnce1");
+MyTestOnce myTestOnce2("myTestOnce2");
 ```
 
 Note that `Test::run()` only calls the active unresolved tests.

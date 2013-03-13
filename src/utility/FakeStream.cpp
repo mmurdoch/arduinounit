@@ -54,7 +54,7 @@ int FakeStream::available()  {
 
 int FakeStream::read() {
     int b = _nextByte;
-	_nextByte = -1;
+        _nextByte = -1;
     return b;
 }
 

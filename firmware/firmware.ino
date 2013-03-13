@@ -29,8 +29,8 @@ void getline()
     if (c <= 0 || c == '\r') { continue; }
     if (c == 127 /* delete  */) { 
       if (i > 0) { 
-	Serial.print(F("\010 \010")); // erase char on terminal
-	--i; 
+        Serial.print(F("\010 \010")); // erase char on terminal
+        --i; 
       }
       continue;
     }
@@ -145,9 +145,9 @@ test(assert_bools)
       bool b = (x != 0);
       testcase(b,c);
       if (checkcase(b,c)) {
-	if (state != LOOPING) { fail(); return; }
+        if (state != LOOPING) { fail(); return; }
       } else {
-	if (state != DONE_FAIL) { fail(); return; }
+        if (state != DONE_FAIL) { fail(); return; }
       }
       state = LOOPING;
     }
@@ -186,13 +186,13 @@ test(assert_ints)
   for (int c = 0; c < 6; ++c) {
     for (int x = -1; x <= 1; ++x) {
       for (int y = -1; y <= 1; ++y) {
-	testcase(x,y,c);
-	if (checkcase(x,y,c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        testcase(x,y,c);
+        if (checkcase(x,y,c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
   }
@@ -233,13 +233,13 @@ test(assert_strings)
   for (int c = 0; c < 6; ++c) {
     for (int x = 0; strings[x] != 0; ++x) {
       for (int y = 0; strings[y] != 0; ++y) {
-	testcase(strings[x],strings[y],c);
-	if (checkcase(strings[x],strings[y],c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        testcase(strings[x],strings[y],c);
+        if (checkcase(strings[x],strings[y],c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
   }
@@ -385,13 +385,13 @@ testing(meta)
   if (phase == metaNextPhase) {
     for (int t=0; t<3; ++t) {
       for (int c=0; c<8; ++c) {
-	metaassert(t,c);
-	if (metacheck(t,c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        metaassert(t,c);
+        if (metacheck(t,c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
     if (phase == 1) metaNextPhase = 3;

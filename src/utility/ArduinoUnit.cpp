@@ -80,19 +80,19 @@ bool Test::String::matches(const char *pattern) const {
     memset(state1,0,nb);
     for (int j=0; j<=np; ++j) {
       if (state0[j/8] & (1 << (j%8))) {
-	if (pattern[j] == '*') {
-	  k=j;
-	  state1[k/8] |= (1 << (k%8));
-	  ++k;
-	  state1[k/8] |= (1 << (k%8));
-	} else if (pattern[j] == c) {
-	  k=j+1;
-	  state1[k/8] |= (1 << (k%8));
-	  while (pattern[k] == '*') {
-	    ++k; 
-	    state1[k/8] |= (1 << (k%8));
-	  }
-	}
+        if (pattern[j] == '*') {
+          k=j;
+          state1[k/8] |= (1 << (k%8));
+          ++k;
+          state1[k/8] |= (1 << (k%8));
+        } else if (pattern[j] == c) {
+          k=j+1;
+          state1[k/8] |= (1 << (k%8));
+          while (pattern[k] == '*') {
+            ++k; 
+            state1[k/8] |= (1 << (k%8));
+          }
+        }
       }
     }
 
@@ -222,7 +222,7 @@ void Test::run()
     } else if (current->state == UNSETUP) {
       current->setup();
       if (current->state == UNSETUP) {
-	current->state = LOOPING;
+        current->state = LOOPING;
       }
     }
 

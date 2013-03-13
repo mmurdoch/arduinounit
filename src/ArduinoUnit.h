@@ -18,6 +18,12 @@
 
 #endif
 
+// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
+#ifdef PROGMEM
+#undef PROGMEM
+#define PROGMEM __attribute__((section(".progmem.data")))
+#endif
+
 #include <utility/FakeStream.h>
 #include <utility/MemoryFree.h>
 

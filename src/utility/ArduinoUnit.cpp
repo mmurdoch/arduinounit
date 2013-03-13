@@ -12,7 +12,7 @@ Test::String::String(const __FlashStringHelper *_data) : data(0x80000000|(uint32
 void Test::String::read(void *destination, uint16_t offset, uint8_t length) const
 {
   if ((data & 0x80000000) != 0) {
-    memcpy_P(destination,(const PROGMEM char *)((data+offset)&0x7FFFFFFF),length);
+    memcpy_P(destination,(const /* PROGMEM */ char *)((data+offset)&0x7FFFFFFF),length);
   } else {
     memcpy(destination,(char*)(data+offset),length);
   }
@@ -20,7 +20,7 @@ void Test::String::read(void *destination, uint16_t offset, uint8_t length) cons
 
 uint16_t Test::String::length() const {
   if ((data & 0x80000000) != 0) {
-    return strlen_P((const PROGMEM char *)(data&0x7FFFFFFF));
+    return strlen_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF));
   } else {
     return strlen((char*)(data));
   }

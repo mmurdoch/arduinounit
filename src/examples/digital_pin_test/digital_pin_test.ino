@@ -62,7 +62,7 @@ void testOutputToInput(int out, int in) {
     for (int i = 0; i < cycleCount; i++) {
         for (int j = 0; j < cycleLength; j++) {
             digitalWrite(out, cycle[j]);
-            assertEquals(cycle[j], digitalRead(in));
+            assertEqual(cycle[j], digitalRead(in));
         }
     }
 }
@@ -101,5 +101,5 @@ test(pins12And13) {
 }
 
 void loop() {
-    suite.run();
+    Test::run();
 }

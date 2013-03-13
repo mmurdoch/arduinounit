@@ -1,3 +1,5 @@
+UNAME := $(shell uname)
+
 ifeq ($(UNAME), Linux)
   ARDUINO_DIR=/usr/share/arduino
 endif
@@ -8,7 +10,6 @@ endif
 DOXYGEN=doxygen
 
 all : firmware doc
-	$(MAKE) -C firmware all
 
 .PHONY: doc
 doc :
@@ -16,7 +17,7 @@ doc :
 
 .PHONY: test
 test :
-	./bin/go compile upload test
+	./bin/go compile upload tests
 
 .PHONY: firmware
 firmware:

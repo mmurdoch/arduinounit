@@ -13,10 +13,10 @@ command> include assert_bools
 command> max_verbosity 00100001
 command> min_verbosity 00100001
 command> run
-firmware.ino:135:1: pass assert (x=1) == (0x1=1)
-firmware.ino:136:1: pass assert (x=0) == (0x0=0)
-firmware.ino:431:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
-firmware.ino:432:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
-firmware.ino:433:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
-firmware.ino:434:1: pass assert (test_assert_bools_instance.state=3) == (Test::DONE_PASS=3)
+firmware.ino:144:1: pass assert (x=1) == (0x1=1)
+firmware.ino:145:1: pass assert (x=0) == (0x0=0)
+firmware.ino:442:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
+firmware.ino:443:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
+firmware.ino:444:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
+firmware.ino:445:1: pass assert (test_assert_bools_instance.state=3) == (Test::DONE_PASS=3)
 test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

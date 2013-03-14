@@ -33,3 +33,11 @@ install :
 .PHONY: clean
 clean :
 	/bin/rm -rf `find . -name '*~' -o -name '#*' -o -name '.#*'`
+
+.PHONY: scrapetests
+scrapetests:
+	for f in tests/*.in ; do ./bin/go run < $$f > $${f%%.in}.out; done
+
+.PHONY: updatetests
+updatetests:
+	for f in tests/*.in ; do cp $${f%%.in}.out $$f; done

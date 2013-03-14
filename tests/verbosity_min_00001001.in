@@ -16,8 +16,8 @@ command> run
 test assert_ints skipped.
 test assert_strings skipped.
 test meta skipped.
-firmware.ino:135:1: fail assert (x=0) == (0x1=1)
-firmware.ino:136:1: fail assert (x=1) == (0x0=0)
+firmware.ino:144:1: fail assert (x=0) == (0x1=1)
+firmware.ino:145:1: fail assert (x=1) == (0x0=0)
 test assert_bools passed.
 test passes passed.
 test fails failed.

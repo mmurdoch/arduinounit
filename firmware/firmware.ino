@@ -1,6 +1,14 @@
 #line 2 "firmware.ino"
 #include <ArduinoUnit.h>
 
+//
+// line number sanity check
+//
+#if __LINE__ != 7
+#error __LINE__ value is incorrect!
+#endif
+
+
 char line[80];
 bool configuring = true;
 unsigned long time = 0;

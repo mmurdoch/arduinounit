@@ -1,6 +1,4 @@
-//
-//
-#line 1 "digital_pin_test.ino"
+#line 2 "digital_pin_test.ino"
 
 /*
 Copyright (c) 2009-2013 Matthew Murdoch

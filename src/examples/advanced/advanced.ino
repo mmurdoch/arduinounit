@@ -1,6 +1,4 @@
-//
-//
-#line 1 "advanced.ino"
+#line 2 "advanced.ino"
 #include <ArduinoUnit.h>
 
 test(simple1)

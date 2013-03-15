@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+import json
+import os
+import re
+import sys
+import glob
+
 class Config:
     def __init__(self):
-        import json
-        import os
-        
         file = os.path.join(
             os.path.dirname(__file__),
             '../firmware/arscons.json')
@@ -18,9 +21,6 @@ class Config:
         return self.config.get(var,None) if self.config else None
 
     def _sys_get(self,var):
-        import re
-        import sys
-
         assign = re.compile('^([^=]*)=(.*)$')
         for arg in sys.argv:
             result = assign.match(arg)
@@ -29,8 +29,6 @@ class Config:
             return None
 
     def _env_get(self,var):
-        import os
-
         return os.environ.get(var,None)
 
     def var(self,var,default_value=None):
@@ -46,8 +44,6 @@ class Config:
         return ans
 
     def _default_port(self):
-        import sys
-
         if sys.platform == 'darwin':
             return '/dev/cu.usb*'
         if sys.platform == 'linux':
@@ -55,8 +51,6 @@ class Config:
         return None
 
     def port(self):
-        import glob
-
         ans = self.var('ARDUINO_PORT')
         if ans == None:
             ans = self._default_port()
@@ -70,18 +64,12 @@ class Config:
         return self.var('ARDUINO_BOARD','uno')
 
     def baud(self):
-        ans = self.var('ARDUINO_BAUD')
-        if ans == None:
-            ans = 9600
-        return ans
+        return self.var('ARDUINO_BAUD',9600)
 
     def find(self,file):
-        import os
-        import sys
-
 #
 #       sys.path does NOT work --- active state leaves out the path
-#       we are looking for in windows
+#       we are looking for in windows (??!)
 #
         sep = ';' if sys.platform == 'win32' else ':'
         path = os.environ['PATH'];

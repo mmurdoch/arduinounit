@@ -54,7 +54,7 @@ Here are the basic files and folders
   - Linux `sudo apt-get install git` or `sudo yum install git-core`
 
   From here on, I will assume you are working from the git-bash
-  shell in windows, or a bash command prompt.
+  shell in Windows, or a bash command prompt.
 
 * Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
@@ -62,7 +62,16 @@ Here are the basic files and folders
   <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
+  </pre>
+  
+  Then, if on OS X or Linux, type:
+  <pre>
       sudo python setup.py install
+  </pre>
+  
+  or, if on Windows, type:
+  <pre>
+      python setup.py install
   </pre>
 
 * Install Scons (scons.org).

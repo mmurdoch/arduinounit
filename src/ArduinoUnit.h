@@ -27,7 +27,7 @@
 #endif
 
 #include <utility/FakeStream.h>
-#include <utility/MemoryFree.h>
+#include <utility/FreeMemory.h>
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2

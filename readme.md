@@ -330,6 +330,18 @@ A.  As far as I can tell, this is a bug in the compiler -- look two
    lines up.  I do not know why the `__LINE__` macro does not match
    the actual line of code.
 
+Q. What's with the `# 2 "file.ino"` business in the examples?
+
+A. This is to address question 1 above, and, without this line, the filename
+   will be a very long and mostly useless name in the asserts, like,
+
+<pre>
+/var/folders/gr/n9s7qtcs2qqbdnmcgm6gjzrm0000gp/T/build2118014134542174575.tmp/sketch_mar17a.ino
+</pre>
+
+  This uses up flash memory space and doesn't give any useful information when
+  something goes wrong.
+
 Q. I get these link errors about multiply defined test_XXXX_instance.
 
 A. You have defined two tests with the same name XXXX using either the

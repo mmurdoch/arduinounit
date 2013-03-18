@@ -1,6 +1,4 @@
-//
-//
-#line 1 "firmware.ino"
+#line 2 "firmware.ino"
 #include <ArduinoUnit.h>
 
 char line[80];

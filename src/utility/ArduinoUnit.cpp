@@ -138,7 +138,7 @@ void Test::resolve()
     output = output || (fail && TEST_VERBOSITY(TESTS_FAILED));
 
     if (output) {
-      out->print(F("test "));
+      out->print(F("Test "));
       out->print(name);
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED)
       if (skip) out->println(F(" skipped."));
@@ -156,7 +156,7 @@ void Test::resolve()
   }
 #if TEST_VERBOSITY_EXISTS(TESTS_SUMMARY)
   if (root == 0 && TEST_VERBOSITY(TESTS_SUMMARY)) {
-    out->print(F("test summary: "));
+    out->print(F("Test summary: "));
     out->print(passed);
     out->print(F(" passed, "));
     out->print(failed);

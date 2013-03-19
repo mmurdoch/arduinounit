@@ -1,5 +1,5 @@
-test overall and phase should always pass.
-interactive tester commands:
+Test overall and phase should always pass.
+Interactive tester commands:
   include <pattern>
   exclude <pattern>
   min_verbosity <binary number>
@@ -13,6 +13,6 @@ command> include assert_bools
 command> max_verbosity 00010001
 command> min_verbosity 00010001
 command> run
-firmware.ino:144:1: fail assert (x=0) == (0x1=1)
-firmware.ino:145:1: fail assert (x=1) == (0x0=0)
-test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).
+Assertion failed: (x=0) == (0x1=1), file firmware.ino, line 144.
+Assertion failed: (x=1) == (0x0=0), file firmware.ino, line 145.
+Test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

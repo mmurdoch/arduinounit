@@ -73,10 +73,10 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
   `Ctrl+Shift+M`) and expect to see the following:
 
 ```
-sketch:17:1: fail assert (x=3) != (y=3)
-test bad failed.
-test ok passed.
-test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
+Assertion failed: (x=3) != (y=3), file sketch.ino, line 17.
+Test bad failed.
+Test ok passed.
+Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
 #Verbosity
 
@@ -174,7 +174,7 @@ See the section below for assertions on tests.
 The output from these assertions is to print a string represenation of the
 arguments, and the value of the arguments, as in:
 ```
-file:line:column: pass/fail assert (arg1=value1) op (arg2=value2)
+Assertion passed/failed: (arg1=value1) op (arg2=value2), file name, line #.
 ```
 These assertions are defined in a way that the problem of multiple
 evaluations is avoided.  The arguments are only evaluated once in these

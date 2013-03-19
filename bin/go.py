@@ -106,7 +106,7 @@ class Go:
                 dev.send(command+'\n')
                 print >>output,'command> ' + command
 
-        ends = re.compile('^test summary')
+        ends = re.compile('^Test summary')
 
         while 1:
             while 1:
@@ -139,7 +139,7 @@ class Go:
                     pass
                 dev.send(command+'\n')
 
-        ends = re.compile('^test summary')
+        ends = re.compile('^Test summary')
 
         while 1:
             expected=input.readline()
@@ -151,8 +151,8 @@ class Go:
                     break
             line=line.rstrip()
             if (expected != line):
-                print >>output, 'expected "' + expected + '" on line ' + str(count)
-                print >>output, '     got "' + line     + '" instead'
+                print >>output, 'Expected "' + expected + '" on line ' + str(count)
+                print >>output, '     got "' + line     + '" instead.'
                 ok = 0
             if ends.match(line):
                 break
@@ -160,9 +160,9 @@ class Go:
         dev.close()
 
         if ok:
-            print >>output, 'meta test passed.'
+            print >>output, 'Meta test passed.'
         else:
-            print >>output, 'meta test failed.'
+            print >>output, 'Meta test failed.'
         return ok
 
     def tests(self,pattern='$0/../../tests/*.in'):
@@ -181,8 +181,8 @@ class Go:
                 bad = bad + 1
             input.close()
 
-        print 'meta test summary: ' + str(ok) + ' passed and ' + \
-            str(bad) + ' failed, out of ' + str(ok+bad) + ' test(s)'
+        print 'Meta test summary: ' + str(ok) + ' passed and ' + \
+            str(bad) + ' failed, out of ' + str(ok+bad) + ' test(s).'
 
 def main():
     # in win32, HOME defaults to 'C:\Users\home\Roaming\AppData' !!

@@ -1,5 +1,5 @@
-test overall and phase should always pass.
-interactive tester commands:
+Test overall and phase should always pass.
+Interactive tester commands:
   include <pattern>
   exclude <pattern>
   min_verbosity <binary number>
@@ -13,21 +13,21 @@ command> include assert_bools
 command> max_verbosity 11111111
 command> min_verbosity 00100001
 command> run
-test assert_ints skipped.
-test assert_strings skipped.
-test meta skipped.
-firmware.ino:144:1: fail assert (x=0) == (0x1=1)
-firmware.ino:144:1: pass assert (x=1) == (0x1=1)
-firmware.ino:145:1: pass assert (x=0) == (0x0=0)
-firmware.ino:145:1: fail assert (x=1) == (0x0=0)
-test assert_bools passed.
-test passes passed.
-test fails failed.
-test skips skipped.
-test phase passed.
-firmware.ino:442:1: pass assert (test_passes_instance.state=3) == (Test::DONE_PASS=3)
-firmware.ino:443:1: pass assert (test_fails_instance.state=4) == (Test::DONE_FAIL=4)
-firmware.ino:444:1: pass assert (test_skips_instance.state=2) == (Test::DONE_SKIP=2)
-firmware.ino:445:1: pass assert (test_assert_bools_instance.state=3) == (Test::DONE_PASS=3)
-test overall passed.
-test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).
+Test assert_ints skipped.
+Test assert_strings skipped.
+Test meta skipped.
+Assertion failed: (x=0) == (0x1=1), file firmware.ino, line 144.
+Assertion passed: (x=1) == (0x1=1), file firmware.ino, line 144.
+Assertion passed: (x=0) == (0x0=0), file firmware.ino, line 145.
+Assertion failed: (x=1) == (0x0=0), file firmware.ino, line 145.
+Test assert_bools passed.
+Test passes passed.
+Test fails failed.
+Test skips skipped.
+Test phase passed.
+Assertion passed: (test_passes_instance.state=3) == (Test::DONE_PASS=3), file firmware.ino, line 442.
+Assertion passed: (test_fails_instance.state=4) == (Test::DONE_FAIL=4), file firmware.ino, line 443.
+Assertion passed: (test_skips_instance.state=2) == (Test::DONE_SKIP=2), file firmware.ino, line 444.
+Assertion passed: (test_assert_bools_instance.state=3) == (Test::DONE_PASS=3), file firmware.ino, line 445.
+Test overall passed.
+Test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

@@ -36,7 +36,7 @@ clean :
 
 .PHONY: scrapetests
 scrapetests:
-	for f in tests/*.in ; do ./bin/go run < $$f > $${f%%.in}.out; done
+	for f in tests/*.in ; do echo "$$f..."; ./bin/go run < $$f > $${f%%.in}.out; done
 
 .PHONY: updatetests
 updatetests:

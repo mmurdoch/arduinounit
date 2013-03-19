@@ -499,12 +499,9 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
-      out->print(file);
-      out->print(F(":"));
-      out->print(line);
-      out->print(F(":1: "));
-      out->print(ok ? F("pass") : F("fail"));
-      out->print(F(" assert ("));
+      out->print(F("Assertion "));
+      out->print(ok ? F("passed") : F("failed"));
+      out->print(F(": ("));
       out->print(lhss);
       out->print(F("="));
       out->print(lhs);
@@ -514,8 +511,11 @@ void loop() {
       out->print(rhss);
       out->print(F("="));
       out->print(rhs);
-      out->print(F(")"));
-      out->println();
+      out->print(F("), file "));
+      out->print(file);
+      out->print(F(", line "));
+      out->print(line);
+      out->println(".");
     }
 #endif
     return ok;

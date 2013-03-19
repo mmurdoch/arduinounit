@@ -17,8 +17,8 @@ int phase = 0;
 
 void motd()
 {
-  Serial.println(F("test overall and phase should always pass."));
-  Serial.println(F("interactive tester commands:"));
+  Serial.println(F("Test overall and phase should always pass."));
+  Serial.println(F("Interactive tester commands:"));
   Serial.println(F("  include <pattern>"));
   Serial.println(F("  exclude <pattern>"));
   Serial.println(F("  min_verbosity <binary number>"));

@@ -1,5 +1,5 @@
-test overall and phase should always pass.
-interactive tester commands:
+Test overall and phase should always pass.
+Interactive tester commands:
   include <pattern>
   exclude <pattern>
   min_verbosity <binary number>
@@ -13,8 +13,8 @@ command> include assert_bools
 command> max_verbosity 00001001
 command> min_verbosity 00001001
 command> run
-test assert_ints skipped.
-test assert_strings skipped.
-test meta skipped.
-test skips skipped.
-test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).
+Test assert_ints skipped.
+Test assert_strings skipped.
+Test meta skipped.
+Test skips skipped.
+Test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

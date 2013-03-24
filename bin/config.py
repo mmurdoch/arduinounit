@@ -7,8 +7,9 @@ import sys
 import glob
 
 class Config:
-    def __init__(self):
-        file = os.path.join(
+    def __init__(self,file=None):
+        if file == None:
+          file = os.path.join(
             os.path.dirname(__file__),
             '../firmware/arscons.json')
 
@@ -47,7 +48,7 @@ class Config:
         if sys.platform == 'darwin':
             return '/dev/cu.usb*'
         if sys.platform == 'linux':
-            return '/dev/ttyUSB*'
+            return '/dev/ttyACM*'
         return None
 
     def port(self):

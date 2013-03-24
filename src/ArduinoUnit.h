@@ -20,6 +20,7 @@
 
 #if defined(__GNUC__) && (__GNUC__*100 + __GNUC_MINOR__ < 407)
 // Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
+//
 #ifdef PROGMEM
 #undef PROGMEM
 #define PROGMEM __attribute__((section(".progmem.data")))

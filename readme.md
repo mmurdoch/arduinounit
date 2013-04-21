@@ -3,16 +3,28 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-###Version 2.0
+##Current Version 2.0
+[Download ArduinoUnit 2.0](https://github.com/mmurdoch/arduinounit/tree/v2.0).
 
-##Why
+ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
+of unit testing with the 1.x library over the last few years. It aims to be 
+easier to use for simple use cases whilst at the same time providing better 
+support for more complex unit testing needs (see below for details). As such 
+it is not fully compatible with 1.x unit test sketches, although it is relatively 
+easy to port these to 2.0 (see the 
+[porting guide](https://github.com/mmurdoch/arduinounit/blob/master/porting-guide.md)).
 
-This follows the spirit of ArduinoUnit 1.X with the following
+If you don't want to take advantage of the great new features in 2.0 then the 
+latest release of the 1.x code line is still 
+[available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
+
+##Why Version 2.0?
+
+ArduinoUnit 2.0 follows the spirit of ArduinoUnit 1.x with the following
 less-is-more features:
 
-1. It does not use dynamic memory.
-1. It does not break tests into suites.
-1. It does not have custom reports.
+1. No test suite setup is required.
+1. Custom reporting now uses the standard Arduino `Print` class.
 
 And the following more-is-more features:
 

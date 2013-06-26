@@ -281,14 +281,14 @@ class Test
 {
  private:
   // allows for both ram/progmem based names
-  class String : public Printable {
+  class TestString : public Printable {
   public:
     const uint32_t data;
-    String(const char *_data);
-    String(const __FlashStringHelper *_data);
+    TestString(const char *_data);
+    TestString(const __FlashStringHelper *_data);
     void read(void *destination, uint16_t offset, uint8_t length) const;
     uint16_t length() const;
-    int8_t compare(const Test::String &to) const;
+    int8_t compare(const Test::TestString &to) const;
     size_t printTo(Print &p) const;
     bool matches(const char *pattern) const;
   };
@@ -379,7 +379,7 @@ class Test
   static Test* current;
 
   /** the name of this test */
-  String name;
+  TestString name;
 
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 

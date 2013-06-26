@@ -7,9 +7,9 @@ const uint8_t Test::DONE_SKIP = 2;
 const uint8_t Test::DONE_PASS = 3;
 const uint8_t Test::DONE_FAIL = 4;
 
-Test::String::String(const char *_data) : data((uint32_t)_data) {}
-Test::String::String(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
-void Test::String::read(void *destination, uint16_t offset, uint8_t length) const
+Test::TestString::TestString(const char *_data) : data((uint32_t)_data) {}
+Test::TestString::TestString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
+void Test::TestString::read(void *destination, uint16_t offset, uint8_t length) const
 {
   if ((data & 0x80000000) != 0) {
     memcpy_P(destination,(const /* PROGMEM */ char *)((data+offset)&0x7FFFFFFF),length);
@@ -18,7 +18,7 @@ void Test::String::read(void *destination, uint16_t offset, uint8_t length) cons
   }
 }
 
-uint16_t Test::String::length() const {
+uint16_t Test::TestString::length() const {
   if ((data & 0x80000000) != 0) {
     return strlen_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF));
   } else {
@@ -26,7 +26,7 @@ uint16_t Test::String::length() const {
   }
 }
 
-int8_t Test::String::compare(const Test::String &to) const
+int8_t Test::TestString::compare(const Test::TestString &to) const
 {
   uint8_t a_buf[4],b_buf[4];
   uint16_t i=0;
@@ -44,7 +44,7 @@ int8_t Test::String::compare(const Test::String &to) const
   }
 }
 
-size_t Test::String::printTo(Print &p) const {
+size_t Test::TestString::printTo(Print &p) const {
   if ((data & 0x80000000) != 0) {
     return p.print((const __FlashStringHelper *)(data & 0x7FFFFFFF));
   } else {
@@ -52,7 +52,7 @@ size_t Test::String::printTo(Print &p) const {
   }
 }
 
-bool Test::String::matches(const char *pattern) const {
+bool Test::TestString::matches(const char *pattern) const {
   uint8_t np = strlen(pattern);
   uint8_t ns = length();
   uint8_t nb = (np+2)/8+((np+2)%8 != 0);

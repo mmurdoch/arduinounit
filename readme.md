@@ -169,6 +169,7 @@ The following types are supported for these assertions:
 ```
 String
 char *
+char
 unsigned char
 int
 unsigned int
@@ -176,6 +177,19 @@ long
 unsigned long
 double
 ```
+
+A note on character strings:  There are specializations for the char * type, like "hello", but some versions of the compiler treats character literals ("hello") and character arrays (char buf[32]) as different types.  You can safely cast character arrays to character pointers for these assertions.  For example:
+```
+test(string)
+{
+  char str1[32];
+  char *str2="test1";
+  strcpy(str1,str2);
+  assertEqual(str1,str2); // may not compile or give warning
+  assertEqual((char*)str1,str2); // ok -- 
+}
+
+
 There are addtionally some boolean assertions:
 ```
 assertTrue(arg)

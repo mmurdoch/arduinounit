@@ -188,7 +188,7 @@ test(string)
   assertEqual(str1,str2); // may not compile or give warning
   assertEqual((char*)str1,str2); // ok -- 
 }
-
+```
 
 There are addtionally some boolean assertions:
 ```

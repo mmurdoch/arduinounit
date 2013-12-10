@@ -42,7 +42,7 @@ And the following more-is-more features:
 
 ##Getting Started
 
-Create a directory called ArduinoUnit under `<arduino installation directory>\libraries`.
+Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
 
 Copy everything from the `src` directory to this new directory.
 

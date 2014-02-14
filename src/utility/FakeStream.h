@@ -52,7 +52,7 @@ public:
     size_t write(uint8_t val);
 
     /**
-     * Flushes this stream. Does nothing in this implementation.
+     * Flushes this stream. When called, 'bytesWritten' becomes empty  ("").
      */
     void flush();
 

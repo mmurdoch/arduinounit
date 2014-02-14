@@ -34,6 +34,8 @@ size_t FakeStream::write(uint8_t val) {
 }
 
 void FakeStream::flush() {
+	_bytesWritten="";
+	setToEndOfStream();
 }
 
 const String& FakeStream::bytesWritten() {

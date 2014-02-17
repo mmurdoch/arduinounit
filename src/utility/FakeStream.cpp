@@ -34,8 +34,13 @@ size_t FakeStream::write(uint8_t val) {
 }
 
 void FakeStream::flush() {
-	_bytesWritten="";
-	setToEndOfStream();
+    // does nothing to avoid conflicts (false negative tests)
+    // for test purpose, use 'reset' function instead
+}
+
+void FakeStream::reset() {
+    _bytesWritten="";
+    setToEndOfStream();
 }
 
 const String& FakeStream::bytesWritten() {

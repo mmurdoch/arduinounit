@@ -52,9 +52,15 @@ public:
     size_t write(uint8_t val);
 
     /**
-     * Flushes this stream. When called, 'bytesWritten' becomes empty  ("").
+     * Flushes this stream. Does nothing in this implementation to avoid conflicts (false negative tests).
      */
     void flush();
+
+    /**
+     * Reset the FakeStream so that it can be reused across tests. 
+     * When called, 'bytesWritten' becomes empty  ("").
+     */
+    void reset();
 
     /**
      * The bytes written by calling write(uint8_t).

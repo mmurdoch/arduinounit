@@ -50,7 +50,7 @@ void FakeStreamBuffer::nextBytes(const char *s) {
 }
 
 int FakeStreamBuffer::available()  {
-    return _getBufferSize();
+    return _getBufferSize(-1);
 }
 
 int FakeStreamBuffer::read() {
@@ -110,14 +110,14 @@ byte FakeStreamBuffer::_nextByte() {
 }
 
 int FakeStreamBuffer::_getBufferSize () {
+    return _getBufferSize(-1);
+}
+int FakeStreamBuffer::_getBufferSize (byte stopAt) {
     int count = 0;
     BufferNode *node = _firstNode;
-    if (node != 0) {
-        count = 1;
-        while (node->next != 0) {
-            node = node->next;
-            count++;
-        }
+    while (node != 0 && node->value != stopAt) {
+        count++;
+        node = node->next;
     }
     return count;
 }

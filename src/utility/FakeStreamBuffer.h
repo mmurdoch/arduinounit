@@ -106,5 +106,6 @@ class FakeStreamBuffer : public FakeStream {
         BufferNode* _popNode();
         byte _nextByte();
         int _getBufferSize();
+        int _getBufferSize(byte stopAt);
         void _clearBuffer();
 };

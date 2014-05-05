@@ -134,4 +134,6 @@ void FakeStreamBuffer::_clearBuffer() {
         free(node);
         node = nextNode;
     }
+    _firstNode = NULL;
+    _lastNode = NULL;
 }

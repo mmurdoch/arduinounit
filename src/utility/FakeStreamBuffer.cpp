@@ -41,7 +41,7 @@ void FakeStreamBuffer::nextByte(byte b) {
     _pushByte(b);
 }
 
-void FakeStreamBuffer::nextBytes(char *s) {
+void FakeStreamBuffer::nextBytes(const char *s) {
     int next = 0;
     while (s[next] != 0) {
         nextByte((byte)s[next]);

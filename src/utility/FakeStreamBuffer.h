@@ -71,7 +71,7 @@ class FakeStreamBuffer : public FakeStream {
          *
          * @param b the byte value
          **/
-        void nextBytes(char *s);
+        void nextBytes(const char *s);
 
         /**
          * The number of bytes available to be read.

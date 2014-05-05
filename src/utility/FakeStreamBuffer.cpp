@@ -55,7 +55,11 @@ int FakeStreamBuffer::available()  {
 
 int FakeStreamBuffer::read() {
     if (_firstNode != NULL) {
-        return _nextByte();
+        int ret = (int)_nextByte();
+        if (ret == 255) {
+            ret = -1;
+        }
+        return ret;
     }
     return -1;
 }

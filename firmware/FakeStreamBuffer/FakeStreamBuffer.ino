@@ -108,7 +108,7 @@ test (FakeStreamBufferAvailable) {
 
 // test (FakeStreamBufferRead) {}
 
-/*test (FakeStreamBufferPeek) {
+test (FakeStreamBufferPeek) {
     FakeStreamBuffer stream = FakeStreamBuffer();
     stream.nextBytes("12");
     assertEqual(2, stream.available());
@@ -121,7 +121,7 @@ test (FakeStreamBufferAvailable) {
     stream.read();
     assertEqual(0, stream.available());
     assertEqual(-1, stream.peek());
-}*/
+}
 
 void setup() {
   Serial.begin(115200);

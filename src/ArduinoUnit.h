@@ -36,6 +36,7 @@
 #endif
 
 #include <utility/FakeStream.h>
+#include <utility/FakeStreamBuffer.h>
 #include <utility/FreeMemory.h>
 
 /** \brief This is defined to manage the API transition to 2.X */

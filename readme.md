@@ -3,8 +3,8 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-##Current Version 2.0
-[Download ArduinoUnit 2.0](https://github.com/mmurdoch/arduinounit/tree/v2.0).
+##Current Version 2.1.0
+[Download ArduinoUnit 2.1.0](https://github.com/mmurdoch/arduinounit/tree/v2.0).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
 of unit testing with the 1.x library over the last few years. It aims to be 
@@ -18,9 +18,9 @@ If you don't want to take advantage of the great new features in 2.0 then the
 latest release of the 1.x code line is still 
 [available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
 
-##Why Version 2.0?
+##Why Version 2?
 
-ArduinoUnit 2.0 follows the spirit of ArduinoUnit 1.x with the following
+ArduinoUnit 2 follows the spirit of ArduinoUnit 1.x with the following
 less-is-more features:
 
 1. No test suite setup is required.
@@ -395,7 +395,8 @@ A. Here is a troubleshooting guideline:
 
 ##License
 
-Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch
+Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch, freenerd, John Macdonald,
+nicolaspanel, Matt Paine
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

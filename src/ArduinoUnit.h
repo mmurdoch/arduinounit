@@ -609,7 +609,7 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<__typeof__(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)

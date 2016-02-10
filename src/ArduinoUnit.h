@@ -558,6 +558,19 @@ bool isLessOrEqual(const T& a, const T& b) { return !(b<a); }
 template <typename T>
 bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
 
+/** Template binary operator== to assist with assertions */
+template <typename T, T absEps=std::sqrt(std::numeric_limits<T>::epsilon()),
+                      T relEps=std::numeric_limits<T>::infinity()>
+bool isClose(const T& a, const T& b)
+{
+  return 
+    (std::isinf(absEps) || 
+     (std::abs(b-a) <= absEps))
+    && (std::isinf(relEps) || 
+	(std::abs(b-a) <= relEps*std::max(std:::abs(a),std::abs(b))));
+  
+}
+
 /** Template specialization for asserting const char * types */
 template <> bool isLess<const char*>(const char* const &a, const char* const &b);
 
@@ -575,7 +588,6 @@ template <> bool isMore<const char*>(const char* const &a, const char* const &b)
 
 /** Template specialization for asserting const char * types */
 template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
-
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
@@ -604,6 +616,16 @@ is in another file (or defined after the assertion on it). */
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
+
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertClose(arg1,arg2)       assertOp(arg1,isClose<typeof(arg2)>,"~=",arg2)
+
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertClose(arg1,arg2,absEps)       assertOp(arg1,isClose<typeof(arg2),absEps>,"~=",arg2)
+
+
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertClose(arg1,arg2,absEps,relEps)       assertOp(arg1,isClose<typeof(arg2),absEps,relEps>,"~=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)

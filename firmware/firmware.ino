@@ -253,6 +253,73 @@ test(assert_strings)
   }
 }
 
+bool checkcase(const char *x, const char *y, int c)
+{
+  T absEps=0;
+  T relEps=0;
+  switch (c) {
+  case 0: absEps=std::sqrt(std::numeric_limits<float>::epsilon();
+          relEps=std::numeric_limits<float>::infinity();
+          break;
+  case 1: absEps=std::numeric_limits<float>::infinity();
+          relEps=1e-3;
+	  break;
+  case 2: absEps=1e-3;
+          relEps=std::numeric_limits<float>::infinity();
+	  beak;
+  case 3: absEps=1e-3;
+          relEps=1e-3;
+	  break;
+  case 4: absEps=0;
+          relEps=std::numeric_limits<float>::infinity();
+	  break;
+  case 5: absEps=std::numeric_limits<float>::infinity();
+          relEps=0;
+	  break;
+  }
+  if (!std::isinfinite(absEps)) {
+    if (std::abs(b-a) > absEps) {
+      return false;
+    }
+  }
+  if (!std::isinfinite(relEps)) {
+    if (std::abs(b-a) > relEps*(std::max(std::abs(a),std::abs(b)))) {
+     return false;
+    }
+  }
+  return true;
+}
+
+void testcase(const float &x, const float &y, int c)
+{
+  switch (c) {
+  case 0: assertClose(x,y); break;
+  case 1: assertClose(x,y,INFINITY,1e-3); break;
+  case 2: assertClose(x,y,1e-3,INFINITY); break;
+  case 3: assertClose(x,y,1e-3,1e-3); break;
+  case 4: assertClose(x,y,0,INFINITY); break;
+  case 5: assertClose(x,y,INFINITY,0); break;
+  }
+}
+
+const float floats [] = { 0, -1, 1, 1e-3, 1e3, 1e-9, 1e9 }; 
+test(assert_floats)
+{
+  for (int c = 0; c < 6; ++c) {
+    for (int x = 0; x < sizeof(floats)/sizeof(float); ++x) {
+      for (int y = 0; y < sizeof(floats)/sizeof(float); ++y) {
+        testcase(floats[x],floats[y],c);
+        if (checkcase(floats[x],floats[y],c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
+      }
+    }
+  }
+}
+
 // simple ongoing tests:
 
 testing(passes)
@@ -415,6 +482,7 @@ testing(phase)
     done = done && checkTestDone(assert_bools);
     done = done && checkTestDone(assert_ints);
     done = done && checkTestDone(assert_strings);
+    done = done && checkTestDone(assert_floats);
     break;
   case 1:
     done = done && (checkTestDone(meta) || (metaNextPhase == 3));
@@ -445,7 +513,9 @@ testing(overall)
     if (!checkTestSkip(assert_bools)) assertTestPass(assert_bools);
     if (!checkTestSkip(assert_ints)) assertTestPass(assert_ints);
     if (!checkTestSkip(assert_strings)) assertTestPass(assert_strings);
+    if (!checkTestSkip(assert_floats)) assertTestPass(assert_floats);
     if (!checkTestSkip(meta)) assertTestPass(meta);
     pass();
   }
 }
+

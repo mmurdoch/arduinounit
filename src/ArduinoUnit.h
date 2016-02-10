@@ -7,6 +7,8 @@
 */
 
 #include <stdint.h>
+#include <limits>
+#include <cmath>
 #include <Print.h>
 
 #if ARDUINO >= 100 && ARDUINO < 103

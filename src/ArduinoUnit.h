@@ -7,8 +7,8 @@
 */
 
 #include <stdint.h>
-#include <limits>
-#include <cmath>
+#include <limits.h>
+#include <math.h>
 #include <Print.h>
 
 #if ARDUINO >= 100 && ARDUINO < 103
@@ -29,8 +29,8 @@
 #endif
 #endif
 
-#include <utility/FakeStream.h>
-#include <utility/FreeMemory.h>
+#include "utility/FakeStream.h"
+#include "utility/FreeMemory.h"
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2
@@ -481,8 +481,8 @@ void loop() {
 
   virtual ~Test();
 
-  template <typename T>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const T& lhs, const __FlashStringHelper *ops, bool (*op)(const T& lhs, const T& rhs), const __FlashStringHelper *rhss, const T& rhs) {
+  template <typename T, typename OP>
+    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const T& lhs, const __FlashStringHelper *ops, OP op, const __FlashStringHelper *rhss, const T& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -561,17 +561,40 @@ template <typename T>
 bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
 
 /** Template binary operator== to assist with assertions */
-template <typename T, T absEps=std::sqrt(std::numeric_limits<T>::epsilon()),
-                      T relEps=std::numeric_limits<T>::infinity()>
-bool isClose(const T& a, const T& b)
-{
-  return 
-    (std::isinf(absEps) || 
-     (std::abs(b-a) <= absEps))
-    && (std::isinf(relEps) || 
-	(std::abs(b-a) <= relEps*std::max(std:::abs(a),std::abs(b))));
-  
+
+template <typename T> T MachineEpsilon() { 
+  T eps=1;
+  while (T(1)+eps/2 != T(1)) { eps/= 2; }
+  return eps;
 }
+
+template <> float MachineEpsilon() {
+  return 1.0/(int32_t(2)<<24);
+}
+
+template <> double MachineEpsilon() {
+  // double means "float" on some architectures, ieee double on others
+  return sizeof(double) == 4 ? 1.0/(int32_t(2)<<24) : 1.0/(int64_t(1)<<53);
+}
+
+template <typename T>
+class IsClose
+{
+  const T absEps;
+  const T relEps;
+ public: IsClose(const T &_absEps=sqrt(machine_epsilon<T>()),
+		 const T &_relEps=INFINITY) 
+    : absEps(_absEps), relEps(_relEps) 
+  {
+  }
+
+  public bool operator()(const T& a, const T& b)
+  {
+    return 
+      (isinf(absEps) || (abs(b-a) <= absEps))
+      && (isinf(relEps) || (abs(b-a) <= relEps*max(abs(a),abs(b))));
+    
+  }
 
 /** Template specialization for asserting const char * types */
 template <> bool isLess<const char*>(const char* const &a, const char* const &b);
@@ -620,14 +643,7 @@ is in another file (or defined after the assertion on it). */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertClose(arg1,arg2)       assertOp(arg1,isClose<typeof(arg2)>,"~=",arg2)
-
-/** macro generates optional output and calls fail() followed by a return if false. */
-#define assertClose(arg1,arg2,absEps)       assertOp(arg1,isClose<typeof(arg2),absEps>,"~=",arg2)
-
-
-/** macro generates optional output and calls fail() followed by a return if false. */
-#define assertClose(arg1,arg2,absEps,relEps)       assertOp(arg1,isClose<typeof(arg2),absEps,relEps>,"~=",arg2)
+#define assertClose(arg1,arg2,...)       assertOp(arg1,IsClose<typeof(arg2)>(__VA_ARGS__),"~=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)

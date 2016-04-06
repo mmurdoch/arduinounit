@@ -578,6 +578,7 @@ template <> bool isMore<const char*>(const char* const &a, const char* const &b)
 /** Template specialization for asserting const char * types */
 template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
 
+/** Template function for determining sqrt(eps) where eps is the smallest value which can be added to 1 and the result is different from 1 */
   template <typename T> T SqrtMachineEpsilon() {
     T eps=1;
     while (T(1+eps) != 1) { eps *= 0.5; }
@@ -587,25 +588,26 @@ template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* co
   template <> const float SqrtMachineEpsilon();
   template <> const double SqrtMachineEpsilon();
 
+/** Template class for determining closeness instead of equality */
 template <typename T>
 class IsClose
 {
-
-  private: const T absEps;
   private: const T relEps;
+  private: const T absEps;
 
-  public: IsClose(const T &_absEps=SqrtMachineEpsilon<T>(),
-		 const T &_relEps=INFINITY) 
-    : absEps(_absEps), relEps(_relEps) 
+  public: IsClose(const T &_relEps=SqrtMachineEpsilon<T>(),
+		 const T &_absEps=INFINITY) 
+    : relEps(_relEps), absEps(_absEps)
   {
   }
 
+  static T Abs(const T& x) { return x < 0 ? -x : x; }
+  static const T& Max(const T& x, const T& y) { return y < x ? x : y; }
+  static const T& Min(const T& x, const T& y) { return x < y ? x : y; }
   public: bool operator()(const T& a, const T& b)
   {
-    return 
-      (isinf(absEps) || (abs(b-a) <= absEps))
-      && (isinf(relEps) || (abs(b-a) <= relEps*max(abs(a),abs(b))));
-    
+    return (isinf(relEps) || abs(b-a) <= relEps*max(abs(a),abs(b)))
+      && (isinf(absEps) || abs(b-a) <= absEps);
   }
 };
 
@@ -644,6 +646,7 @@ is in another file (or defined after the assertion on it). */
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
 
+/** macro generates optional output and calls fail() followed by a return if false, optional first argument defaults to sqrt(machine_epsilon) for relative error, and second argument to INFINITY for absolute error. */
 #define assertClose(arg1,arg2,...)       assertOp1(arg1,IsClose<typeof(arg1)>(__VA_ARGS__),"~=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */

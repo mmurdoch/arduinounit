@@ -253,11 +253,13 @@ test(assert_strings)
   }
 }
 
-float meps()
-{
-  float eps=1;
-  while (float(1+eps) != 1) { eps=eps/2; }
-  return 2*eps;
+float smeps() {
+  static float eps=1;
+  if (eps == 1) {
+     while (1+eps != 1) eps /= 2;
+     eps=sqrt(2*eps);
+  }
+  return eps;
 }
 
 bool checkcase(const float &a, const float &b, int c)
@@ -265,23 +267,23 @@ bool checkcase(const float &a, const float &b, int c)
   float absEps=0;
   float relEps=0;
   switch (c) {
-  case 0: absEps=sqrt(meps());
-          relEps=INFINITY;
+  case 0: relEps=smeps();
+          absEps=INFINITY;
           break;
-  case 1: absEps=INFINITY;
-          relEps=1e-3;
+  case 1: relEps=INFINITY;
+          absEps=1e-3;
 	  break;
-  case 2: absEps=1e-3;
-          relEps=INFINITY;
+  case 2: relEps=1e-3;
+          absEps=INFINITY;
 	  break;
-  case 3: absEps=1e-3;
-          relEps=1e-3;
+  case 3: relEps=1e-3;
+          absEps=1e-3;
 	  break;
-  case 4: absEps=0;
-          relEps=INFINITY;
+  case 4: relEps=0;
+          absEps=INFINITY;
 	  break;
-  case 5: absEps=INFINITY;
-          relEps=0;
+  case 5: relEps=INFINITY;
+          absEps=0;
 	  break;
   }
   if (!isinf(absEps)) {
@@ -309,7 +311,7 @@ void testcase(const float &x, const float &y, int c)
   }
 }
 
-const float floats [] = { 0, -1, 1, 1e-3, 1e3, 1e-9, 1e9 }; 
+const float floats [] = { 0, 0.00001, -1, -0.99999, 1, 1.01, 1e-3, 1.00001e-3, 1e-9, 1e9 }; 
 test(assert_floats)
 {
   for (int c = 0; c < 6; ++c) {

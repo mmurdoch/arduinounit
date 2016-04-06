@@ -182,6 +182,28 @@ assertions.
 
 All the assert macros expand to a test that creates an optional message, and, if false, calls fail() on the current test and returns.
 
+##Approximate Assertion
+
+For comparing double or float values, there is the approximate assertion:
+```
+assertClose(x,y,relativeError,absoluteError)
+```
+The last two arguments are optional.
+
+The default relative error is usually 0.00035.  When comparing double values that are actually represented as an IEEE double (8 bytes, like on the DUE) it defaults to 0.000000015. Use INFINITY to ignore relative error.
+
+If the relative error is finite, it is tested with
+```
+abs(x-y) <= relativeError*max(abs(x),abs(y))
+```
+
+The default absolute error is INFINITY (ignored).
+
+If the absolute error is finite, it is tested with
+```
+abs(x-y) <= absErr
+```
+
 ##Meta Assertions
 
 You can make assertions on the outcome of tests as well.  The following meta-assertions are supported:

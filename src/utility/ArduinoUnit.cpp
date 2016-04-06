@@ -302,3 +302,11 @@ bool isMore<const char*>(const char* const &a, const char* const &b)
 {
   return (strcmp(a,b) > 0);
 }
+
+template <> const float SqrtMachineEpsilon() {
+  return 3.4526698300124390841e-4;
+}
+
+template <> const double SqrtMachineEpsilon() {
+  return (sizeof(double) == 4) ? 3.4526698300124390841e-4 : 1.490116119384765625e-8;
+}

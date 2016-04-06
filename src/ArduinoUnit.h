@@ -560,42 +560,6 @@ bool isLessOrEqual(const T& a, const T& b) { return !(b<a); }
 template <typename T>
 bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
 
-/** Template binary operator== to assist with assertions */
-
-template <typename T> T MachineEpsilon() { 
-  T eps=1;
-  while (T(1)+eps/2 != T(1)) { eps/= 2; }
-  return eps;
-}
-
-template <> float MachineEpsilon() {
-  return 1.0/(int32_t(2)<<24);
-}
-
-template <> double MachineEpsilon() {
-  // double means "float" on some architectures, ieee double on others
-  return sizeof(double) == 4 ? 1.0/(int32_t(2)<<24) : 1.0/(int64_t(1)<<53);
-}
-
-template <typename T>
-class IsClose
-{
-  const T absEps;
-  const T relEps;
- public: IsClose(const T &_absEps=sqrt(machine_epsilon<T>()),
-		 const T &_relEps=INFINITY) 
-    : absEps(_absEps), relEps(_relEps) 
-  {
-  }
-
-  public bool operator()(const T& a, const T& b)
-  {
-    return 
-      (isinf(absEps) || (abs(b-a) <= absEps))
-      && (isinf(relEps) || (abs(b-a) <= relEps*max(abs(a),abs(b))));
-    
-  }
-
 /** Template specialization for asserting const char * types */
 template <> bool isLess<const char*>(const char* const &a, const char* const &b);
 
@@ -613,6 +577,39 @@ template <> bool isMore<const char*>(const char* const &a, const char* const &b)
 
 /** Template specialization for asserting const char * types */
 template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
+
+  template <typename T> T SqrtMachineEpsilon() {
+    T eps=1;
+    while (T(1+eps) != 1) { eps *= 0.5; }
+    return sqrt(2*eps);
+  }
+
+  template <> const float SqrtMachineEpsilon();
+  template <> const double SqrtMachineEpsilon();
+
+template <typename T>
+class IsClose
+{
+
+  private: const T absEps;
+  private: const T relEps;
+
+  public: IsClose(const T &_absEps=SqrtMachineEpsilon<T>(),
+		 const T &_relEps=INFINITY) 
+    : absEps(_absEps), relEps(_relEps) 
+  {
+  }
+
+  public: bool operator()(const T& a, const T& b)
+  {
+    return 
+      (isinf(absEps) || (abs(b-a) <= absEps))
+      && (isinf(relEps) || (abs(b-a) <= relEps*max(abs(a),abs(b))));
+    
+  }
+};
+
+
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
@@ -639,11 +636,15 @@ is in another file (or defined after the assertion on it). */
 // helper define for the operators below
 #define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
 
+// helper define for the operators below
+#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2), bool (*)(const typeof(arg2)&,const typeof(arg2)&) >(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+
+#define assertOp1(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
 
-/** macro generates optional output and calls fail() followed by a return if false. */
-#define assertClose(arg1,arg2,...)       assertOp(arg1,IsClose<typeof(arg2)>(__VA_ARGS__),"~=",arg2)
+#define assertClose(arg1,arg2,...)       assertOp1(arg1,IsClose<typeof(arg1)>(__VA_ARGS__),"~=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)

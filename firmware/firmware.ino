@@ -253,37 +253,44 @@ test(assert_strings)
   }
 }
 
-bool checkcase(const char *x, const char *y, int c)
+float meps()
 {
-  T absEps=0;
-  T relEps=0;
+  float eps=1;
+  while (float(1+eps) != 1) { eps=eps/2; }
+  return 2*eps;
+}
+
+bool checkcase(const float &a, const float &b, int c)
+{
+  float absEps=0;
+  float relEps=0;
   switch (c) {
-  case 0: absEps=std::sqrt(std::numeric_limits<float>::epsilon();
-          relEps=std::numeric_limits<float>::infinity();
+  case 0: absEps=sqrt(meps());
+          relEps=INFINITY;
           break;
-  case 1: absEps=std::numeric_limits<float>::infinity();
+  case 1: absEps=INFINITY;
           relEps=1e-3;
 	  break;
   case 2: absEps=1e-3;
-          relEps=std::numeric_limits<float>::infinity();
-	  beak;
+          relEps=INFINITY;
+	  break;
   case 3: absEps=1e-3;
           relEps=1e-3;
 	  break;
   case 4: absEps=0;
-          relEps=std::numeric_limits<float>::infinity();
+          relEps=INFINITY;
 	  break;
-  case 5: absEps=std::numeric_limits<float>::infinity();
+  case 5: absEps=INFINITY;
           relEps=0;
 	  break;
   }
-  if (!std::isinfinite(absEps)) {
-    if (std::abs(b-a) > absEps) {
+  if (!isinf(absEps)) {
+    if (abs(b-a) > absEps) {
       return false;
     }
   }
-  if (!std::isinfinite(relEps)) {
-    if (std::abs(b-a) > relEps*(std::max(std::abs(a),std::abs(b)))) {
+  if (!isinf(relEps)) {
+    if (abs(b-a) > relEps*(max(abs(a),abs(b)))) {
      return false;
     }
   }

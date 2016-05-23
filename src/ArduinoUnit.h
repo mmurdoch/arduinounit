@@ -488,8 +488,8 @@ void loop() {
 
   virtual ~Test();
 
-  template <typename T>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const T& lhs, const __FlashStringHelper *ops, bool (*op)(const T& lhs, const T& rhs), const __FlashStringHelper *rhss, const T& rhs) {
+  template <typename A, typename B>
+    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, const __FlashStringHelper *ops, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -543,69 +543,131 @@ class TestOnce : public Test {
   virtual void once() = 0;
 };
 
+/** Class to unify comparisons.  There are a variety of specializations to account for
+    char *, const char *, and char [N] types which map to strcmp(). 
+*/
+
+template <typename A, typename B>
+struct Compare
+{
+  inline static int cmp(const A &a, const B &b)
+  {
+    if (a<b) return -1;
+    if (b<a) return  1;
+    return 0;
+  }
+};
+
+template <>
+struct Compare<const char *, const char *>
+{
+  inline static int cmp(const char* const &a, const char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <>
+struct Compare<const char *, char *>
+{
+  inline static int cmp(const char* const &a, char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <>
+struct Compare<char *, const char *>
+{
+  inline static int cmp(char* const &a, const char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <>
+struct Compare<char *, char *>
+{
+  inline static int cmp(char* const &a, char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <size_t N>
+struct Compare<char [N], const char *>
+{
+  inline static int cmp(const char (&a)[N], const char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <size_t N>
+struct Compare<const char *, char [N]>
+{
+  inline static int cmp(const char* const &a, const char (&b)[N])
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <size_t N, size_t M>
+struct Compare<char [N], char [M]>
+{
+  inline static int cmp(const char (&a)[N], const char (&b)[M])
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <size_t N>
+struct Compare<char [N], char *>
+{
+  inline static int cmp(const char (&a)[N], char* const &b)
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <size_t N>
+struct Compare<char *, char [N]>
+{
+  inline static int cmp(char* const &a, const char (&b)[N])
+  {
+    return strcmp(a,b);
+  }
+};
+
+template <typename A, typename B>
+inline int compare(const A &a, const B &b)
+{
+  return Compare<A,B>::cmp(a,b);
+}
+
 /** Template binary operator== to assist with assertions */
-template <typename T>
-bool isEqual(const T& a, const T& b) { return a==b; }
+template <typename A, typename B>
+bool isEqual(const A& a, const B& b) { return compare(a,b)==0; }
 
 /** Template binary operator!= to assist with assertions */
-template <typename T>
-bool isNotEqual(const T& a, const T& b) { return !(a==b); }
+template <typename A, typename B>
+bool isNotEqual(const A& a, const B& b) { return compare(a,b) !=0; }
 
 /** Template binary operator< to assist with assertions */
-template <typename T>
-bool isLess(const T& a, const T& b) { return a < b; }
+template <typename A, typename B>
+bool isLess(const A& a, const B& b) { return compare(a,b) < 0; }
 
 /** Template binary operator> to assist with assertions */
-template <typename T>
-bool isMore(const T& a, const T& b) { return b < a; }
+template <typename A, typename B>
+bool isMore(const A& a, const B& b) { return compare(a,b) > 0; }
 
 /** Template binary operator<= to assist with assertions */
-template <typename T>
-bool isLessOrEqual(const T& a, const T& b) { return !(b<a); }
+template <typename A, typename B>
+bool isLessOrEqual(const A& a, const B& b) { return compare(a,b) <= 0; }
 
 /** Template binary operator>= to assist with assertions */
-template <typename T>
-bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
-
-/** Template specialization for asserting const char * types */
-template <> bool isLess<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isLessOrEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isNotEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMore<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
-
-/* --- */
-
-/** Template specialization for asserting char * types */
-template <> bool isLess<char*>(char* const &a, char* const &b);
-
-/** Template specialization for asserting char * types */
-template <> bool isLessOrEqual<char*>(char* const &a, char* const &b);
-
-/** Template specialization for asserting char * types */
-template <> bool isEqual<char*>(char* const &a, char* const &b);
-
-/** Template specialization for asserting char * types */
-template <> bool isNotEqual<char*>(char* const &a, char* const &b);
-
-/** Template specialization for asserting char * types */
-template <> bool isMore<char*>(char* const &a, char* const &b);
-
-/** Template specialization for asserting char * types */
-template <> bool isMoreOrEqual<char*>(char* const &a, char* const &b);
-
-/* --- */
+template <typename A, typename B>
+bool isMoreOrEqual(const A& a, const B& b) { return compare(a,b) >= 0; }
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
@@ -630,7 +692,7 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)

@@ -585,6 +585,27 @@ template <> bool isMore<const char*>(const char* const &a, const char* const &b)
 /** Template specialization for asserting const char * types */
 template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
 
+/* --- */
+
+/** Template specialization for asserting char * types */
+template <> bool isLess<char*>(char* const &a, char* const &b);
+
+/** Template specialization for asserting char * types */
+template <> bool isLessOrEqual<char*>(char* const &a, char* const &b);
+
+/** Template specialization for asserting char * types */
+template <> bool isEqual<char*>(char* const &a, char* const &b);
+
+/** Template specialization for asserting char * types */
+template <> bool isNotEqual<char*>(char* const &a, char* const &b);
+
+/** Template specialization for asserting char * types */
+template <> bool isMore<char*>(char* const &a, char* const &b);
+
+/** Template specialization for asserting char * types */
+template <> bool isMoreOrEqual<char*>(char* const &a, char* const &b);
+
+/* --- */
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */

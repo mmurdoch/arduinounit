@@ -179,7 +179,7 @@ unsigned long
 double
 ```
 
-A note on character strings:  There are specializations for the char * type, like "hello", but some versions of the compiler treats character literals ("hello") and character arrays (char buf[32]) as different types.  You can safely cast character arrays to character pointers for these assertions.  For example:
+A note on character strings:  There are specializations for the const char * type, like "hello", but some versions of the compiler treats character literals ("hello") and character arrays (char buf[32]) as different types.  You can safely cast character arrays to *constant* character pointers for these assertions.  For example:
 ```
 test(string)
 {
@@ -187,7 +187,7 @@ test(string)
   char *str2="test1";
   strcpy(str1,str2);
   assertEqual(str1,str2); // may not compile or give warning
-  assertEqual((char*)str1,str2); // ok -- 
+  assertEqual((const char*)str1,(const char *)str2); // ok -- 
 }
 ```
 

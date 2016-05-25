@@ -180,6 +180,22 @@ long
 unsigned long
 double
 ```
+All the string-like types (String, char *, char[] and flash string literals) can be used
+interchangeably in assertions, i.e.:
+```
+test(strings) {
+   const char *cok="ok";
+   char aok[3];
+   String sok(cok);
+
+   strcpy(aok,cok);
+   
+   assertEqual(cok,aok);
+   assertEqual(aok,sok);
+   assertEqual(sok,F("ok"));
+   // etc.
+}
+```   
 
 There are addtionally some boolean assertions:
 ```

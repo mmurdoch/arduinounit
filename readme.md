@@ -170,6 +170,8 @@ The following types are supported for these assertions:
 ```
 String
 char *
+char []
+flash string literals, i.e. F("ok")
 char
 unsigned char
 int

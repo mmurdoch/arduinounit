@@ -9,6 +9,7 @@ struct MkCompare
 
   static const TYPES SPECIAL[];
 
+  int phase;
   TYPES typeA;
   TYPES typeB;
 
@@ -65,19 +66,44 @@ struct MkCompare
     }
   }
 
-  MkCompare(std::ostream &_out) : out(_out) {}
+  MkCompare(std::ostream &_out) : out(_out)
+  {
+    typeA=GENERIC;
+    typeB=GENERIC;
+    phase=1;
+  }
 
   virtual void print() {
+    mask();
     head();
-    between();
-    equal();
-    notEqual();
-    less();
-    more();
-    lessOrEqual();
-    moreOrEqual();
-    foot();
+    if (phase > 0) {
+      between();
+      equal();
+      notEqual();
+      less();
+      more();
+      lessOrEqual();
+      moreOrEqual();
+      foot();
+    }
+    unmask();
   };
+
+  bool masked() {
+    return typeA == FLASH_CHAR_PTR || typeB == FLASH_CHAR_PTR;
+  }
+
+  void mask() {
+    if (masked()) {
+      out << "#if defined(F)" << std::endl;
+    }
+  }
+
+  void unmask() {
+    if (masked()) {
+      out << "#endif" << std::endl;
+    }
+  }
 
   virtual void args() {
     out << "(";
@@ -100,9 +126,9 @@ struct MkCompare
           out << "    return strcmp(a,b);" << std::endl;
         }
       } else if ((typeA != FLASH_CHAR_PTR && typeA != STRING) && typeB == FLASH_CHAR_PTR) {
-        out << "    return strcmp_PF(a,b);" << std::endl;
+        out << "    return strcmp_P(a,(const char *)b);" << std::endl;
       } else if (typeA == FLASH_CHAR_PTR && (typeB != FLASH_CHAR_PTR && typeB != STRING)) {
-        out << "    return -strcmp_PF(b,a);" << std::endl;
+        out << "    return -strcmp_P(b,(const char *)a);" << std::endl;
       } else {
         if (typeB == STRING) {
           out << "    return -Compare < "; templateArg(typeB,'b'); out << ","; templateArg(typeA,'a'); out << " >::between(b,a);" << std::endl;
@@ -116,9 +142,9 @@ struct MkCompare
           if (typeA == STRING) {
             out << "         a.getBytes(a_buf,4,i);" << std::endl;            
           } else {
-            out << "         memcpy_PF(a_buf,a+i,4);" << std::endl;
+            out << "         memcpy_P(a_buf,((const char *)a)+i,4);" << std::endl;
           }
-          out << "         memcpy_PF(b_buf,b+i,4);" << std::endl;        
+          out << "         memcpy_P(b_buf,((const char *)b)+i,4);" << std::endl;        
           out << "      }" << std::endl;
           out << "      if (a_buf[j] < b_buf[j]) return -1;" << std::endl;
           out << "      if (a_buf[j] > b_buf[j]) return  1;" << std::endl;
@@ -212,8 +238,13 @@ struct MkCompare
   virtual void head() {
     out << "template ";
     templateDeclare();
-    out << "struct Compare"; templateArgs(); out << std:: endl;
-    out << "{" << std:: endl;
+    out << "struct Compare"; templateArgs();
+    if (phase == 0) {
+      out << ";" << std::endl;
+    } else {
+      out << std:: endl;
+      out << "{" << std:: endl;
+    }
   }
 
   virtual void foot() {
@@ -237,8 +268,8 @@ void mkTemplate()
 }
 
 const MkCompare::TYPES MkCompare::SPECIAL [] = {
-  MkCompare::CONST_CHAR_PTR, MkCompare::FLASH_CHAR_PTR,MkCompare::CHAR_PTR,
-  MkCompare::SIZED_ARRAY, MkCompare::GENERIC_ARRAY, MkCompare::STRING,
+  MkCompare::STRING, MkCompare::CONST_CHAR_PTR, MkCompare::FLASH_CHAR_PTR,MkCompare::CHAR_PTR,
+  MkCompare::SIZED_ARRAY, /* MkCompare::GENERIC_ARRAY, */ 
 };
 
 
@@ -261,7 +292,9 @@ int main(int argc, const char *argv[])
   mk.out << "#pragma once" << std::endl;
 
   if (includeFlash) {
+    mk.out << "#if defined(F)" << std::endl;
     mk.out << "#include <avr/pgmspace.h>" << std::endl;
+    mk.out << "#endif" << std::endl;    
   }
 
   if (includeString) {
@@ -276,19 +309,22 @@ int main(int argc, const char *argv[])
     mk.print();
   }
 
+  for (mk.phase = 0; mk.phase < 2; ++mk.phase) {
 
-  for (int i=0; i<sizeof(MkCompare::SPECIAL)/sizeof(MkCompare::TYPES); ++i) {
-    for (int j=0; j<sizeof(MkCompare::SPECIAL)/sizeof(MkCompare::TYPES); ++j) {
-      mk.typeA=MkCompare::SPECIAL[i];
-      mk.typeB=MkCompare::SPECIAL[j];
 
-      if ((!includeFlash)
-          && (mk.typeA == MkCompare::FLASH_CHAR_PTR || mk.typeB == MkCompare::FLASH_CHAR_PTR)) continue;
-
-      if ((!includeString)
-          && (mk.typeA == MkCompare::STRING || mk.typeB == MkCompare::STRING)) continue;
-      
-      mk.print();
+    for (int i=0; i<sizeof(MkCompare::SPECIAL)/sizeof(MkCompare::TYPES); ++i) {
+      for (int j=0; j<sizeof(MkCompare::SPECIAL)/sizeof(MkCompare::TYPES); ++j) {
+        mk.typeA=MkCompare::SPECIAL[i];
+        mk.typeB=MkCompare::SPECIAL[j];
+        
+        if ((!includeFlash)
+            && (mk.typeA == MkCompare::FLASH_CHAR_PTR || mk.typeB == MkCompare::FLASH_CHAR_PTR)) continue;
+        
+        if ((!includeString)
+            && (mk.typeA == MkCompare::STRING || mk.typeB == MkCompare::STRING)) continue;
+        
+        mk.print();
+      }
     }
   }
 

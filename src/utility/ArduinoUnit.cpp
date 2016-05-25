@@ -266,39 +266,3 @@ void TestOnce::loop()
   once();
   if (state == LOOPING) state = DONE_PASS;
 }
-
-template <>
-bool isLess<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) < 0);
-}
-
-template <>
-bool isLessOrEqual<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) <= 0);
-}
-
-template <>
-bool isEqual<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) == 0);
-}
-
-template <>
-bool isNotEqual<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) != 0);
-}
-
-template <>
-bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) >= 0);
-}
-
-template <>
-bool isMore<const char*>(const char* const &a, const char* const &b)
-{
-  return (strcmp(a,b) > 0);
-}

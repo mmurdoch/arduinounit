@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <Print.h>
+#include <Compare.h>
 
 #if ARDUINO >= 100 && ARDUINO < 103
 #undef F
@@ -547,127 +548,6 @@ class TestOnce : public Test {
     char *, const char *, and char [N] types which map to strcmp(). 
 */
 
-template <typename A, typename B>
-struct Compare
-{
-  inline static int cmp(const A &a, const B &b)
-  {
-    if (a<b) return -1;
-    if (b<a) return  1;
-    return 0;
-  }
-};
-
-template <>
-struct Compare<const char *, const char *>
-{
-  inline static int cmp(const char* const &a, const char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <>
-struct Compare<const char *, char *>
-{
-  inline static int cmp(const char* const &a, char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <>
-struct Compare<char *, const char *>
-{
-  inline static int cmp(char* const &a, const char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <>
-struct Compare<char *, char *>
-{
-  inline static int cmp(char* const &a, char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <size_t N>
-struct Compare<char [N], const char *>
-{
-  inline static int cmp(const char (&a)[N], const char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <size_t N>
-struct Compare<const char *, char [N]>
-{
-  inline static int cmp(const char* const &a, const char (&b)[N])
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <size_t N, size_t M>
-struct Compare<char [N], char [M]>
-{
-  inline static int cmp(const char (&a)[N], const char (&b)[M])
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <size_t N>
-struct Compare<char [N], char *>
-{
-  inline static int cmp(const char (&a)[N], char* const &b)
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <size_t N>
-struct Compare<char *, char [N]>
-{
-  inline static int cmp(char* const &a, const char (&b)[N])
-  {
-    return strcmp(a,b);
-  }
-};
-
-template <typename A, typename B>
-inline int compare(const A &a, const B &b)
-{
-  return Compare<A,B>::cmp(a,b);
-}
-
-/** Template binary operator== to assist with assertions */
-template <typename A, typename B>
-bool isEqual(const A& a, const B& b) { return compare(a,b)==0; }
-
-/** Template binary operator!= to assist with assertions */
-template <typename A, typename B>
-bool isNotEqual(const A& a, const B& b) { return compare(a,b) !=0; }
-
-/** Template binary operator< to assist with assertions */
-template <typename A, typename B>
-bool isLess(const A& a, const B& b) { return compare(a,b) < 0; }
-
-/** Template binary operator> to assist with assertions */
-template <typename A, typename B>
-bool isMore(const A& a, const B& b) { return compare(a,b) > 0; }
-
-/** Template binary operator<= to assist with assertions */
-template <typename A, typename B>
-bool isLessOrEqual(const A& a, const B& b) { return compare(a,b) <= 0; }
-
-/** Template binary operator>= to assist with assertions */
-template <typename A, typename B>
-bool isMoreOrEqual(const A& a, const B& b) { return compare(a,b) >= 0; }
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
@@ -695,22 +575,22 @@ is in another file (or defined after the assertion on it). */
 #define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
+#define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)
+#define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLess(arg1,arg2)        assertOp(arg1,isLess,"<",arg2)
+#define assertLess(arg1,arg2)        assertOp(arg1,compareLess,"<",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMore(arg1,arg2)        assertOp(arg1,isMore,">",arg2)
+#define assertMore(arg1,arg2)        assertOp(arg1,compareMore,">",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLessOrEqual(arg1,arg2) assertOp(arg1,isLessOrEqual,"<=",arg2)
+#define assertLessOrEqual(arg1,arg2) assertOp(arg1,compareLessOrEqual,"<=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,isMoreOrEqual,">=",arg2)
+#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,compareMoreOrEqual,">=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertTrue(arg) assertEqual(arg,true)

@@ -1,6 +1,9 @@
 #include <string.h>
 #include <iostream>
 
+#include "Compare.h"
+
+#if 0
 template <typename A, typename B>
 struct Compare
 {
@@ -101,6 +104,7 @@ struct Compare<char *, char [N]>
     return strcmp(a,b);
   }
 };
+#endif
 
 template <typename A, typename B>
 inline int compare(const A &a, const B &b)

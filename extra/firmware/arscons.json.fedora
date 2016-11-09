@@ -1,0 +1,4 @@
+{
+  "ARDUINO_PORT" : "/dev/ttyACM*",
+  "ARDUINO_BOARD" : "mega2560"
+}

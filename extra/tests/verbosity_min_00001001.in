@@ -1,0 +1,27 @@
+Test overall and phase should always pass.
+Interactive tester commands:
+  include <pattern>
+  exclude <pattern>
+  min_verbosity <binary number>
+  max_verbosity <binary number>
+  run
+command> exclude *
+command> include passes
+command> include fails
+command> include skips
+command> include assert_bools
+command> max_verbosity 11111111
+command> min_verbosity 00001001
+command> run
+Test assert_ints skipped.
+Test assert_strings skipped.
+Test meta skipped.
+Assertion failed: (x=0) == (0x1=1), file firmware.ino, line 144.
+Assertion failed: (x=1) == (0x0=0), file firmware.ino, line 145.
+Test assert_bools passed.
+Test passes passed.
+Test fails failed.
+Test skips skipped.
+Test phase passed.
+Test overall passed.
+Test summary: 4 passed, 1 failed, and 4 skipped, out of 9 test(s).

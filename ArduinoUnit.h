@@ -8,6 +8,7 @@
 
 #include <stdint.h>
 #include <Print.h>
+#include <Compare.h>
 
 #if ARDUINO >= 100 && ARDUINO < 103
 #undef F
@@ -488,8 +489,8 @@ void loop() {
 
   virtual ~Test();
 
-  template <typename T>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const T& lhs, const __FlashStringHelper *ops, bool (*op)(const T& lhs, const T& rhs), const __FlashStringHelper *rhss, const T& rhs) {
+  template <typename A, typename B>
+    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, const __FlashStringHelper *ops, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -543,47 +544,9 @@ class TestOnce : public Test {
   virtual void once() = 0;
 };
 
-/** Template binary operator== to assist with assertions */
-template <typename T>
-bool isEqual(const T& a, const T& b) { return a==b; }
-
-/** Template binary operator!= to assist with assertions */
-template <typename T>
-bool isNotEqual(const T& a, const T& b) { return !(a==b); }
-
-/** Template binary operator< to assist with assertions */
-template <typename T>
-bool isLess(const T& a, const T& b) { return a < b; }
-
-/** Template binary operator> to assist with assertions */
-template <typename T>
-bool isMore(const T& a, const T& b) { return b < a; }
-
-/** Template binary operator<= to assist with assertions */
-template <typename T>
-bool isLessOrEqual(const T& a, const T& b) { return !(b<a); }
-
-/** Template binary operator>= to assist with assertions */
-template <typename T>
-bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
-
-/** Template specialization for asserting const char * types */
-template <> bool isLess<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isLessOrEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isNotEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMore<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
+/** Class to unify comparisons.  There are a variety of specializations to account for
+    char *, const char *, and char [N] types which map to strcmp(). 
+*/
 
 
 /** Create a test-once test, usually checked with assertXXXX.
@@ -609,25 +572,25 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
+#define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)
+#define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLess(arg1,arg2)        assertOp(arg1,isLess,"<",arg2)
+#define assertLess(arg1,arg2)        assertOp(arg1,compareLess,"<",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMore(arg1,arg2)        assertOp(arg1,isMore,">",arg2)
+#define assertMore(arg1,arg2)        assertOp(arg1,compareMore,">",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLessOrEqual(arg1,arg2) assertOp(arg1,isLessOrEqual,"<=",arg2)
+#define assertLessOrEqual(arg1,arg2) assertOp(arg1,compareLessOrEqual,"<=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,isMoreOrEqual,">=",arg2)
+#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,compareMoreOrEqual,">=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertTrue(arg) assertEqual(arg,true)

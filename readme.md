@@ -170,6 +170,8 @@ The following types are supported for these assertions:
 ```
 String
 char *
+char []
+flash string literals, i.e. F("ok")
 char
 unsigned char
 int
@@ -178,18 +180,22 @@ long
 unsigned long
 double
 ```
+All the string-like types (String, char *, char[] and flash string literals) can be used
+interchangeably in assertions, i.e.:
+```
+test(strings) {
+   const char *cok="ok";
+   char aok[3];
+   String sok(cok);
 
-A note on character strings:  There are specializations for the const char * type, like "hello", but some versions of the compiler treats character literals ("hello") and character arrays (char buf[32]) as different types.  You can safely cast character arrays to *constant* character pointers for these assertions.  For example:
-```
-test(string)
-{
-  char str1[32];
-  char *str2="test1";
-  strcpy(str1,str2);
-  assertEqual(str1,str2); // may not compile or give warning
-  assertEqual((const char*)str1,(const char *)str2); // ok -- 
+   strcpy(aok,cok);
+   
+   assertEqual(cok,aok);
+   assertEqual(aok,sok);
+   assertEqual(sok,F("ok"));
+   // etc.
 }
-```
+```   
 
 There are addtionally some boolean assertions:
 ```

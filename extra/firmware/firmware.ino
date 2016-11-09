@@ -24,6 +24,9 @@ void motd()
   Serial.println(F("  min_verbosity <binary number>"));
   Serial.println(F("  max_verbosity <binary number>"));
   Serial.println(F("  run"));
+  Serial.println(F("Note:"));
+  Serial.println(F("  Just 'run' will (correctly) have 1 test fail and 1 skip."));
+  Serial.println(F("  Enable 'newline' in the serial monitor to send commands."));
 }
 
 void getline()
@@ -448,4 +451,150 @@ testing(overall)
     if (!checkTestSkip(meta)) assertTestPass(meta);
     pass();
   }
+}
+
+char *iss47a="47";
+const char *iss47b="47";
+char iss47c[3]={'4','7',0};
+const char iss47d[3]={'4','7',0};
+String iss47e="47";
+const char iss47f_P[] PROGMEM  = {"47"};
+const __FlashStringHelper *iss47f=(const __FlashStringHelper *)iss47f_P;
+
+char *iss47A="48";
+const char *iss47B="48";
+char iss47C[3]={'4','8',0};
+const char iss47D[3]={'4','8',0};
+String iss47E="48";
+const char iss47F_P[] PROGMEM  = {"48"};
+const __FlashStringHelper *iss47F=(const __FlashStringHelper *)iss47F_P;
+
+test(iss47)
+{
+  Serial.println("iss47");
+  assertEqual(iss47a,iss47a);
+  assertEqual(iss47a,iss47b);
+  assertEqual(iss47a,iss47c);
+  assertEqual(iss47a,iss47d);
+  assertEqual(iss47a,iss47e);
+  assertEqual(iss47a,iss47f);
+
+  assertEqual(iss47b,iss47a);  
+  assertEqual(iss47b,iss47b);
+  assertEqual(iss47b,iss47c);
+  assertEqual(iss47b,iss47d);
+  assertEqual(iss47b,iss47e);
+  assertEqual(iss47b,iss47f);  
+
+  assertEqual(iss47c,iss47a);  
+  assertEqual(iss47c,iss47b);  
+  assertEqual(iss47c,iss47c);
+  assertEqual(iss47c,iss47d);
+  assertEqual(iss47c,iss47e);
+  assertEqual(iss47c,iss47f);
+
+  assertEqual(iss47d,iss47a);  
+  assertEqual(iss47d,iss47b);  
+  assertEqual(iss47d,iss47c);
+  assertEqual(iss47d,iss47d);
+  assertEqual(iss47d,iss47e);
+  assertEqual(iss47d,iss47f);
+
+  assertEqual(iss47e,iss47a);  
+  assertEqual(iss47e,iss47b);  
+  assertEqual(iss47e,iss47c);
+  assertEqual(iss47e,iss47d);
+  assertEqual(iss47e,iss47e);
+  assertEqual(iss47e,iss47f);
+  
+  assertEqual(iss47f,iss47a);  
+  assertEqual(iss47f,iss47b);  
+  assertEqual(iss47f,iss47c);
+  assertEqual(iss47f,iss47d);
+  assertEqual(iss47f,iss47e);
+  assertEqual(iss47f,iss47f);
+  
+  assertNotEqual(iss47a,iss47A);
+  assertNotEqual(iss47a,iss47B);
+  assertNotEqual(iss47a,iss47C);
+  assertNotEqual(iss47a,iss47D);
+  assertNotEqual(iss47a,iss47E);
+  assertNotEqual(iss47a,iss47F);  
+
+  assertNotEqual(iss47b,iss47A);  
+  assertNotEqual(iss47b,iss47B);
+  assertNotEqual(iss47b,iss47C);
+  assertNotEqual(iss47b,iss47D);
+  assertNotEqual(iss47b,iss47E);
+  assertNotEqual(iss47b,iss47F);  
+
+  assertNotEqual(iss47c,iss47A);  
+  assertNotEqual(iss47c,iss47B);  
+  assertNotEqual(iss47c,iss47C);
+  assertNotEqual(iss47c,iss47D);
+  assertNotEqual(iss47c,iss47E);
+  assertNotEqual(iss47c,iss47F);  
+
+  assertNotEqual(iss47d,iss47A);  
+  assertNotEqual(iss47d,iss47B);  
+  assertNotEqual(iss47d,iss47C);
+  assertNotEqual(iss47d,iss47D);
+  assertNotEqual(iss47d,iss47E);
+  assertNotEqual(iss47d,iss47F);  
+
+  assertNotEqual(iss47e,iss47A);  
+  assertNotEqual(iss47e,iss47B);  
+  assertNotEqual(iss47e,iss47C);
+  assertNotEqual(iss47e,iss47D);
+  assertNotEqual(iss47e,iss47E);
+  assertNotEqual(iss47e,iss47F);  
+
+  assertNotEqual(iss47f,iss47A);  
+  assertNotEqual(iss47f,iss47B);  
+  assertNotEqual(iss47f,iss47C);
+  assertNotEqual(iss47f,iss47D);
+  assertNotEqual(iss47f,iss47E);
+  assertNotEqual(iss47f,iss47F);  
+  
+  assertNotEqual(iss47A,iss47a);
+  assertNotEqual(iss47A,iss47b);
+  assertNotEqual(iss47A,iss47c);
+  assertNotEqual(iss47A,iss47d);
+  assertNotEqual(iss47A,iss47e);
+  assertNotEqual(iss47A,iss47f);  
+
+  assertNotEqual(iss47B,iss47a);  
+  assertNotEqual(iss47B,iss47b);
+  assertNotEqual(iss47B,iss47c);
+  assertNotEqual(iss47B,iss47d);
+  assertNotEqual(iss47B,iss47e);
+  assertNotEqual(iss47B,iss47f);  
+
+  assertNotEqual(iss47C,iss47a);  
+  assertNotEqual(iss47C,iss47b);  
+  assertNotEqual(iss47C,iss47c);
+  assertNotEqual(iss47C,iss47d);
+  assertNotEqual(iss47C,iss47e);
+  assertNotEqual(iss47C,iss47f);  
+
+  assertNotEqual(iss47D,iss47a);  
+  assertNotEqual(iss47D,iss47b);  
+  assertNotEqual(iss47D,iss47c);
+  assertNotEqual(iss47D,iss47d);
+  assertNotEqual(iss47D,iss47e);
+  assertNotEqual(iss47D,iss47f);  
+
+  assertNotEqual(iss47E,iss47a);  
+  assertNotEqual(iss47E,iss47b);  
+  assertNotEqual(iss47E,iss47c);
+  assertNotEqual(iss47E,iss47d);
+  assertNotEqual(iss47E,iss47e);
+  assertNotEqual(iss47E,iss47f);  
+
+  assertNotEqual(iss47F,iss47a);  
+  assertNotEqual(iss47F,iss47b);  
+  assertNotEqual(iss47F,iss47c);
+  assertNotEqual(iss47F,iss47d);
+  assertNotEqual(iss47F,iss47e);
+  assertNotEqual(iss47F,iss47f);  
 }

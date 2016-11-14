@@ -23,10 +23,6 @@ test :
 firmware:
 	./bin/go compile
 
-.PHONY: up
-up :
-	cp -r src/* ..
-
 .PHONY: install
 install : 
 	mkdir -p $(ARDUINO_DIR)/libraries/ArduinoUnit

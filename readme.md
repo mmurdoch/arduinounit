@@ -44,7 +44,7 @@ And the following more-is-more features:
 
 Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
 
-Copy everything from this direcotry (containing library.properties)  directory to this new directory.
+Copy everything from this directory (containing library.properties)  directory to this new directory.
 
 Open a sketch in arduino and click `Sketch | Import Library... | ArduinoUnit` to start unit testing.
 

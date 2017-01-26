@@ -215,11 +215,11 @@ pip-log.txt
 .mr.developer.cfg
 
 # arduino-make
-firmware/build-*/*.d
-firmware/build-*/*.o
+firmware/build-*
 
 # arscons
 firmware/arscons.json
+firmware/firmware.elf
 firmware/firmware.hex
 firmware/firmware.sym
 firmware/.sconsign.dblite

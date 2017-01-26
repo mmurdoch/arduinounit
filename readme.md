@@ -3,16 +3,28 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-###Version 2.0
+##Current Version 2.2.0
+[Download ArduinoUnit 2.2.0](https://github.com/mmurdoch/arduinounit/releases/tag/v2.2.0).
 
-##Why
+ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
+of unit testing with the 1.x library over the last few years. It aims to be 
+easier to use for simple use cases whilst at the same time providing better 
+support for more complex unit testing needs (see below for details). As such 
+it is not fully compatible with 1.x unit test sketches, although it is relatively 
+easy to port these to 2.0 (see the 
+[porting guide](https://github.com/mmurdoch/arduinounit/blob/master/porting-guide.md)).
 
-This follows the spirit of ArduinoUnit 1.X with the following
+If you don't want to take advantage of the great new features in 2.0 then the 
+latest release of the 1.x code line is still 
+[available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
+
+##Why Version 2?
+
+ArduinoUnit 2 follows the spirit of ArduinoUnit 1.x with the following
 less-is-more features:
 
-1. It does not use dynamic memory.
-1. It does not break tests into suites.
-1. It does not have custom reports.
+1. No test suite setup is required.
+1. Custom reporting now uses the standard Arduino `Print` class.
 
 And the following more-is-more features:
 
@@ -30,16 +42,16 @@ And the following more-is-more features:
 
 ##Getting Started
 
-Create a directory called ArduinoUnit under `<arduino installation directory>\libraries`.
+Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
 
-Copy everything from the `src` directory to this new directory.
+Copy everything from this directory (containing library.properties)  directory to this new directory.
 
 Open a sketch in arduino and click `Sketch | Import Library... | ArduinoUnit` to start unit testing.
 
 For example, try this simple unit testing sketch:
 
 ```
-#line 2 "sketch"
+#line 2 "sketch.ino"
 #include <ArduinoUnit.h>
 
 test(ok) 
@@ -59,6 +71,7 @@ test(bad)
 void setup()
 {
   Serial.begin(9600);
+  while(!Serial); // for the Arduino Leonardo/Micro only
 }
 
 void loop()
@@ -73,10 +86,10 @@ Turn on the Serial Monitor (using the 'Serial Monitor' button, `Tools | Serial M
   `Ctrl+Shift+M`) and expect to see the following:
 
 ```
-sketch:17:1: fail assert (x=3) != (y=3)
-test bad failed.
-test ok passed.
-test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
+Assertion failed: (x=3) != (y=3), file sketch.ino, line 17.
+Test bad failed.
+Test ok passed.
+Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
 #Verbosity
 
@@ -157,6 +170,9 @@ The following types are supported for these assertions:
 ```
 String
 char *
+char []
+flash string literals, i.e. F("ok")
+char
 unsigned char
 int
 unsigned int
@@ -164,6 +180,23 @@ long
 unsigned long
 double
 ```
+All the string-like types (String, char *, char[] and flash string literals) can be used
+interchangeably in assertions, i.e.:
+```
+test(strings) {
+   const char *cok="ok";
+   char aok[3];
+   String sok(cok);
+
+   strcpy(aok,cok);
+   
+   assertEqual(cok,aok);
+   assertEqual(aok,sok);
+   assertEqual(sok,F("ok"));
+   // etc.
+}
+```   
+
 There are addtionally some boolean assertions:
 ```
 assertTrue(arg)
@@ -174,7 +207,7 @@ See the section below for assertions on tests.
 The output from these assertions is to print a string represenation of the
 arguments, and the value of the arguments, as in:
 ```
-file:line:column: pass/fail assert (arg1=value1) op (arg2=value2)
+Assertion passed/failed: (arg1=value1) op (arg2=value2), file name, line #.
 ```
 These assertions are defined in a way that the problem of multiple
 evaluations is avoided.  The arguments are only evaluated once in these
@@ -263,7 +296,7 @@ public:
 class MyTestOnce : public TestOnce
 {
 public:
-  MyTestOnce(const __FlashStringHelper *name) : TestOnce(name) {
+  MyTestOnce(const char *name) : TestOnce(name) {
   // same as MyTest
   }
   void setup() {
@@ -280,8 +313,8 @@ public:
 MyTest myTest1(F("myTest1"));
 MyTest myTest2(F("myTest2"));
 
-MyTestOnce myTestOnce1(F("myTestOnce1"));
-MyTestOnce myTestOnce2(F("myTestOnce2"));
+MyTestOnce myTestOnce1("myTestOnce1");
+MyTestOnce myTestOnce2("myTestOnce2");
 ```
 
 Note that `Test::run()` only calls the active unresolved tests.
@@ -304,6 +337,7 @@ A single test `my_test`
 void setup()
 {
   Serial.begin(9600);
+  while(!Serial); // for the Arduino Leonardo/Micro only
   Test::exclude("*");
   Test::include("my_test");
 }
@@ -314,6 +348,7 @@ All tests named dev_-something, but not the ones ending in _skip or _slow, or ha
 void setup()
 {
   Serial.begin(9600);
+  while(!Serial); // for the Arduino Leonardo/Micro only
   Test::exclude("*");
   Test::include("dev_*");
   Test::exclude("*_slow");
@@ -330,6 +365,18 @@ A.  As far as I can tell, this is a bug in the compiler -- look two
    lines up.  I do not know why the `__LINE__` macro does not match
    the actual line of code.
 
+Q. What's with the `# 2 "file.ino"` business in the examples?
+
+A. This is to address question 1 above, and, without this line, the filename
+   will be a very long and mostly useless name in the asserts, like,
+
+<pre>
+/var/folders/gr/n9s7qtcs2qqbdnmcgm6gjzrm0000gp/T/build2118014134542174575.tmp/sketch_mar17a.ino
+</pre>
+
+  This uses up flash memory space and doesn't give any useful information when
+  something goes wrong.
+
 Q. I get these link errors about multiply defined test_XXXX_instance.
 
 A. You have defined two tests with the same name XXXX using either the
@@ -342,6 +389,9 @@ A. Here is a troubleshooting guideline:
  * Make sure you call `Serial.begin()` in your setup.  Or, if you redirect
    output by changing the value of `Test::out`, make sure you configure
    the Print stream you direct it to.
+ * If you are using an Arduino Leonardo/Micro: don't forget to add 
+   `while(!Serial)` after `Serial.begin(9600)` in the setup(). Without this line
+   nothing will be printed in the serial monitor.
  * Make sure you call `Test::run()` in your loop().
  * Make sure you did not exclude the test(s) with `Test::exclude(pattern)`.
    By default all tests are included.
@@ -357,7 +407,8 @@ A. Here is a troubleshooting guideline:
 
 ##License
 
-Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch
+Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch, freenerd, John Macdonald,
+nicolaspanel, Matt Paine
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

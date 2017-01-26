@@ -1,14 +1,15 @@
+UNAME := $(shell uname)
+
 ifeq ($(UNAME), Linux)
   ARDUINO_DIR=/usr/share/arduino
 endif
 ifeq ($(UNAME), Darwin)
-  ARDUINO_DIR=/Applications/Arduino.app/Contents/Resources/Java
+  ARDUINO_DIR=$(HOME)/Documents/Arduino
 endif
 
 DOXYGEN=doxygen
 
 all : firmware doc
-	$(MAKE) -C firmware all
 
 .PHONY: doc
 doc :
@@ -16,12 +17,11 @@ doc :
 
 .PHONY: test
 test :
-	$(MAKE) -C firmware upload
-	./bin/test tests/*
+	./bin/go compile upload tests
 
 .PHONY: firmware
 firmware:
-	$(MAKE) -C firmware all
+	./bin/go compile
 
 .PHONY: install
 install : 
@@ -33,3 +33,11 @@ install :
 .PHONY: clean
 clean :
 	/bin/rm -rf `find . -name '*~' -o -name '#*' -o -name '.#*'`
+
+.PHONY: scrapetests
+scrapetests:
+	for f in tests/*.in ; do echo "$$f..."; ./bin/go run < $$f > $${f%%.in}.out; done
+
+.PHONY: updatetests
+updatetests:
+	for f in tests/*.in ; do cp $${f%%.in}.out $$f; done

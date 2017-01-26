@@ -18,5 +18,6 @@ var searchData=
   ['asserttestnotskip',['assertTestNotSkip',['../_arduino_unit_8h.html#a439c30d54d91aed8c833b2231c78a8ac',1,'ArduinoUnit.h']]],
   ['asserttestpass',['assertTestPass',['../_arduino_unit_8h.html#a8a163b115adb11159acfcae4dfa60033',1,'ArduinoUnit.h']]],
   ['asserttestskip',['assertTestSkip',['../_arduino_unit_8h.html#ad6d04bfb8589206f0d44229a5c0e178f',1,'ArduinoUnit.h']]],
-  ['asserttrue',['assertTrue',['../_arduino_unit_8h.html#abf5260a4376989bd11cbbbb86843e381',1,'ArduinoUnit.h']]]
+  ['asserttrue',['assertTrue',['../_arduino_unit_8h.html#abf5260a4376989bd11cbbbb86843e381',1,'ArduinoUnit.h']]],
+  ['available',['available',['../class_fake_stream.html#a425db0fb16e50da74ea573be6c655711',1,'FakeStream']]]
 ];

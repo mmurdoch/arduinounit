@@ -45,6 +45,7 @@ import json
 import os
 import re
 import sys
+import platform
 
 # arscons version
 __version__ = "1.0.0"
@@ -124,8 +125,6 @@ ARDUINO_VER     = resolve_var('ARDUINO_VER', 0) # Default to 0 if nothing is spe
 RST_TRIGGER     = resolve_var('RST_TRIGGER', None) # use built-in pulseDTR() by default
 EXTRA_LIB       = resolve_var('EXTRA_LIB', None) # handy for adding another arduino-lib dir
 
-print "PORT: " + ARDUINO_PORT
-
 if not ARDUINO_HOME:
     print 'ARDUINO_HOME must be defined.'
     raise KeyError('ARDUINO_HOME')
@@ -198,6 +197,7 @@ if EXTRA_LIB:
 if SKETCHBOOK_HOME:
     ARDUINO_LIBS.append(path.join(SKETCHBOOK_HOME, 'libraries'))
 
+print 'ARDUINO_LIBS: ' + str(ARDUINO_LIBS)
 
 # Override MCU and F_CPU
 MCU = ARGUMENTS.get('MCU', getBoardConf('build.mcu'))
@@ -449,7 +449,6 @@ AlwaysBuild(upload)
 
 # Clean build directory
 envArduino.Clean('all', 'build/')
-os.system('bash -c echo $PATH')
 # Monitor 
 monitor_cmd = '"%s" -m serial.tools.miniterm -b %s %s' % (resolve_var('PYTHON','python'),resolve_var('ARDUINO_BAUD',9600), ARDUINO_PORT)
 monitor = envArduino.Alias('monitor', '', [monitor_cmd])

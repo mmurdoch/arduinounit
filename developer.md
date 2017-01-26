@@ -54,33 +54,24 @@ Here are the basic files and folders
   - Linux `sudo apt-get install git` or `sudo yum install git-core`
 
   From here on, I will assume you are working from the git-bash
-  shell in windows, or a bash command prompt.
+  shell in Windows, or a bash command prompt.
 
-* Istall pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
+* Install pyserial 2.6 (https://pypi.python.org/pypi/pyserial)
 
   Download tar.gz file and type:
   <pre>
       tar zxf pyserial-2.6.tar.gz
       cd pyserial-2.6
+  </pre>
+  
+  Then, if on OS X or Linux, type:
+  <pre>
       sudo python setup.py install
   </pre>
-
-* On unix (osx/linux) install pexpect 2.3 (http://www.noah.org/wiki/Pexpect#topip.py)
-
-  Download tar.gz file and type:
+  
+  or, if on Windows, type:
   <pre>
-      tar zxf pexpect-2.3.tar.gz
-      cd pexpect-2.3
-      sudo python setup.py install
-  </pre>
-
-* On windows install winpexpect (https://bitbucket.org/geertj/winpexpect/downloads)
-
-  Download tar.gz file and type:
-  <pre>
-      tar zxf geertj-winpexpect*.tar.gz
-      cd geertj-winpexpect*
-      sudo python setup.py install
+      python setup.py install
   </pre>
 
 * Install Scons (scons.org).
@@ -94,12 +85,15 @@ Here are the basic files and folders
   A leading tile (~) in ARDUINO_HOME, AVR_HOME, and SKETCHBOOK_HOME is
   replaced by the user's home directory.
 
-* Build, upload, and monitor the test code in the project root folder
+* Build, upload, monitor, run and test from the project root folder
 
   <pre>
-    ./bin/build 
-    ./bin/build upload
-    ./bin/build monitor
+    ./bin/go compile
+    ./bin/go upload
+    ./bin/go monitor
+    ./bin/go run < tests/<some-test>.in
+    ./bin/go test < tests/<some-test>.in
+    ./bin/go tests
   </pre>
 
 * Run the testing firmware
@@ -124,11 +118,6 @@ Here are the basic files and folders
   </pre>
   You can use the prompted commands to change the test set and the verbosity
   of the tests.
-
-  You can automatically run a set of tests using 
-  <pre>
-    ./bin/test tests/*.in
-  </pre>
 
 ##License
 

@@ -1,24 +1,38 @@
 #line 2 "firmware.ino"
 #include <ArduinoUnit.h>
 
+//
+// line number sanity check
+//
+#if __LINE__ != 7
+#error __LINE__ value is incorrect!
+#endif
+
+
 char line[80];
 bool configuring = true;
+unsigned long time = 0;
+unsigned long startTime = 0;
+int phase = 0;
 
 void motd()
 {
-  Serial.println(F("The overall test should pass..."));
-  Serial.println(F("interactive tester commands:"));
+  Serial.println(F("Test overall and phase should always pass."));
+  Serial.println(F("Interactive tester commands:"));
   Serial.println(F("  include <pattern>"));
   Serial.println(F("  exclude <pattern>"));
   Serial.println(F("  min_verbosity <binary number>"));
   Serial.println(F("  max_verbosity <binary number>"));
   Serial.println(F("  run"));
+  Serial.println(F("Note:"));
+  Serial.println(F("  Just 'run' will (correctly) have 1 test fail and 1 skip."));
+  Serial.println(F("  Enable 'newline' in the serial monitor to send commands."));
 }
 
 void getline()
 {
   int c = 0;
-  int i = 0;
+  size_t i = 0;
   Serial.print(F("command> "));
   for (;;) {
     while (!Serial.available()) { }
@@ -26,8 +40,8 @@ void getline()
     if (c <= 0 || c == '\r') { continue; }
     if (c == 127 /* delete  */) { 
       if (i > 0) { 
-	Serial.print(F("\010 \010")); // erase char on terminal
-	--i; 
+        Serial.print(F("\010 \010")); // erase char on terminal
+        --i; 
       }
       continue;
     }
@@ -102,35 +116,19 @@ void setup()
     getline();
     process();
   }
+  phase=0;
+
+  Test::include("phase");
+  Test::include("overall");
+  startTime = millis();
 }
 
 void loop()
 {
+  time = millis()-startTime;
   Test::run();
 }
 
-// simple ongoing tests:
-
-testing(passes)
-{
-  if (millis() > 1000) {
-    pass();
-  }
-}
-
-testing(fails)
-{
-  if (millis() > 1000) {
-    fail();
-  }
-}
-
-testing(skips)
-{
-  if (millis() > 1000) {
-    skip();
-  }
-}
 
 // all boolean asserts
 
@@ -140,6 +138,7 @@ bool checkcase(bool x, int c)
   case 0: return x;
   case 1: return !x;
   }
+  return false;
 }
 
 void testcase(bool x,int c)
@@ -157,9 +156,9 @@ test(assert_bools)
       bool b = (x != 0);
       testcase(b,c);
       if (checkcase(b,c)) {
-	if (state != LOOPING) { fail(); return; }
+        if (state != LOOPING) { fail(); return; }
       } else {
-	if (state != DONE_FAIL) { fail(); return; }
+        if (state != DONE_FAIL) { fail(); return; }
       }
       state = LOOPING;
     }
@@ -178,6 +177,7 @@ bool checkcase(int x, int y, int c)
   case 4: return x >= y;
   case 5: return x > y;
   }
+  return false;
 }
 
 void testcase(int x, int y, int c)
@@ -197,13 +197,13 @@ test(assert_ints)
   for (int c = 0; c < 6; ++c) {
     for (int x = -1; x <= 1; ++x) {
       for (int y = -1; y <= 1; ++y) {
-	testcase(x,y,c);
-	if (checkcase(x,y,c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        testcase(x,y,c);
+        if (checkcase(x,y,c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
   }
@@ -224,6 +224,7 @@ bool checkcase(const char *x, const char *y, int c)
   case 4: return strcmp(x,y) >= 0;
   case 5: return strcmp(x,y) > 0;
   }
+  return false;
 }
 
 void testcase(const char *x, const char *y, int c)
@@ -243,15 +244,38 @@ test(assert_strings)
   for (int c = 0; c < 6; ++c) {
     for (int x = 0; strings[x] != 0; ++x) {
       for (int y = 0; strings[y] != 0; ++y) {
-	testcase(strings[x],strings[y],c);
-	if (checkcase(strings[x],strings[y],c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        testcase(strings[x],strings[y],c);
+        if (checkcase(strings[x],strings[y],c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
+  }
+}
+
+// simple ongoing tests:
+
+testing(passes)
+{
+  if (phase == 2 && time > 250) {
+    pass();
+  }
+}
+
+testing(fails)
+{
+  if (phase == 2 && time > 500) {
+    fail();
+  }
+}
+
+testing(skips)
+{
+  if (phase == 2 && time > 750) {
+    skip();
   }
 }
 
@@ -366,27 +390,53 @@ void metaassert(int t, int c)
   }
 }
 
+int metaNextPhase = 1;
 testing(meta)
 {
-  static unsigned long timeout = 0;
-  if (millis() >= timeout) {
-    timeout = millis() + 500;
-    
+  if (phase == metaNextPhase) {
     for (int t=0; t<3; ++t) {
       for (int c=0; c<8; ++c) {
-	metaassert(t,c);
-	if (metacheck(t,c)) {
-	  if (state != LOOPING) { fail(); return; }
-	} else {
-	  if (state != DONE_FAIL) { fail(); return; }
-	}
-	state = LOOPING;
+        metaassert(t,c);
+        if (metacheck(t,c)) {
+          if (state != LOOPING) { fail(); return; }
+        } else {
+          if (state != DONE_FAIL) { fail(); return; }
+        }
+        state = LOOPING;
       }
     }
-
-    if (timeout >= 2000) pass();
+    if (phase == 1) metaNextPhase = 3;
+    else pass();
   }
 }
+
+testing(phase)
+{
+  bool done = true;
+  switch(phase) {
+  case 0:
+    done = done && checkTestDone(assert_bools);
+    done = done && checkTestDone(assert_ints);
+    done = done && checkTestDone(assert_strings);
+    break;
+  case 1:
+    done = done && (checkTestDone(meta) || (metaNextPhase == 3));
+    break;
+  case 2:
+    done = done && (time > 1000);
+    break;
+  case 3:
+    done = done && checkTestDone(meta);
+    break;
+  case 4:
+    pass();
+    break;
+  }
+  if (done) {
+    ++phase;
+    startTime = millis();
+  }
+}    
 
 testing(overall)
 {
@@ -401,4 +451,150 @@ testing(overall)
     if (!checkTestSkip(meta)) assertTestPass(meta);
     pass();
   }
+}
+
+char *iss47a="47";
+const char *iss47b="47";
+char iss47c[3]={'4','7',0};
+const char iss47d[3]={'4','7',0};
+String iss47e="47";
+const char iss47f_P[] PROGMEM  = {"47"};
+const __FlashStringHelper *iss47f=(const __FlashStringHelper *)iss47f_P;
+
+char *iss47A="48";
+const char *iss47B="48";
+char iss47C[3]={'4','8',0};
+const char iss47D[3]={'4','8',0};
+String iss47E="48";
+const char iss47F_P[] PROGMEM  = {"48"};
+const __FlashStringHelper *iss47F=(const __FlashStringHelper *)iss47F_P;
+
+test(iss47)
+{
+  Serial.println("iss47");
+  assertEqual(iss47a,iss47a);
+  assertEqual(iss47a,iss47b);
+  assertEqual(iss47a,iss47c);
+  assertEqual(iss47a,iss47d);
+  assertEqual(iss47a,iss47e);
+  assertEqual(iss47a,iss47f);
+
+  assertEqual(iss47b,iss47a);  
+  assertEqual(iss47b,iss47b);
+  assertEqual(iss47b,iss47c);
+  assertEqual(iss47b,iss47d);
+  assertEqual(iss47b,iss47e);
+  assertEqual(iss47b,iss47f);  
+
+  assertEqual(iss47c,iss47a);  
+  assertEqual(iss47c,iss47b);  
+  assertEqual(iss47c,iss47c);
+  assertEqual(iss47c,iss47d);
+  assertEqual(iss47c,iss47e);
+  assertEqual(iss47c,iss47f);
+
+  assertEqual(iss47d,iss47a);  
+  assertEqual(iss47d,iss47b);  
+  assertEqual(iss47d,iss47c);
+  assertEqual(iss47d,iss47d);
+  assertEqual(iss47d,iss47e);
+  assertEqual(iss47d,iss47f);
+
+  assertEqual(iss47e,iss47a);  
+  assertEqual(iss47e,iss47b);  
+  assertEqual(iss47e,iss47c);
+  assertEqual(iss47e,iss47d);
+  assertEqual(iss47e,iss47e);
+  assertEqual(iss47e,iss47f);
+  
+  assertEqual(iss47f,iss47a);  
+  assertEqual(iss47f,iss47b);  
+  assertEqual(iss47f,iss47c);
+  assertEqual(iss47f,iss47d);
+  assertEqual(iss47f,iss47e);
+  assertEqual(iss47f,iss47f);
+  
+  assertNotEqual(iss47a,iss47A);
+  assertNotEqual(iss47a,iss47B);
+  assertNotEqual(iss47a,iss47C);
+  assertNotEqual(iss47a,iss47D);
+  assertNotEqual(iss47a,iss47E);
+  assertNotEqual(iss47a,iss47F);  
+
+  assertNotEqual(iss47b,iss47A);  
+  assertNotEqual(iss47b,iss47B);
+  assertNotEqual(iss47b,iss47C);
+  assertNotEqual(iss47b,iss47D);
+  assertNotEqual(iss47b,iss47E);
+  assertNotEqual(iss47b,iss47F);  
+
+  assertNotEqual(iss47c,iss47A);  
+  assertNotEqual(iss47c,iss47B);  
+  assertNotEqual(iss47c,iss47C);
+  assertNotEqual(iss47c,iss47D);
+  assertNotEqual(iss47c,iss47E);
+  assertNotEqual(iss47c,iss47F);  
+
+  assertNotEqual(iss47d,iss47A);  
+  assertNotEqual(iss47d,iss47B);  
+  assertNotEqual(iss47d,iss47C);
+  assertNotEqual(iss47d,iss47D);
+  assertNotEqual(iss47d,iss47E);
+  assertNotEqual(iss47d,iss47F);  
+
+  assertNotEqual(iss47e,iss47A);  
+  assertNotEqual(iss47e,iss47B);  
+  assertNotEqual(iss47e,iss47C);
+  assertNotEqual(iss47e,iss47D);
+  assertNotEqual(iss47e,iss47E);
+  assertNotEqual(iss47e,iss47F);  
+
+  assertNotEqual(iss47f,iss47A);  
+  assertNotEqual(iss47f,iss47B);  
+  assertNotEqual(iss47f,iss47C);
+  assertNotEqual(iss47f,iss47D);
+  assertNotEqual(iss47f,iss47E);
+  assertNotEqual(iss47f,iss47F);  
+  
+  assertNotEqual(iss47A,iss47a);
+  assertNotEqual(iss47A,iss47b);
+  assertNotEqual(iss47A,iss47c);
+  assertNotEqual(iss47A,iss47d);
+  assertNotEqual(iss47A,iss47e);
+  assertNotEqual(iss47A,iss47f);  
+
+  assertNotEqual(iss47B,iss47a);  
+  assertNotEqual(iss47B,iss47b);
+  assertNotEqual(iss47B,iss47c);
+  assertNotEqual(iss47B,iss47d);
+  assertNotEqual(iss47B,iss47e);
+  assertNotEqual(iss47B,iss47f);  
+
+  assertNotEqual(iss47C,iss47a);  
+  assertNotEqual(iss47C,iss47b);  
+  assertNotEqual(iss47C,iss47c);
+  assertNotEqual(iss47C,iss47d);
+  assertNotEqual(iss47C,iss47e);
+  assertNotEqual(iss47C,iss47f);  
+
+  assertNotEqual(iss47D,iss47a);  
+  assertNotEqual(iss47D,iss47b);  
+  assertNotEqual(iss47D,iss47c);
+  assertNotEqual(iss47D,iss47d);
+  assertNotEqual(iss47D,iss47e);
+  assertNotEqual(iss47D,iss47f);  
+
+  assertNotEqual(iss47E,iss47a);  
+  assertNotEqual(iss47E,iss47b);  
+  assertNotEqual(iss47E,iss47c);
+  assertNotEqual(iss47E,iss47d);
+  assertNotEqual(iss47E,iss47e);
+  assertNotEqual(iss47E,iss47f);  
+
+  assertNotEqual(iss47F,iss47a);  
+  assertNotEqual(iss47F,iss47b);  
+  assertNotEqual(iss47F,iss47c);
+  assertNotEqual(iss47F,iss47d);
+  assertNotEqual(iss47F,iss47e);
+  assertNotEqual(iss47F,iss47f);  
 }

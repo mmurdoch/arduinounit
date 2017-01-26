@@ -18,20 +18,27 @@
 
 #endif
 
-#if ARDUINO >= 100
-// this is still an outstanding bug
-// this does not generate incorrect code, but generates a lot of
-// incorrect warnings...
+#if defined(__GNUC__) && (__GNUC__*100 + __GNUC_MINOR__ < 407)
 // Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
+//
 #ifdef PROGMEM
 #undef PROGMEM
 #define PROGMEM __attribute__((section(".progmem.data")))
 #endif
-
 #endif
 
-#include <utility/FakeStream.h>
-#include <utility/MemoryFree.h>
+// Workaround for Arduino Due
+#if defined(__arm__) && !defined(PROGMEM)
+#define PROGMEM
+#define PSTR(s) s
+#define memcpy_P(a, b, c) memcpy(a, b, c)
+#define strlen_P(a) strlen(a)
+#endif
+
+#include <ArduinoUnitUtility/Compare.h>
+#include <ArduinoUnitUtility/FakeStream.h>
+#include <ArduinoUnitUtility/FakeStreamBuffer.h>
+#include <ArduinoUnitUtility/FreeMemory.h>
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2
@@ -284,14 +291,14 @@ class Test
 {
  private:
   // allows for both ram/progmem based names
-  class String : public Printable {
+  class TestString : public Printable {
   public:
     const uint32_t data;
-    String(const char *_data);
-    String(const __FlashStringHelper *_data);
+    TestString(const char *_data);
+    TestString(const __FlashStringHelper *_data);
     void read(void *destination, uint16_t offset, uint8_t length) const;
     uint16_t length() const;
-    int8_t compare(const Test::String &to) const;
+    int8_t compare(const Test::TestString &to) const;
     size_t printTo(Print &p) const;
     bool matches(const char *pattern) const;
   };
@@ -382,7 +389,7 @@ class Test
   static Test* current;
 
   /** the name of this test */
-  String name;
+  TestString name;
 
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 
@@ -482,8 +489,8 @@ void loop() {
 
   virtual ~Test();
 
-  template <typename T>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const T& lhs, const __FlashStringHelper *ops, bool (*op)(const T& lhs, const T& rhs), const __FlashStringHelper *rhss, const T& rhs) {
+  template <typename A, typename B>
+    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, const __FlashStringHelper *ops, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -503,12 +510,9 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
-      out->print(file);
-      out->print(F(":"));
-      out->print(line);
-      out->print(F(":1: "));
-      out->print(ok ? F("pass") : F("fail"));
-      out->print(F(" assert ("));
+      out->print(F("Assertion "));
+      out->print(ok ? F("passed") : F("failed"));
+      out->print(F(": ("));
       out->print(lhss);
       out->print(F("="));
       out->print(lhs);
@@ -518,8 +522,11 @@ void loop() {
       out->print(rhss);
       out->print(F("="));
       out->print(rhs);
-      out->print(F(")"));
-      out->println();
+      out->print(F("), file "));
+      out->print(file);
+      out->print(F(", line "));
+      out->print(line);
+      out->println(".");
     }
 #endif
     return ok;
@@ -537,47 +544,9 @@ class TestOnce : public Test {
   virtual void once() = 0;
 };
 
-/** Template binary operator== to assist with assertions */
-template <typename T>
-bool isEqual(const T& a, const T& b) { return a==b; }
-
-/** Template binary operator!= to assist with assertions */
-template <typename T>
-bool isNotEqual(const T& a, const T& b) { return !(a==b); }
-
-/** Template binary operator< to assist with assertions */
-template <typename T>
-bool isLess(const T& a, const T& b) { return a < b; }
-
-/** Template binary operator> to assist with assertions */
-template <typename T>
-bool isMore(const T& a, const T& b) { return b < a; }
-
-/** Template binary operator<= to assist with assertions */
-template <typename T>
-bool isLessOrEqual(const T& a, const T& b) { return !(b<a); }
-
-/** Template binary operator>= to assist with assertions */
-template <typename T>
-bool isMoreOrEqual(const T& a, const T& b) { return !(a<b); }
-
-/** Template specialization for asserting const char * types */
-template <> bool isLess<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isLessOrEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isNotEqual<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMore<const char*>(const char* const &a, const char* const &b);
-
-/** Template specialization for asserting const char * types */
-template <> bool isMoreOrEqual<const char*>(const char* const &a, const char* const &b);
+/** Class to unify comparisons.  There are a variety of specializations to account for
+    char *, const char *, and char [N] types which map to strcmp(). 
+*/
 
 
 /** Create a test-once test, usually checked with assertXXXX.
@@ -603,25 +572,25 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) if (!Test::assertion<typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return;
+#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertEqual(arg1,arg2)       assertOp(arg1,isEqual,"==",arg2)
+#define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertNotEqual(arg1,arg2)    assertOp(arg1,isNotEqual,"!=",arg2)
+#define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLess(arg1,arg2)        assertOp(arg1,isLess,"<",arg2)
+#define assertLess(arg1,arg2)        assertOp(arg1,compareLess,"<",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMore(arg1,arg2)        assertOp(arg1,isMore,">",arg2)
+#define assertMore(arg1,arg2)        assertOp(arg1,compareMore,">",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLessOrEqual(arg1,arg2) assertOp(arg1,isLessOrEqual,"<=",arg2)
+#define assertLessOrEqual(arg1,arg2) assertOp(arg1,compareLessOrEqual,"<=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,isMoreOrEqual,">=",arg2)
+#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,compareMoreOrEqual,">=",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertTrue(arg) assertEqual(arg,true)

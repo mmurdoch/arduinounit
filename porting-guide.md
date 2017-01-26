@@ -37,3 +37,8 @@ will become:
         // ...
         assertStringsEqual(expected, actual);
     }
+
+**Note**: assertions on strings are now built-in, so the best port of the
+above assertion would actually be to remove the redundant definition and simply use
+the built-in `assertEqual` macro in ArduinoTest.  See the readme for additional
+information.

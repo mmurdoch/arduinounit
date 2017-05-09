@@ -1,6 +1,12 @@
 #pragma once
 #if defined(F)
+#ifdef ESP8266
+#include <cores/esp8266/pgmspace.h>
+#elif ESP32
+#include <cores/esp32/pgmspace.h>
+#else
 #include <avr/pgmspace.h>
+#endif
 #endif
 #include <WString.h>
 

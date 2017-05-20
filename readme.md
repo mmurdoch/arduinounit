@@ -3,7 +3,7 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-##Current Version 2.2.0
+## Current Version 2.2.0
 [Download ArduinoUnit 2.2.0](https://github.com/mmurdoch/arduinounit/releases/tag/v2.2.0).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
@@ -18,7 +18,7 @@ If you don't want to take advantage of the great new features in 2.0 then the
 latest release of the 1.x code line is still 
 [available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
 
-##Why Version 2?
+## Why Version 2?
 
 ArduinoUnit 2 follows the spirit of ArduinoUnit 1.x with the following
 less-is-more features:
@@ -40,7 +40,7 @@ And the following more-is-more features:
    - Test names can optionally be stored in either RAM or flash.
 1. assertions about other tests.
 
-##Getting Started
+## Getting Started
 
 Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
 
@@ -91,7 +91,7 @@ Test bad failed.
 Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
-#Verbosity
+# Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:
 
@@ -138,7 +138,7 @@ TEST_VERBOSITY_ALL                (0x3F)
 TEST_VERBOSITY_NONE               (0x00)
 ```
 
-#Output
+# Output
 
 The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 
 
@@ -154,7 +154,7 @@ Test::out = &Serial3;
 
 in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
 
-##Built-in Assertions
+## Built-in Assertions
 
 The following assertions are supported
 
@@ -215,7 +215,7 @@ assertions.
 
 All the assert macros expand to a test that creates an optional message, and, if false, calls fail() on the current test and returns.
 
-##Meta Assertions
+## Meta Assertions
 
 You can make assertions on the outcome of tests as well.  The following meta-assertions are supported:
 ```
@@ -267,7 +267,7 @@ testing(too_slow)
 Since the ordering tests cannot be controlled, only use test-asserts
 in a testing() environment.
 
-#`Test` and `TestOnce`
+# `Test` and `TestOnce`
 You can create your own modular tests by deriving from these classes.
 
 ```
@@ -319,7 +319,7 @@ MyTestOnce myTestOnce2("myTestOnce2");
 
 Note that `Test::run()` only calls the active unresolved tests.
 
-##Selecting tests
+## Selecting tests
 
 In your setup() function, you can select which tests are going to be setup and looped.  The default is that all tests are included.
 
@@ -329,7 +329,7 @@ In your setup() function, you can select which tests are going to be setup and l
 
 Here are some examples:
 
-##Select examples:
+## Select examples:
 
 A single test `my_test`
 
@@ -357,7 +357,7 @@ void setup()
 }
 ```
 
-##FAQ
+## FAQ
 
 Q. The line number of the asserts do not match the source file.
 
@@ -405,7 +405,7 @@ A. Here is a troubleshooting guideline:
    * Setting Test::min_verbosity = TEST_VERBOSITY_ALL (the default is TEST_VERSOBITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED, generating output only for failed assertions, completions of tests, and an overall summary).
    * With these settings, the per-test verbosity has no effect.
 
-##License
+## License
 
 Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch, freenerd, John Macdonald,
 nicolaspanel, Matt Paine

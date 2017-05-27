@@ -179,14 +179,14 @@ void Test::remove()
   }
 }
 
-Test::Test(const __FlashStringHelper *_name, uint8_t _verbosity)
-  : name(_name), verbosity(_verbosity)
+Test::Test(const __FlashStringHelper *_name, const __FlashStringHelper *_filename, uint8_t _verbosity)
+  : name(_name), filename(_filename), verbosity(_verbosity)
 {
   insert();
 }
 
-Test::Test(const char *_name, uint8_t _verbosity)
-  : name(_name), verbosity(_verbosity)
+Test::Test(const char *_name, const __FlashStringHelper *_filename, uint8_t _verbosity)
+  : name(_name), filename(_filename), verbosity(_verbosity)
 {
   insert();
 }
@@ -235,6 +235,18 @@ void Test::run()
   }
 }
 
+const __FlashStringHelper *Test::opName(AssertOps op) {
+	switch(op) {
+		case AssertOps::EQUAL: return F(" == ");
+		case AssertOps::NOT_EQUAL: return F(" != ");
+		case AssertOps::LESS: return F(" < ");
+		case AssertOps::MORE: return F(" > ");
+		case AssertOps::LESS_OR_EQUAL: return F(" <= ");
+		case AssertOps::MORE_OR_EQUAL: return F(" >= ");
+		default: return F("Unknown AssertOp");
+	}
+}
+
 Test::~Test()
 {
   remove();
@@ -258,8 +270,8 @@ void Test::exclude(const char *pattern)
   }
 }
 
-TestOnce::TestOnce(const __FlashStringHelper *name) : Test(name) {}
-TestOnce::TestOnce(const char *name) : Test(name) {}
+TestOnce::TestOnce(const __FlashStringHelper *name, const __FlashStringHelper *filename) : Test(name, filename) {}
+TestOnce::TestOnce(const char *name, const __FlashStringHelper *filename) : Test(name, filename) {}
 
 void TestOnce::loop() 
 {

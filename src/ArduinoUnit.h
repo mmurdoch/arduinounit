@@ -50,7 +50,20 @@
 // These define what you want for output from tests.
 //
 
-/** 
+/**
+\brief Reduce macro expansion code size (default: off).
+ On assertion fails, ArduinoUnit reports test expressions on left and right sides of the assertion operator (default).
+ Setting this symbol to a non-zero value considerably reduces the code footprint of every single assertion in your tests. Set to e.g. 1 BEFORE the #include <ArduinoUnit.h> statement:
+ 
+     #define TEST_REDUCE_CODE_FOOTPRINT      1
+ 
+ Note: this is not a verbosity mask applied dynamically but a static symbol driving macro expansion. The side effect of a non-zero value is the omission of the actual test expression when a failure is reported. However, the expected value and the actual value used by the assertion are still displayed and the error can easily be tracked back to the failing assertion via file name and line number.
+ */
+#ifndef TEST_REDUCE_CODE_FOOTPRINT
+  #define TEST_REDUCE_CODE_FOOTPRINT      0
+#endif
+
+/**
 \brief Verbosity mask for overall summary (default).
 
 Verbosity mask for a 1-line summary of the form:
@@ -137,24 +150,24 @@ Verbosity mask for a 1-line summary of failed assertions of the form:
 */
 #define  TEST_VERBOSITY_ASSERTIONS_ALL    0x30
 
+
 /**
 This is the default value for TEST_MAX_VERBOSITY, and Test::max_verbosity is this, so no output is globally suppressed.
 */
-#define  TEST_VERBOSITY_ALL               0x3F
+#define TEST_VERBOSITY_ALL                0x3F
 
 /**
 Verbosity mask for no verbostiy.  The default value of Test::min_verbosity asks that failed assertions and test summaries be generated (TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED).
 */
-#define  TEST_VERBOSITY_NONE              0x00
-
+#define TEST_VERBOSITY_NONE               0x00
 
 #ifndef TEST_MAX_VERBOSITY
-/**
-Define what output code is included in the in the library (default TEST_VERBOSITY_ALL).
+	/**
+	Define what output code is included in the in the library (default TEST_VERBOSITY_ALL).
 
-Clearing a mask in TEST_MAX_VERBOSITY eliminates the code related to that kind of output.  Change this only to save PROGMEM space.
-*/
-#define TEST_MAX_VERBOSITY TEST_VERBOSITY_ALL
+	Clearing a mask in TEST_MAX_VERBOSITY eliminates the code related to that kind of output.  Change this only to save PROGMEM space.
+	*/
+	#define TEST_MAX_VERBOSITY TEST_VERBOSITY_ALL
 #endif
 
 
@@ -205,6 +218,19 @@ Clearing a mask in TEST_MAX_VERBOSITY eliminates the code related to that kind o
 
 */
 #define TEST_VERBOSITY(OF) (TEST_VERBOSITY_ALLOWED(OF) && (((Test::min_verbosity & TEST_VERBOSITY_ ## OF ) != 0) || (((Test::current != 0) && ((Test::current->verbosity & TEST_VERBOSITY_ ## OF) != 0)))))
+
+/**
+ Comparison operations supported by assertions.
+ */
+enum class AssertOps {
+	EQUAL = 1,
+	NOT_EQUAL = 2,
+	LESS = 3,
+	MORE = 4,
+	LESS_OR_EQUAL = 5,
+	MORE_OR_EQUAL = 6
+};
+
 
 /** 
 There are two convenience macros for extending this class and
@@ -390,6 +416,9 @@ class Test
 
   /** the name of this test */
   TestString name;
+	
+  /** name of the file in which this class or a subclasses, respectively, is defined */
+  const __FlashStringHelper *filename;
 
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 
@@ -446,28 +475,28 @@ class Test
   static void include(const char *pattern);
 
   /** 
-exclude (skip) currently included tests that match some
-wildcard (*) pattern like,
+  exclude (skip) currently included tests that match some
+  wildcard (*) pattern like,
   
       "my_broken_test", "*_skip", "*", "io_*", etc.  
   
-This should be done inside your setup() function.
+  This should be done inside your setup() function.
   */
-static void exclude(const char *pattern);
+  static void exclude(const char *pattern);
 
-/**
+  /**
   
-Simple usage:
+  Simple usage:
 
-    void setup() {
-      Serial.begin(9600);
-    }
+      void setup() {
+        Serial.begin(9600);
+      }
     
-    void loop() {
-      Test::run();
-    }
+      void loop() {
+        Test::run();
+      }
     
-Complex usage:
+  Complex usage:
     
     void setup() {
       Test::exclude("*"); // exclude everything
@@ -476,21 +505,23 @@ Complex usage:
       Test::include("crypto_*_aes128"); // and use all crypto_*_aes128 tests
     }
 
-void loop() {
-  Test::run();
-}
+  void loop() {
+    Test::run();
+  }
   */
   static void run();
+	
+	static const __FlashStringHelper *opName(AssertOps op);
 
-  // Construct a test with a given name and verbosity level
-  Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
+  // Construct a test with a given name, the name of its containing file and verbosity level
+  Test(const __FlashStringHelper *_name, const __FlashStringHelper *_filename, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
 
-  Test(const char *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
+  Test(const char *_name, const __FlashStringHelper *_filename, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
 
   virtual ~Test();
 
   template <typename A, typename B>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, const __FlashStringHelper *ops, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
+    static bool assertion(uint16_t line, const __FlashStringHelper *lhss, const A& lhs, AssertOps op_enum, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -513,18 +544,24 @@ void loop() {
       out->print(F("Assertion "));
       out->print(ok ? F("passed") : F("failed"));
       out->print(F(": ("));
-      out->print(lhss);
-      out->print(F("="));
-      out->print(lhs);
-      out->print(F(") "));
-      out->print(ops);
-      out->print(F(" ("));
-      out->print(rhss);
-      out->print(F("="));
-      out->print(rhs);
-      out->print(F("), file "));
-      out->print(file);
-      out->print(F(", line "));
+      if (lhss != NULL && rhss != NULL) {
+        out->print(lhss);
+        out->print(F("="));
+        out->print(lhs);
+        out->print(F(")"));
+        out->print(opName(op_enum));
+        out->print(F("("));
+        out->print(rhss);
+        out->print(F("="));
+        out->print(rhs);
+      } else {
+        out->print(lhs);
+				out->print(Test::opName(op_enum));
+        out->print(rhs);
+      }
+      out->print(F("), file '"));
+      out->print(current->filename);
+      out->print(F("', line "));
       out->print(line);
       out->println(".");
     }
@@ -538,8 +575,8 @@ void loop() {
     setup(), calls Test::once() */
 class TestOnce : public Test {
  public:
-  TestOnce(const __FlashStringHelper *name);
-  TestOnce(const char *name);
+  TestOnce(const __FlashStringHelper *name, const __FlashStringHelper *filename);
+  TestOnce(const char *name, const __FlashStringHelper *filename);
   void loop();
   virtual void once() = 0;
 };
@@ -551,7 +588,7 @@ class TestOnce : public Test {
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
-#define test(name) struct test_ ## name : TestOnce { test_ ## name() : TestOnce(F(#name)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once() 
+#define test(name) struct test_ ## name : TestOnce { test_ ## name() : TestOnce(F(#name),F(__FILE__)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once()
 
 /** Create an extern reference to a test-once test defined elsewhere.
 
@@ -564,7 +601,7 @@ is in another file (or defined after the assertion on it). */
 
 This is only necessary if you use assertTestXXXX when the test
 is in another file (or defined after the assertion on it). */
-#define testing(name) struct test_ ## name : Test { test_ ## name() : Test(F(#name)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop() 
+#define testing(name) struct test_ ## name : Test { test_ ## name() : Test(F(#name),F(__FILE__)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop()
 
 /** Create an extern reference to a test-until-skip-pass-or-fail defined
 elsewhere.  This is only necessary if you use assertTestXXXX when the test
@@ -572,25 +609,30 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0)
+#if TEST_REDUCE_CODE_FOOTPRINT == 0
+  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__LINE__,F(#arg1),(arg1),op_enum,op,F(#arg2),(arg2))) return; } while (0)
+#else
+  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__LINE__,NULL,(arg1),op_enum,op,NULL,(arg2))) return; } while (0)
+#endif
+
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
+#define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,AssertOps::EQUAL,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)
+#define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,AssertOps::NOT_EQUAL,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLess(arg1,arg2)        assertOp(arg1,compareLess,"<",arg2)
+#define assertLess(arg1,arg2)        assertOp(arg1,compareLess,AssertOps::LESS,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMore(arg1,arg2)        assertOp(arg1,compareMore,">",arg2)
+#define assertMore(arg1,arg2)        assertOp(arg1,compareMore,AssertOps::MORE,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLessOrEqual(arg1,arg2) assertOp(arg1,compareLessOrEqual,"<=",arg2)
+#define assertLessOrEqual(arg1,arg2) assertOp(arg1,compareLessOrEqual,AssertOps::LESS_OR_EQUAL,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,compareMoreOrEqual,">=",arg2)
+#define assertMoreOrEqual(arg1,arg2) assertOp(arg1,compareMoreOrEqual,AssertOps::MORE_OR_EQUAL,arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertTrue(arg) assertEqual(arg,true)

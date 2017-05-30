@@ -454,12 +454,11 @@ Q. The assertions are eating up all my program storage space. What's happening?
 A. Here are two things you can do to reduce the storage footprint of assertion() statements:
 
  * Make sure you add `#line 2 "file.ino"` as the first line of your test program (see above).
- * Enable the `TEST_REDUCE_CODE_FOOTPRINT` option before you include ArduinoUnit.
-   This is particularly effective if you have long value expressions as arguments of your _assert_ statements like `assertEqual(controllerType,static_cast<T_SensorControllerType_ID>(SensorControllerType::MESSAGE))`. A side effect of this option is that it causes the literal value expressions to vanish from the error message displayed for failed asserts, e.g. 
+ * Enable the `TEST_REDUCE_CODE_FOOTPRINT` option before you include ArduinoUnit. This is particularly effective if you have long value expressions as arguments of your _assert_ statements like `assertNotEqual(controllerType,static_cast<T_SensorControllerType_ID>(SensorControllerType::MESSAGE))`. A side effect of this option is that it causes the literal value expressions to vanish from the error message displayed for failed asserts, e.g. 
 <pre>Assertion failed: (3 != 3), file 'file.ino', line 17.</pre>
 instead of
-<pre>Assertion failed: (controllerType=3) != (static_cast<T_SensorControllerType_ID>(SensorControllerType::MESSAGE)=3), file 'file.ino', line 17.
-</pre>
+<pre>Assertion failed: (controllerType=3) != (static_cast&lt;T_SensorControllerType_ID&gt;(SensorControllerType::MESSAGE)=3), file 'file.ino', line 17.</pre>
+
 However, the actual value and the expected value used by the assertion are still displayed and the error can easily be tracked back to the failing assertion via file name and line number. This is how it's done:
 
 <pre>

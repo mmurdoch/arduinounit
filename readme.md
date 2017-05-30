@@ -3,7 +3,7 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-##Current Version 2.2.0
+## Current Version 2.2.0
 [Download ArduinoUnit 2.2.0](https://github.com/mmurdoch/arduinounit/releases/tag/v2.2.0).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
@@ -18,7 +18,7 @@ If you don't want to take advantage of the great new features in 2.0 then the
 latest release of the 1.x code line is still 
 [available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
 
-##Why Version 2?
+## Why Version 2?
 
 ArduinoUnit 2 follows the spirit of ArduinoUnit 1.x with the following
 less-is-more features:
@@ -40,7 +40,7 @@ And the following more-is-more features:
    - Test names can optionally be stored in either RAM or flash.
 1. assertions about other tests.
 
-##Getting Started
+## Getting Started
 
 Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
 
@@ -91,7 +91,7 @@ Test bad failed.
 Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
-#Verbosity
+## Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:
 
@@ -138,7 +138,7 @@ TEST_VERBOSITY_ALL                (0x3F)
 TEST_VERBOSITY_NONE               (0x00)
 ```
 
-#Output
+## Output
 
 The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 
 
@@ -154,7 +154,7 @@ Test::out = &Serial3;
 
 in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
 
-##Built-in Assertions
+## Built-in Assertions
 
 The following assertions are supported
 
@@ -215,7 +215,7 @@ assertions.
 
 All the assert macros expand to a test that creates an optional message, and, if false, calls fail() on the current test and returns.
 
-##Meta Assertions
+## Meta Assertions
 
 You can make assertions on the outcome of tests as well.  The following meta-assertions are supported:
 ```
@@ -267,7 +267,7 @@ testing(too_slow)
 Since the ordering tests cannot be controlled, only use test-asserts
 in a testing() environment.
 
-#`Test` and `TestOnce`
+## `Test` and `TestOnce`
 You can create your own modular tests by deriving from these classes.
 
 ```
@@ -319,7 +319,7 @@ MyTestOnce myTestOnce2("myTestOnce2");
 
 Note that `Test::run()` only calls the active unresolved tests.
 
-##Selecting tests
+## Selecting tests
 
 In your setup() function, you can select which tests are going to be setup and looped.  The default is that all tests are included.
 
@@ -329,7 +329,7 @@ In your setup() function, you can select which tests are going to be setup and l
 
 Here are some examples:
 
-##Select examples:
+### Select examples
 
 A single test `my_test`
 
@@ -356,8 +356,80 @@ void setup()
   Test::exclude("*eeprom*");
 }
 ```
+## Splitting Tests across multiple Files
+Typically you put your tests (`test(name)` macros) inside an `.ino` file and invoke test assertions (e.g. `assertEqual(a,b)`) within that these test contexts.
 
-##FAQ
+### External Tests
+Sometimes you may want to define tests in external files (`.h` and `.cpp`) in your project or even include them from a library and then reference your external tests from within the main file. You can create external references to tests using the `externTest(name)` or `externTesting(name)` macros.
+
+### External Assertions
+Sometimes you want to reuse a certain set of assertions from within several tests and thus write a function (e.g. `checkResults(MyStruct *s)`) to do that. However, these functions are missing the test context, so you have to create it using the `testcontext()` macro. Do this regardless of whether your functions are defined in the `.ino` file or in an included `.h` file.
+
+#### Local Function `performAssertion(.)`
+```
+#line 2 "basic.ino"
+#include <ArduinoUnit.h>
+
+//
+// IMPORTANT: Create a test context.
+//
+testcontext();
+
+void performAssertion(int x) {
+  assertNotEqual(x,1);
+}
+
+test(incorrect) {
+  int x = 1;
+  performAssertion(x);
+}
+
+void setup() {
+  Serial.begin(9600);
+  while(!Serial); // for the Arduino Leonardo/Micro only
+}
+
+void loop() {
+  Test::run();
+}
+```
+
+#### External Function `performAssertion(.)`
+```
+#line 2 "do_assert.h"
+#include <ArduinoUnit.h>
+
+//
+// IMPORTANT: Create a test context to perform asserts in the context of tests declared elsewhere.
+//
+testcontext();
+
+void performAssertion(int y) {
+  assertNotEqual(y,1);
+}
+```
+
+#### External Functions in multiple Files
+If you have multiple external files using assertions outside the original test context, then you need to use namespaces to avoid naming conflicts:
+
+```
+#line 2 “more_asserts.h”
+#include <ArduinoUnit.h>
+
+namespace more_asserts {
+
+  testcontext();
+
+  void performAnotherAssertion(int z) {
+    assertNotEqual(z,1);
+  }
+}
+```
+
+Invoke the function as `more_asserts:: performAnotherAssertion(z)`.
+
+
+## FAQ
 
 Q. The line number of the asserts do not match the source file.
 
@@ -365,7 +437,7 @@ A.  As far as I can tell, this is a bug in the compiler -- look two
    lines up.  I do not know why the `__LINE__` macro does not match
    the actual line of code.
 
-Q. What's with the `# 2 "file.ino"` business in the examples?
+Q. What's with the `#line 2 "file.ino"` business in the examples?
 
 A. This is to address question 1 above, and, without this line, the filename
    will be a very long and mostly useless name in the asserts, like,
@@ -376,6 +448,25 @@ A. This is to address question 1 above, and, without this line, the filename
 
   This uses up flash memory space and doesn't give any useful information when
   something goes wrong.
+
+Q. The assertions are eating up all my program storage space. What's happening?
+
+A. Here are two things you can do to reduce the storage footprint of assertion() statements:
+
+ * Make sure you add `#line 2 "file.ino"` as the first line of your test program (see above).
+ * Enable the `TEST_REDUCE_CODE_FOOTPRINT` option before you include ArduinoUnit. This is particularly effective if you have long value expressions as arguments of your _assert_ statements like `assertNotEqual(controllerType,static_cast<T_SensorControllerType_ID>(SensorControllerType::MESSAGE))`. A side effect of this option is that it causes the literal value expressions to vanish from the error message displayed for failed asserts, e.g. 
+<pre>Assertion failed: (3 != 3), file 'file.ino', line 17.</pre>
+instead of
+<pre>Assertion failed: (controllerType=3) != (static_cast&lt;T_SensorControllerType_ID&gt;(SensorControllerType::MESSAGE)=3), file 'file.ino', line 17.</pre>
+
+However, the actual value and the expected value used by the assertion are still displayed and the error can easily be tracked back to the failing assertion via file name and line number. This is how it's done:
+
+<pre>
+#line 2 "file.ino"
+#define TEST_REDUCE_CODE_FOOTPRINT 1
+#include &lt;ArduinoUnit.h&gt;
+</pre>
+
 
 Q. I get these link errors about multiply defined test_XXXX_instance.
 
@@ -404,8 +495,8 @@ A. Here is a troubleshooting guideline:
    * Assuring that Test::max_verbosity is TEST_VERBOSITY_ALL (the default).
    * Setting Test::min_verbosity = TEST_VERBOSITY_ALL (the default is TEST_VERSOBITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED, generating output only for failed assertions, completions of tests, and an overall summary).
    * With these settings, the per-test verbosity has no effect.
-
-##License
+ 
+## License
 
 Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch, freenerd, John Macdonald,
 nicolaspanel, Matt Paine

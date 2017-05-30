@@ -1,6 +1,6 @@
 #line 2 "basic.ino"
-//#define TEST_REDUCE_CODE_FOOTPRINT 1
 #include <ArduinoUnit.h>
+#include "do_assert.h"
 
 test(correct)
 {
@@ -12,7 +12,11 @@ test(incorrect)
 {
   int x=1;
   assertNotEqual(x,1);
-  assertNotEqual(x,1);
+}
+
+test(incorrect_included)
+{
+  performAssertion();  // included 
 }
 
 void setup()

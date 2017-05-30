@@ -416,9 +416,6 @@ class Test
 
   /** the name of this test */
   TestString name;
-	
-  /** name of the file in which this class or a subclasses, respectively, is defined */
-  const __FlashStringHelper *filename;
 
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 
@@ -513,15 +510,15 @@ class Test
 	
 	static const __FlashStringHelper *opName(AssertOps op);
 
-  // Construct a test with a given name, the name of its containing file and verbosity level
-  Test(const __FlashStringHelper *_name, const __FlashStringHelper *_filename, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
-
-  Test(const char *_name, const __FlashStringHelper *_filename, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
+  // Construct a test with a given name and verbosity level
+  Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
+  
+  Test(const char *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
 
   virtual ~Test();
 
   template <typename A, typename B>
-    static bool assertion(uint16_t line, const __FlashStringHelper *lhss, const A& lhs, AssertOps op_enum, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
+    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, AssertOps op_enum, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -560,7 +557,7 @@ class Test
         out->print(rhs);
       }
       out->print(F("), file '"));
-      out->print(current->filename);
+      out->print(file);
       out->print(F("', line "));
       out->print(line);
       out->println(".");
@@ -575,20 +572,28 @@ class Test
     setup(), calls Test::once() */
 class TestOnce : public Test {
  public:
-  TestOnce(const __FlashStringHelper *name, const __FlashStringHelper *filename);
-  TestOnce(const char *name, const __FlashStringHelper *filename);
+  TestOnce(const __FlashStringHelper *name);
+  TestOnce(const char *name);
   void loop();
   virtual void once() = 0;
 };
 
-/** Class to unify comparisons.  There are a variety of specializations to account for
-    char *, const char *, and char [N] types which map to strcmp(). 
+/** Avoid the file name of the test file being captured by each assertion by declaring it once.
 */
-
+#define defineTestFileName1(name) static const char __test_file_ ## name[] PROGMEM = __FILE__
+#define defineTestFileName2(name) const __FlashStringHelper *__TEST_FILE = (reinterpret_cast<const __FlashStringHelper *>(&__test_file_## name [0]))
 
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
-#define test(name) struct test_ ## name : TestOnce { test_ ## name() : TestOnce(F(#name),F(__FILE__)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once()
+#define test(name) defineTestFileName1(name); struct test_ ## name : TestOnce { defineTestFileName2(name); test_ ## name() : TestOnce(F(#name)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once()
+
+/** Create local variables representing the test-file name.
+ 
+ This is only necessary if you use assertXXXX in an auxiliary file, typically ending
+ in .h or .cpp, which does not perform asserts within its own test context (test(xxxx)).
+ The auxiliary file is being included and its functions are invoked by by a proper
+ ArduinoUnit test file, typically a .ino file from inside a test(xxxx) block. */
+#define testcontext() defineTestFileName1(name); defineTestFileName2(name);
 
 /** Create an extern reference to a test-once test defined elsewhere.
 
@@ -601,18 +606,19 @@ is in another file (or defined after the assertion on it). */
 
 This is only necessary if you use assertTestXXXX when the test
 is in another file (or defined after the assertion on it). */
-#define testing(name) struct test_ ## name : Test { test_ ## name() : Test(F(#name),F(__FILE__)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop()
+#define testing(name) defineTestFileName1(name); struct test_ ## name : Test { defineTestFileName2(name); test_ ## name() : Test(F(#name)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop()
 
-/** Create an extern reference to a test-until-skip-pass-or-fail defined
-elsewhere.  This is only necessary if you use assertTestXXXX when the test
+/** Create an extern reference to a test-until-skip-pass-or-fail defined elsewhere.
+ 
+This is only necessary if you use assertTestXXXX when the test
 is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
 #if TEST_REDUCE_CODE_FOOTPRINT == 0
-  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__LINE__,F(#arg1),(arg1),op_enum,op,F(#arg2),(arg2))) return; } while (0)
+  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__TEST_FILE,__LINE__,F(#arg1),(arg1),op_enum,op,F(#arg2),(arg2))) return; } while (0)
 #else
-  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__LINE__,NULL,(arg1),op_enum,op,NULL,(arg2))) return; } while (0)
+  #define assertOp(arg1,op,op_enum,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(__TEST_FILE,__LINE__,NULL,(arg1),op_enum,op,NULL,(arg2))) return; } while (0)
 #endif
 
 

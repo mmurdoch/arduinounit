@@ -582,8 +582,43 @@ namespace arduino_unit {
 #define decltype typeof
 #endif
 
+// When an assertion fails, the failure_return function is called and
+// its return value is returned. This can be used to let a failed
+// assertion return a value in non-void helper functions, but can also
+// be used to do cleanup or print some context on failure.
+//
+// This function is weak, so it can be replaced by another global
+// function. Alternatively, a local macro or callable variable can be
+// declared to shadow the global function. A lambda is typically
+// convenient for this. For example:
+//
+//      test(foo) {
+//        uint8_t i;
+//        auto on_failure = [&i]() { Serial.print("i = "); Serial.println(i); };
+//        for (i = 0; i < 10; ++i)
+//          assertTrue(doSomething(i));
+//      }
+//
+// Now, when doSomething returns false, the current value of i is
+// printed and then the foo test returns.
+//
+// The same approach can be used to modify the return value of a helper
+// function:
+//
+//   bool checkFoo(uint8_t v) {
+//     auto on_failure = []() { return false; }
+//     assertEqual(v, FOO);
+//     return true;
+//   }
+//
+// This particular example would be better using a macro, but this
+// scheme can be useful for a longer helper function containing multiple
+// asserts.
+void on_failure() __attribute__((__weak__));
+inline void on_failure() { }
+
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<arduino_unit::remove_reference<decltype(arg1)>::type,arduino_unit::remove_reference<decltype(arg2)>::type>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0) 
+#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<arduino_unit::remove_reference<decltype(arg1)>::type,arduino_unit::remove_reference<decltype(arg2)>::type>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) { return on_failure(); } } while (0) 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
 

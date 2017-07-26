@@ -446,40 +446,41 @@ class Test
   static void include(const char *pattern);
 
   /** 
-exclude (skip) currently included tests that match some
-wildcard (*) pattern like,
-  
-      "my_broken_test", "*_skip", "*", "io_*", etc.  
-  
-This should be done inside your setup() function.
+  exclude (skip) currently included tests that match some
+  wildcard (*) pattern like,
+    
+        "my_broken_test", "*_skip", "*", "io_*", etc.  
+    
+  This should be done inside your setup() function.
+    */
+  static void exclude(const char *pattern);
+
+  /**
+    
+  Simple usage:
+
+      void setup() {
+        Serial.begin(9600);
+      }
+      
+      void loop() {
+        Test::run();
+      }
+      
+  Complex usage:
+      
+      void setup() {
+        Test::exclude("*"); // exclude everything
+        Test::include("io_*"); // but include io_* tests
+        Test::exclude("io_*_lcd"); // except io_*_lcd tests
+        Test::include("crypto_*_aes128"); // and use all crypto_*_aes128 tests
+      }
+
+  void loop() {
+    Test::run();
+  }
   */
-static void exclude(const char *pattern);
 
-/**
-  
-Simple usage:
-
-    void setup() {
-      Serial.begin(9600);
-    }
-    
-    void loop() {
-      Test::run();
-    }
-    
-Complex usage:
-    
-    void setup() {
-      Test::exclude("*"); // exclude everything
-      Test::include("io_*"); // but include io_* tests
-      Test::exclude("io_*_lcd"); // except io_*_lcd tests
-      Test::include("crypto_*_aes128"); // and use all crypto_*_aes128 tests
-    }
-
-void loop() {
-  Test::run();
-}
-  */
   static void run();
 
   // Construct a test with a given name and verbosity level

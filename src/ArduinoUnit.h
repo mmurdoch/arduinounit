@@ -430,6 +430,16 @@ class Test
   /** Run a test.  Test::loop() will be called on each Test::run() until a pass(), fail() or skip(). */
   virtual void loop() = 0;
 
+  /**
+   * Reset all done tests (including skipped tests), so they can be run
+   * again, and reset the counters to reflect this. Any tests that are
+   * not completed are unaffected.
+   *
+   * Should never be called from inside a test, but only between calls
+   * to Test::run() (and typically only when all tests are done).
+   */
+  static void resetDoneTests();
+
   /** include (use) currently excluded (skipped) tests that match some
   wildcard (*) pattern like,
   

@@ -190,6 +190,17 @@ Test::~Test()
   remove();
 }
 
+void Test::resetDoneTests() {
+  Test::passed = Test::failed = Test::skipped = 0;
+  Test *p = done;
+  while (p != 0) {
+    Test *next = p->next;
+    p->insert();
+    p = next;
+  }
+  done = 0;
+}
+
 void Test::include(const char *pattern)
 {
   for (Test *p = root; p != 0; p=p->next) {

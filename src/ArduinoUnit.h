@@ -446,40 +446,41 @@ class Test
   static void include(const char *pattern);
 
   /** 
-exclude (skip) currently included tests that match some
-wildcard (*) pattern like,
-  
-      "my_broken_test", "*_skip", "*", "io_*", etc.  
-  
-This should be done inside your setup() function.
+  exclude (skip) currently included tests that match some
+  wildcard (*) pattern like,
+    
+        "my_broken_test", "*_skip", "*", "io_*", etc.  
+    
+  This should be done inside your setup() function.
+    */
+  static void exclude(const char *pattern);
+
+  /**
+    
+  Simple usage:
+
+      void setup() {
+        Serial.begin(9600);
+      }
+      
+      void loop() {
+        Test::run();
+      }
+      
+  Complex usage:
+      
+      void setup() {
+        Test::exclude("*"); // exclude everything
+        Test::include("io_*"); // but include io_* tests
+        Test::exclude("io_*_lcd"); // except io_*_lcd tests
+        Test::include("crypto_*_aes128"); // and use all crypto_*_aes128 tests
+      }
+
+  void loop() {
+    Test::run();
+  }
   */
-static void exclude(const char *pattern);
 
-/**
-  
-Simple usage:
-
-    void setup() {
-      Serial.begin(9600);
-    }
-    
-    void loop() {
-      Test::run();
-    }
-    
-Complex usage:
-    
-    void setup() {
-      Test::exclude("*"); // exclude everything
-      Test::include("io_*"); // but include io_* tests
-      Test::exclude("io_*_lcd"); // except io_*_lcd tests
-      Test::include("crypto_*_aes128"); // and use all crypto_*_aes128 tests
-    }
-
-void loop() {
-  Test::run();
-}
-  */
   static void run();
 
   // Construct a test with a given name and verbosity level
@@ -571,9 +572,18 @@ elsewhere.  This is only necessary if you use assertTestXXXX when the test
 is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
-// helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<typeof(arg1),typeof(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0)
+namespace arduino_unit {
+  template< class T > struct remove_reference      {typedef T type;};
+  template< class T > struct remove_reference<T&>  {typedef T type;};
+  template< class T > struct remove_reference<T&&> {typedef T type;};
+}
 
+#if __cplusplus < 201103L
+#define decltype typeof
+#endif
+
+// helper define for the operators below
+#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<arduino_unit::remove_reference<decltype(arg1)>::type,arduino_unit::remove_reference<decltype(arg2)>::type>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0) 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
 

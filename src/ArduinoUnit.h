@@ -306,6 +306,9 @@ class Test
  private:
   // linked list structure for active tests
   static Test* root;
+
+  // linked list structure for inactive tests  
+  static Test* trash;
   Test *next;
 
   // static statistics for tests
@@ -481,6 +484,10 @@ void loop() {
 }
   */
   static void run();
+
+
+  /** Reset all tests (even skipped tests) to UNSETUP state, and move them back into the active list.  */
+  static void reset();
 
   // Construct a test with a given name and verbosity level
   Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);

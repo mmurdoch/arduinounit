@@ -106,6 +106,7 @@ bool Test::TestString::matches(const char *pattern) const {
 }
 
 Test* Test::root = 0;
+Test* Test::trash = 0;
 Test* Test::current = 0;
 
 uint16_t Test::count = 0;
@@ -169,14 +170,34 @@ void Test::resolve()
 #endif
 }
 
+// loop() efficiently removes tests 
 void Test::remove()
 {
   for (Test **p = &root; *p != 0; p=&((*p)->next)) {
     if (*p == this) {
       *p = (*p)->next;
+      this->next = trash;
+      trash = this;
       break;
     }
   }
+}
+
+void Test::reset() {
+  for (Test **p = &trash; *p != 0; p=&((*p)->next)) {
+    (*p)->insert();
+    --Test::count; // already accounted for
+  }
+  
+  Test::trash = 0;
+
+  for (Test **p = &root; *p != 0; p=&((*p)->next)) {
+    (*p)->state = UNSETUP
+  }
+
+  Test::passed = 0;
+  Test::failed = 0;
+  Test::skipped = 0;
 }
 
 Test::Test(const __FlashStringHelper *_name, uint8_t _verbosity)
@@ -206,6 +227,7 @@ void Test::insert()
   ++Test::count;
 }
 
+
 void Test::pass() { state = DONE_PASS; }
 void Test::fail() { state = DONE_FAIL; }
 void Test::skip() { state = DONE_SKIP; }
@@ -228,6 +250,8 @@ void Test::run()
 
     if (current->state != LOOPING) {
       (*p)=((*p)->next);
+      (*p)->next = trash;
+      trash = (*p);
       current->resolve();
     } else {
       p=&((*p)->next);

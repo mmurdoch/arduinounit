@@ -30,7 +30,7 @@ int8_t Test::TestString::compare(const Test::TestString &to) const
 {
   uint8_t a_buf[4],b_buf[4];
   uint16_t i=0;
-  
+
   for (;;) {
     uint8_t j=(i%4);
     if (j == 0) {
@@ -89,7 +89,7 @@ bool Test::TestString::matches(const char *pattern) const {
           k=j+1;
           state1[k/8] |= (1 << (k%8));
           while (pattern[k] == '*') {
-            ++k; 
+            ++k;
             state1[k/8] |= (1 << (k%8));
           }
         }
@@ -117,20 +117,20 @@ uint8_t Test::min_verbosity = TEST_VERBOSITY_TESTS_SUMMARY;
 
 Print* Test::out = &Serial;
 
-void Test::resolve() 
+void Test::resolve()
 {
   bool pass = current->state==DONE_PASS;
   bool fail = current->state==DONE_FAIL;
   bool skip = current->state==DONE_SKIP;
   bool done = (pass || fail || skip);
-  
+
   if (done) {
     if (pass) ++Test::passed;
     if (fail) ++Test::failed;
     if (skip) ++Test::skipped;
-    
+
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED) || TEST_VERBOSITY_EXISTS(TESTS_PASSED) || TEST_VERBOSITY_EXISTS(TESTS_FAILED)
-    
+
     bool output = false;
 
     output = output || (skip && TEST_VERBOSITY(TESTS_SKIPPED));
@@ -143,11 +143,11 @@ void Test::resolve()
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED)
       if (skip) out->println(F(" skipped."));
 #endif
-      
+
 #if TEST_VERBOSITY_EXISTS(TESTS_PASSED)
       if (pass) out->println(F(" passed."));
 #endif
-      
+
 #if TEST_VERBOSITY_EXISTS(TESTS_FAILED)
       if (fail) out->println(F(" failed."));
 #endif
@@ -166,6 +166,9 @@ void Test::resolve()
     out->print(count);
     out->println(F(" test(s)."));
   }
+#endif
+#ifdef ESP8266
+  yield();
 #endif
 }
 
@@ -232,6 +235,9 @@ void Test::run()
     } else {
       p=&((*p)->next);
     }
+#ifdef ESP8266
+    yield();
+#endif
   }
 }
 
@@ -261,7 +267,7 @@ void Test::exclude(const char *pattern)
 TestOnce::TestOnce(const __FlashStringHelper *name) : Test(name) {}
 TestOnce::TestOnce(const char *name) : Test(name) {}
 
-void TestOnce::loop() 
+void TestOnce::loop()
 {
   once();
   if (state == LOOPING) state = DONE_PASS;

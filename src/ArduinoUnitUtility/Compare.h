@@ -1,6 +1,19 @@
 #pragma once
 #if defined(F)
+#ifndef ESP8266
 #include <avr/pgmspace.h>
+#endif
+#ifdef ESP8266
+#undef PROGMEM
+#define PROGMEM
+#undef PSTR
+#define PSTR(s) (s)
+#undef pgm_read_byte
+#define pgm_read_byte(addr) (*reinterpret_cast<const uint8_t*>(addr))
+#undef pgm_read_word
+#define pgm_read_word(addr) (*reinterpret_cast<const uint16_t*>(addr))
+#define typeof(x) __typeof__(x)
+#endif
 #endif
 #include <WString.h>
 
@@ -8,32 +21,53 @@ template  < typename A, typename B > struct Compare
 {
   inline static int between(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     if (a<b) return -1;
     if (b<a) return  1;
     return 0;
   } // between
   inline static bool equal(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return (!(a<b)) && (!(b<a));
   } // equal
   inline static bool notEqual(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return (a<b) || (b<a);
   } // notEqual
   inline static bool less(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return a<b;
   } // less
   inline static bool more(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return b<a;
   } // more
   inline static bool lessOrEqual(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return !(b<a);
   } // lessOrEqual
   inline static bool moreOrEqual(const A &a,const B &b)
   {
+#ifdef ESP8266
+    yield();
+#endif
     return !(a<b);
   } // moreOrEqual
 };

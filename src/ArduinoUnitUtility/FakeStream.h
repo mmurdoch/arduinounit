@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
 
 /**
  * A fake stream which can be used in place of other streams

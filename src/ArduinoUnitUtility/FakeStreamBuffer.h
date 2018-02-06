@@ -22,7 +22,7 @@ SOFTWARE.
 
 #pragma once
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include "FakeStream.h"
 
 struct BufferNode {

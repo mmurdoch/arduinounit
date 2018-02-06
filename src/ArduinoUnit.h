@@ -35,10 +35,10 @@
 #define strlen_P(a) strlen(a)
 #endif
 
-#include <ArduinoUnitUtility/Compare.h>
-#include <ArduinoUnitUtility/FakeStream.h>
-#include <ArduinoUnitUtility/FakeStreamBuffer.h>
-#include <ArduinoUnitUtility/FreeMemory.h>
+#include "ArduinoUnitUtility/Compare.h"
+#include "ArduinoUnitUtility/FakeStream.h"
+#include "ArduinoUnitUtility/FakeStreamBuffer.h"
+#include "ArduinoUnitUtility/FreeMemory.h"
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2

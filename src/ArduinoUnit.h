@@ -16,6 +16,26 @@
 
 #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
+#else
+
+// http://michael-buschbeck.github.io/arduino/2013/10/22/string-merging-pstr-percent-codes/
+#define PSTR(str) \
+  (__extension__({ \
+    PGM_P ptr;  \
+    asm volatile \
+    ( \
+      ".pushsection .progmem.data, \"SM\", @progbits, 1" "\n\t" \
+      "0: .string " #str                                 "\n\t" \
+      ".popsection"                                      "\n\t" \
+    ); \
+    asm volatile \
+    ( \
+      "ldi %A0, lo8(0b)"                                 "\n\t" \
+      "ldi %B0, hi8(0b)"                                 "\n\t" \
+      : "=d" (ptr) \
+    ); \
+    ptr; \
+  }))
 #endif
 
 #if defined(__GNUC__) && (__GNUC__*100 + __GNUC_MINOR__ < 407)
@@ -34,6 +54,8 @@
 #define memcpy_P(a, b, c) memcpy(a, b, c)
 #define strlen_P(a) strlen(a)
 #endif
+
+
 
 #include <ArduinoUnitUtility/Compare.h>
 #include <ArduinoUnitUtility/FakeStream.h>

@@ -11,6 +11,7 @@
 #include <Print.h>
 
 #include <ArduinoUnitUtility/Flash.h>
+#include <ArduinoUnitUtility/ArduinoUnitString.h>
 #include <ArduinoUnitUtility/Compare.h>
 #include <ArduinoUnitUtility/FakeStream.h>
 #include <ArduinoUnitUtility/FakeStreamBuffer.h>
@@ -266,20 +267,6 @@ Variables you might want to adjust:
 class Test
 {
  private:
-  // allows for both ram/progmem based names
-  class TestString : public Printable {
-  public:
-    const uint32_t data;
-    TestString(const char *_data);
-    TestString(const __FlashStringHelper *_data);
-    void read(void *destination, uint16_t offset, uint8_t length) const;
-    uint16_t length() const;
-    int8_t compare(const Test::TestString &to) const;
-    size_t printTo(Print &p) const;
-    bool matches(const char *pattern) const;
-  };
-
- private:
   // linked list structure for active tests
   static Test* root;
   Test *next;
@@ -365,7 +352,7 @@ class Test
   static Test* current;
 
   /** the name of this test */
-  TestString name;
+  ArduinoUnitString name;
 
   /** Per-test verbosity defaults to TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTS_FAILED, but note that the compile-time constant TEST_VERBOSITY_MAX and run-time global (static) values Test::max_verbosity and Test::min_verbosity also effect the verbosity of a test.  According to the following rules:
 

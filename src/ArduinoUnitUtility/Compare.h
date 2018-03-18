@@ -145,20 +145,7 @@ template  <  > struct Compare<String,const __FlashStringHelper *>
 {
   inline static int between(const String &a,const __FlashStringHelper * const &b)
   {
-    uint8_t a_buf[4],b_buf[4];
-    uint16_t i=0;
-
-    for (;;) {
-      uint8_t j=(i%4);
-      if (j == 0) {
-         a.getBytes(a_buf,4,i);
-         memcpy_P(b_buf,((const char *)b)+i,4);
-      }
-      if (a_buf[j] < b_buf[j]) return -1;
-      if (a_buf[j] > b_buf[j]) return  1;
-      if (a_buf[j] == 0) return 0;
-      ++i;
-    }
+    return ArduinoUnitString(a.c_str()).compare(ArduinoUnitString(b));
   } // between
   inline static bool equal(const String &a,const __FlashStringHelper * const &b)
   {
@@ -476,20 +463,7 @@ template  <  > struct Compare<const __FlashStringHelper *,const __FlashStringHel
 {
   inline static int between(const __FlashStringHelper * const &a,const __FlashStringHelper * const &b)
   {
-    uint8_t a_buf[4],b_buf[4];
-    uint16_t i=0;
-
-    for (;;) {
-      uint8_t j=(i%4);
-      if (j == 0) {
-         memcpy_P(a_buf,((const char *)a)+i,4);
-         memcpy_P(b_buf,((const char *)b)+i,4);
-      }
-      if (a_buf[j] < b_buf[j]) return -1;
-      if (a_buf[j] > b_buf[j]) return  1;
-      if (a_buf[j] == 0) return 0;
-      ++i;
-    }
+    return ArduinoUnitString(a).compare(ArduinoUnitString(b));
   } // between
   inline static bool equal(const __FlashStringHelper * const &a,const __FlashStringHelper * const &b)
   {

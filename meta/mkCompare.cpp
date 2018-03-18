@@ -29,6 +29,19 @@ struct MkCompare
     };
   }
 
+  void testString(TYPES T, char name) {
+    switch(T) {
+    case GENERIC: out << "ArduinoUnitString(String( " << name << "))"; break;
+    case CONST_CHAR_PTR: out << "ArduinoUnitString(" << name << ")"; break;
+    case FLASH_CHAR_PTR: out << "ArduinoUnitString(" << name << ")"; break;
+    case CHAR_PTR: out << "ArduinoUnitString((const char *) " << name << ")"; break;
+    case SIZED_ARRAY: out << "ArduinoUnitString((const char *) " << name << ")"; break;
+    case GENERIC_ARRAY: out << "ArduinoUnitString((const char *) " << name << ")"; break;
+    case STRING: out << "ArduinoUnitString(" << name << ".c_str())"; break;
+    default: break;
+    };
+  }
+
   bool templateDeclareArg(TYPES T, char name, bool comma=false) {
     switch(T) {
     case GENERIC: out << (comma ? ", " : "") << "typename " << (name == 'a' ? "A" : "B"); return true;
@@ -55,6 +68,8 @@ struct MkCompare
     default: break;
     };
   }
+
+
 
   void templateArgs() {
     if (typeA != GENERIC || typeB != GENERIC) {
@@ -130,27 +145,10 @@ struct MkCompare
       } else if (typeA == FLASH_CHAR_PTR && (typeB != FLASH_CHAR_PTR && typeB != STRING)) {
         out << "    return -strcmp_P(b,(const char *)a);" << std::endl;
       } else {
-        if (typeB == STRING) {
+        if (typeA < typeB) {
           out << "    return -Compare < "; templateArg(typeB,'b'); out << ","; templateArg(typeA,'a'); out << " >::between(b,a);" << std::endl;
         } else {
-          out << "    uint8_t a_buf[4],b_buf[4];" << std::endl;
-          out << "    uint16_t i=0;" << std::endl;
-          out << std::endl;
-          out << "    for (;;) {" << std::endl;
-          out << "      uint8_t j=(i%4);" << std::endl;
-          out << "      if (j == 0) {" << std::endl;
-          if (typeA == STRING) {
-            out << "         a.getBytes(a_buf,4,i);" << std::endl;            
-          } else {
-            out << "         memcpy_P(a_buf,((const char *)a)+i,4);" << std::endl;
-          }
-          out << "         memcpy_P(b_buf,((const char *)b)+i,4);" << std::endl;        
-          out << "      }" << std::endl;
-          out << "      if (a_buf[j] < b_buf[j]) return -1;" << std::endl;
-          out << "      if (a_buf[j] > b_buf[j]) return  1;" << std::endl;
-          out << "      if (a_buf[j] == 0) return 0;" << std::endl;
-          out << "      ++i;" << std::endl;
-          out << "    }" << std::endl;
+          out << "    return "; testString(typeA,'a'); out << ".compare("; testString(typeB,'b'); out << ");" << std::endl;
         }
       }
     } else {

@@ -19,12 +19,16 @@ doc :
 test :
 	./bin/go compile upload tests
 
+.PHONY: meta
+meta :
+	$(MAKE) -C meta all
+
 .PHONY: firmware
 firmware:
 	./bin/go compile
 
 .PHONY: install
-install : 
+install : meta
 	/bin/rm -rf "${ARDUINO_DIR}/libraries/ArduinoUnit"
 	mkdir -p ${ARDUINO_DIR}/libraries/ArduinoUnit
 	find . -path './.*' -prune -false -o -type f -a -regex '.*/[a-zA-Z0-9][-_a-zA-Z0-9.]*[a-zA-Z0-9]' > install-files

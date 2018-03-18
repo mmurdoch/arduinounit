@@ -52,12 +52,12 @@
 // #endif
 // #endif
 
-// // Workaround for Arduino Due
-// #if defined(__arm__) && !defined(PROGMEM)
-// #define PSTR(s) s
-// #define memcpy_P(a, b, c) memcpy(a, b, c)
-// #define strlen_P(a) strlen(a)
-// #endif
+// Workaround for Arduino Due
+#if defined(__arm__) && !defined(PROGMEM)
+#define PSTR(s) s
+#define memcpy_P(a, b, c) memcpy(a, b, c)
+#define strlen_P(a) strlen(a)
+#endif
 
 #include <ArduinoUnitUtility/Compare.h>
 #include <ArduinoUnitUtility/FakeStream.h>

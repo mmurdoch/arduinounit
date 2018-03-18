@@ -30,7 +30,7 @@
 * Remove support of very old gcc compiler
 * Add support for de-duplicaton of flash strings
 * Add support for ESP 8266 and ESP 32
-
+* Use more standard file names (README.md, LICENSE, and CHANGELOG.md)
 
 
 

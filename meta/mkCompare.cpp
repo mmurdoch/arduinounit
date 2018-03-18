@@ -293,7 +293,13 @@ int main(int argc, const char *argv[])
 
   if (includeFlash) {
     mk.out << "#if defined(F)" << std::endl;
-    mk.out << "#include <avr/pgmspace.h>" << std::endl;
+    mk.out << "#  if defined(ESP8266)" << std::endl;
+    mk.out << "#    include <cores/esp8266/pgmspace.h>" << std::endl;
+    mk.out << "#  elif defined(ESP32)" << std::endl;
+    mk.out << "#    include <cores/esp32/pgmspace.h>" << std::endl;
+    mk.out << "#  else" << std::endl;
+    mk.out << "#    include <avr/pgmspace.h>" << std::endl;
+    mk.out << "#  endif" << std::endl;
     mk.out << "#endif" << std::endl;    
   }
 

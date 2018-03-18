@@ -73,7 +73,7 @@ test(bad)
 void setup()
 {
   Serial.begin(9600);
-  while(!Serial); // for the Arduino Leonardo/Micro only
+  while(!Serial) {} // Portability for Leonardo/Micro
 }
 
 void loop()
@@ -339,7 +339,7 @@ A single test `my_test`
 void setup()
 {
   Serial.begin(9600);
-  while(!Serial); // for the Arduino Leonardo/Micro only
+  while(!Serial) {} // Portability for Leonardo/Micro
   Test::exclude("*");
   Test::include("my_test");
 }
@@ -350,7 +350,7 @@ All tests named dev_-something, but not the ones ending in _skip or _slow, or ha
 void setup()
 {
   Serial.begin(9600);
-  while(!Serial); // for the Arduino Leonardo/Micro only
+  while(!Serial) {} // Portability for Leonardo/Micro
   Test::exclude("*");
   Test::include("dev_*");
   Test::exclude("*_slow");
@@ -392,7 +392,7 @@ A. Here is a troubleshooting guideline:
    output by changing the value of `Test::out`, make sure you configure
    the Print stream you direct it to.
  * If you are using an Arduino Leonardo/Micro: don't forget to add 
-   `while(!Serial)` after `Serial.begin(9600)` in the setup(). Without this line
+   `while(!Serial) {}` after `Serial.begin(9600)` in the setup(). Without this line
    nothing will be printed in the serial monitor.
  * Make sure you call `Test::run()` in your loop().
  * Make sure you did not exclude the test(s) with `Test::exclude(pattern)`.

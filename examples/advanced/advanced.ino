@@ -75,7 +75,7 @@ MyTest myTest3("myTest3");
 void setup()
 {
   Serial.begin(9600);
-  while(!Serial); // for the Arduino Leonardo/Micro only
+  while(!Serial) {} // Portability for Leonardo/Micro
 
   Test::min_verbosity |= TEST_VERBOSITY_ASSERTIONS_ALL;
   Test::exclude("my*2");

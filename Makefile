@@ -27,7 +27,8 @@ firmware:
 install : 
 	/bin/rm -rf "${ARDUINO_DIR}/libraries/ArduinoUnit"
 	mkdir -p ${ARDUINO_DIR}/libraries/ArduinoUnit
-	tar cf - `find . -regex '.*/[-_a-zA-Z0-9][-_a-zA-Z0-9.]*'` | tar -C "${ARDUINO_DIR}/libraries/ArduinoUnit" -xvf -
+	find . -path './.*' -prune -false -o -type f -a -regex '.*/[a-zA-Z0-9][-_a-zA-Z0-9.]*[a-zA-Z0-9]' > install-files
+	tar -cf - -T install-files | tar -C "${ARDUINO_DIR}/libraries/ArduinoUnit" -xvf -
 
 .PHONY: clean
 clean :

@@ -3,8 +3,8 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-## Current Version 2.2.0
-[Download ArduinoUnit 2.2.0](https://github.com/mmurdoch/arduinounit/releases/tag/v2.2.0).
+## Current Version 2.3.0-alpha
+[Download ArduinoUnit 2.3.0-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.0-alpha).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
 of unit testing with the 1.x library over the last few years. It aims to be 
@@ -42,13 +42,15 @@ And the following more-is-more features:
 
 ## Getting Started
 
-Create a directory called ArduinoUnit in your [Arduino Libraries Directory](http://arduino.cc/en/Guide/Libraries) e.g. `<arduino installation directory>\libraries`.
+Install the library from the Arduino IDE.  From the menu, navigate:
 
-Copy everything from this directory (containing library.properties)  directory to this new directory.
+* Sketch->Include Library->Manage Libraries...
+* Search for "arduinounit"
+* Install
 
-Open a sketch in arduino and click `Sketch | Import Library... | ArduinoUnit` to start unit testing.
+After this, examples should be available from File->Examples in the "Examples from Custom Libraries" section.
 
-For example, try this simple unit testing sketch:
+Here is a simple unit testing sketch:
 
 ```
 #line 2 "sketch.ino"
@@ -404,26 +406,3 @@ A. Here is a troubleshooting guideline:
    * Assuring that Test::max_verbosity is TEST_VERBOSITY_ALL (the default).
    * Setting Test::min_verbosity = TEST_VERBOSITY_ALL (the default is TEST_VERSOBITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED, generating output only for failed assertions, completions of tests, and an overall summary).
    * With these settings, the per-test verbosity has no effect.
-
-## License
-
-Copyright (c) 2013 Warren MacEvoy, Matthew Murdoch, freenerd, John Macdonald,
-nicolaspanel, Matt Paine
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.

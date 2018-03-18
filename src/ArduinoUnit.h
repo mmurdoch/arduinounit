@@ -9,16 +9,9 @@
 #include <stdint.h>
 #include <Print.h>
 
-#if ARDUINO >= 100 && ARDUINO < 103
-#undef F
-#undef PSTR
-#define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
-
-#define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
-
-#else
-
+#if defined(PSTR)
 // http://michael-buschbeck.github.io/arduino/2013/10/22/string-merging-pstr-percent-codes/
+#undef PSTR
 #define PSTR(str) \
   (__extension__({ \
     PGM_P ptr;  \
@@ -37,25 +30,34 @@
     ptr; \
   }))
 #endif
+// #if ARDUINO >= 100 && ARDUINO < 103
+// #undef F
+// #undef PSTR
+// #define PSTR(s) (__extension__({static const char __c[] PROGMEM = (s); &__c[0];}))
 
-#if defined(__GNUC__) && (__GNUC__*100 + __GNUC_MINOR__ < 407)
-// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
-//
-#ifdef PROGMEM
-#undef PROGMEM
-#define PROGMEM __attribute__((section(".progmem.data")))
-#endif
-#endif
+// #define F(string_literal) (reinterpret_cast<const __FlashStringHelper *>(PSTR(string_literal)))
 
-// Workaround for Arduino Due
-#if defined(__arm__) && !defined(PROGMEM)
-#define PROGMEM
-#define PSTR(s) s
-#define memcpy_P(a, b, c) memcpy(a, b, c)
-#define strlen_P(a) strlen(a)
-#endif
+// #else
+// #if 1
+// 
+// #endif
+// #endif
 
+// #if defined(__GNUC__) && (__GNUC__*100 + __GNUC_MINOR__ < 407)
+// // Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734
+// //
+// #ifdef PROGMEM
+// #undef PROGMEM
+// #define PROGMEM __attribute__((section(".progmem.data")))
+// #endif
+// #endif
 
+// // Workaround for Arduino Due
+// #if defined(__arm__) && !defined(PROGMEM)
+// #define PSTR(s) s
+// #define memcpy_P(a, b, c) memcpy(a, b, c)
+// #define strlen_P(a) strlen(a)
+// #endif
 
 #include <ArduinoUnitUtility/Compare.h>
 #include <ArduinoUnitUtility/FakeStream.h>

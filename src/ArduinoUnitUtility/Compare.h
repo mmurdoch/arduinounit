@@ -1,13 +1,5 @@
 #pragma once
-#if defined(F)
-#  if defined(ESP8266)
-#    include <cores/esp8266/pgmspace.h>
-#  elif defined(ESP32)
-#    include <cores/esp32/pgmspace.h>
-#  else
-#    include <avr/pgmspace.h>
-#  endif
-#endif
+#include <ArduinoUnitUtility/Flash.h>
 #include <WString.h>
 
 template  < typename A, typename B > struct Compare

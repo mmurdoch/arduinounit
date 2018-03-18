@@ -31,6 +31,7 @@
 * Add support for de-duplicaton of flash strings
 * Add support for ESP 8266 and ESP 32
 * Use more standard file names (README.md, LICENSE, and CHANGELOG.md)
+* Use less likely to fail version of `while (!Serial) {}` in examples and documentation.
 
 
 

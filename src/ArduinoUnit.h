@@ -473,21 +473,21 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
-      out->print(F("Assertion "));
-      out->print(ok ? F("passed") : F("failed"));
-      out->print(F(": ("));
+      out->print(ARDUINO_UNIT_STRING("Assertion "));
+      out->print(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
+      out->print(ARDUINO_UNIT_STRING(": ("));
       out->print(lhss);
-      out->print(F("="));
+      out->print(ARDUINO_UNIT_STRING("="));
       out->print(lhs);
-      out->print(F(") "));
+      out->print(ARDUINO_UNIT_STRING(") "));
       out->print(ops);
-      out->print(F(" ("));
+      out->print(ARDUINO_UNIT_STRING(" ("));
       out->print(rhss);
-      out->print(F("="));
+      out->print(ARDUINO_UNIT_STRING("="));
       out->print(rhs);
-      out->print(F("), file "));
+      out->print(ARDUINO_UNIT_STRING("), file "));
       out->print(file);
-      out->print(F(", line "));
+      out->print(ARDUINO_UNIT_STRING(", line "));
       out->print(line);
       out->println(".");
     }
@@ -507,14 +507,9 @@ class TestOnce : public Test {
   virtual void once() = 0;
 };
 
-/** Class to unify comparisons.  There are a variety of specializations to account for
-    char *, const char *, and char [N] types which map to strcmp(). 
-*/
-
-
 /** Create a test-once test, usually checked with assertXXXX.
     The test is assumed to pass unless failed or skipped. */
-#define test(name) struct test_ ## name : TestOnce { test_ ## name() : TestOnce(F(#name)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once() 
+#define test(name) struct test_ ## name : TestOnce { test_ ## name() : TestOnce(ARDUINO_UNIT_STRING(#name)) {}; void once(); } test_ ## name ## _instance; void test_ ## name :: once()
 
 /** Create an extern reference to a test-once test defined elsewhere.
 
@@ -527,7 +522,7 @@ is in another file (or defined after the assertion on it). */
 
 This is only necessary if you use assertTestXXXX when the test
 is in another file (or defined after the assertion on it). */
-#define testing(name) struct test_ ## name : Test { test_ ## name() : Test(F(#name)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop() 
+#define testing(name) struct test_ ## name : Test { test_ ## name() : Test(ARDUINO_UNIT_STRING(#name)) {}; void loop(); } test_ ## name ## _instance; void test_ ## name :: loop() 
 
 /** Create an extern reference to a test-until-skip-pass-or-fail defined
 elsewhere.  This is only necessary if you use assertTestXXXX when the test
@@ -535,7 +530,8 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<__typeof__(arg1),__typeof__(arg2)>(F(__FILE__),__LINE__,F(#arg1),(arg1),F(op_name),op,F(#arg2),(arg2))) return; } while (0)
+// #define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<__typeof__(arg1),__typeof__(arg2)>(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)
+#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)  
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)

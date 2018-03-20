@@ -1,49 +1,80 @@
 #include <Arduino.h>
 #include <ArduinoUnitUtility/ArduinoUnitString.h>
 
-ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
+#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
 ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
+#else
+ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
+#endif
+
 void ArduinoUnitString::read(void *destination, uint16_t offset, uint8_t length) const
 {
+#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     memcpy_P(destination,(const /* PROGMEM */ char *)((data+offset)&0x7FFFFFFF),length);
   } else {
     memcpy(destination,(char*)(data+offset),length);
   }
+#else
+  memcpy(destination,(char*)(data+offset),length);
+#endif
 }
 
 uint16_t ArduinoUnitString::length() const {
+#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     return strlen_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF));
   } else {
     return strlen((char*)(data));
   }
+#else
+    return strlen((char*)(data));  
+#endif  
 }
 
 int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
 {
-  uint8_t a_buf[4],b_buf[4];
-  uint16_t i=0;
+#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+  switch ((flash()?2:0)|(to.flash()?1:0)) {
+  case 0: return strcmp((const char *) data,(const char *) to.data);
+  case 1: return -strcmp_P((const /* PROGMEM */ char *)(to.data&0x7FFFFFFF), (const char *) data);
+  case 2: return strcmp_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF), (const char *) to.data);
+  default:
+    uint8_t a_buf[4],b_buf[4];
+    const char *a_ptr = (const char *)(data&0x7FFFFFFF);
+    const char *b_ptr = (const char *)(to.data&0x7FFFFFFF);
+    uint16_t i=0;
   
-  for (;;) {
-    uint8_t j=(i%4);
-    if (j == 0) {
-      this->read(a_buf,i,4);
-      to.read(b_buf,i,4);
+    for (;;) {
+      uint8_t j=(i%4);
+      if (j == 0) {
+        memcpy_P(a_buf,a_ptr,sizeof(a_buf));
+        a_ptr += sizeof(a_buf);
+        memcpy_P(b_buf,b_ptr,sizeof(b_buf));
+        b_ptr += sizeof(b_buf);
+      }
+      if (a_buf[j] < b_buf[j]) return -1;
+      if (a_buf[j] > b_buf[j]) return  1;
+      if (a_buf[j] == 0) return 0;
+      ++i;
     }
-    if (a_buf[j] < b_buf[j]) return -1;
-    if (a_buf[j] > b_buf[j]) return  1;
-    if (a_buf[j] == 0) return 0;
-    ++i;
   }
+#else
+  return strcmp(data,to.data);
+#endif
 }
 
 size_t ArduinoUnitString::printTo(Print &p) const {
+#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     return p.print((const __FlashStringHelper *)(data & 0x7FFFFFFF));
   } else {
     return p.print((char*)data);
   }
+#else
+    return p.print(data);  
+#endif
 }
 
 bool ArduinoUnitString::matches(const char *pattern) const {

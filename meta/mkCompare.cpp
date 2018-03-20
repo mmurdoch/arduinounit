@@ -110,7 +110,7 @@ struct MkCompare
 
   void mask() {
     if (masked()) {
-      out << "#if defined(F)" << std::endl;
+      out << "#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0" << std::endl;
     }
   }
 

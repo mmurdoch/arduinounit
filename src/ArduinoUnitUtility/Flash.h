@@ -4,17 +4,11 @@
 // find progmem, and setup flash string de-duplication for avrs...
 //
 #if defined(F)
-#  if defined(ESP8266)
-#    include <cores/esp8266/pgmspace.h>
-#  elif defined(ESP32)
-#    include <cores/esp32/pgmspace.h>
-#  else
-#    include <avr/pgmspace.h>
+#  if defined(__AVR__)
 //
 //   http://michael-buschbeck.github.io/arduino/2013/10/22/string-merging-pstr-percent-codes/
 //
-#    undef PSTR
-#    define PSTR(str) \
+#    define ARDUINO_UNIT_PSTR(str) \
        (__extension__({ \
          PGM_P ptr;  \
          asm volatile \
@@ -31,14 +25,14 @@
          ); \
          ptr; \
        }))
+// #    define ARDUINO_UNIT_PSTR(STR) PSTR(STR)
+// #    define ARDUINO_UNIT_STRING(STR) (reinterpret_cast<const __FlashStringHelper *>(ARDUINO_UNIT_PSTR(STR)))
+#define ARDUINO_UNIT_STRING(STR) F(STR)
+#    define ARDUINO_UNIT_USE_FLASH_STRINGS 1
 #  endif
 #endif
 
-//
-// Workaround for Arduino Due
-//
-#if defined(__arm__) && !defined(PROGMEM)
-#define PSTR(s) s
-#define memcpy_P(a, b, c) memcpy(a, b, c)
-#define strlen_P(a) strlen(a)
+#if !defined(ARDUINO_UNIT_STRING)
+#define ARDUINO_UNIT_STRING(STR) ((const char *)(STR))
+#define ARDUINO_UNIT_USE_FLASH_STRINGS 0
 #endif

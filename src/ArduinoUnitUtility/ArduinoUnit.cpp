@@ -41,33 +41,33 @@ void Test::resolve()
     output = output || (fail && TEST_VERBOSITY(TESTS_FAILED));
 
     if (output) {
-      out->print(F("Test "));
+      out->print(ARDUINO_UNIT_STRING("Test "));
       out->print(name);
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED)
-      if (skip) out->println(F(" skipped."));
+      if (skip) out->println(ARDUINO_UNIT_STRING(" skipped."));
 #endif
       
 #if TEST_VERBOSITY_EXISTS(TESTS_PASSED)
-      if (pass) out->println(F(" passed."));
+      if (pass) out->println(ARDUINO_UNIT_STRING(" passed."));
 #endif
       
 #if TEST_VERBOSITY_EXISTS(TESTS_FAILED)
-      if (fail) out->println(F(" failed."));
+      if (fail) out->println(ARDUINO_UNIT_STRING(" failed."));
 #endif
     }
 #endif
   }
 #if TEST_VERBOSITY_EXISTS(TESTS_SUMMARY)
   if (root == 0 && TEST_VERBOSITY(TESTS_SUMMARY)) {
-    out->print(F("Test summary: "));
+    out->print(ARDUINO_UNIT_STRING("Test summary: "));
     out->print(passed);
-    out->print(F(" passed, "));
+    out->print(ARDUINO_UNIT_STRING(" passed, "));
     out->print(failed);
-    out->print(F(" failed, and "));
+    out->print(ARDUINO_UNIT_STRING(" failed, and "));
     out->print(skipped);
-    out->print(F(" skipped, out of "));
+    out->print(ARDUINO_UNIT_STRING(" skipped, out of "));
     out->print(count);
-    out->println(F(" test(s)."));
+    out->println(ARDUINO_UNIT_STRING(" test(s)."));
   }
 #endif
 }

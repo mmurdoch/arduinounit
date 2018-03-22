@@ -17,6 +17,7 @@ template< > struct ArduinoUnitWiden < float > { typedef double type; };
 template< > struct ArduinoUnitWiden < char * > { typedef const char *type; };
 template< > struct ArduinoUnitWiden < char [] > { typedef const char *type; };
 template<int N> struct ArduinoUnitWiden < char [N] > { typedef const char *type; };
+template<int N> struct ArduinoUnitWiden < const char [N] > { typedef const char *type; };
 template< > struct ArduinoUnitWiden < const char [] > { typedef const char *type; };
 
 #define ArduinoUnitType(T) ArduinoUnitWiden < ArduinoUnitRemoveConstTemplate < ArduinoUnitRemoveReferenceTemplate < T >::type >::type >::type

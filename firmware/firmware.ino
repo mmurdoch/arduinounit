@@ -11,7 +11,7 @@
 
 char line[80];
 bool configuring = true;
-unsigned long time = 0;
+unsigned long currentTime = 0;
 unsigned long startTime = 0;
 int phase = 0;
 
@@ -126,7 +126,7 @@ void setup()
 
 void loop()
 {
-  time = millis()-startTime;
+  currentTime = millis()-startTime;
   Test::run();
 }
 
@@ -261,21 +261,21 @@ test(assert_strings)
 
 testing(passes)
 {
-  if (phase == 2 && time > 250) {
+  if (phase == 2 && currentTime > 250) {
     pass();
   }
 }
 
 testing(fails)
 {
-  if (phase == 2 && time > 500) {
+  if (phase == 2 && currentTime > 500) {
     fail();
   }
 }
 
 testing(skips)
 {
-  if (phase == 2 && time > 750) {
+  if (phase == 2 && currentTime > 750) {
     skip();
   }
 }
@@ -424,7 +424,7 @@ testing(phase)
     done = done && (checkTestDone(meta) || (metaNextPhase == 3));
     break;
   case 2:
-    done = done && (time > 1000);
+    done = done && (currentTime > 1000);
     break;
   case 3:
     done = done && checkTestDone(meta);

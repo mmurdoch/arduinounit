@@ -11,6 +11,7 @@
 #include <Print.h>
 
 #include <ArduinoUnitUtility/Flash.h>
+#include <ArduinoUnitUtility/ArduinoUnitWiden.h>
 #include <ArduinoUnitUtility/ArduinoUnitString.h>
 #include <ArduinoUnitUtility/Compare.h>
 #include <ArduinoUnitUtility/FakeStream.h>
@@ -445,15 +446,17 @@ void loop() {
   */
   static void run();
 
+#if ARDUINO_UNIT_USE_FLASH > 0
   // Construct a test with a given name and verbosity level
   Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
+#endif
 
   Test(const char *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
 
   virtual ~Test();
 
   template <typename A, typename B>
-    static bool assertion(const __FlashStringHelper *file, uint16_t line, const __FlashStringHelper *lhss, const A& lhs, const __FlashStringHelper *ops, bool (*op)(const A& lhs, const B& rhs), const __FlashStringHelper *rhss, const B& rhs) {
+    static bool assertion(ARDUINO_UNIT_DECLARE_STRING file, uint16_t line, ARDUINO_UNIT_DECLARE_STRING lhss, const A& lhs, ARDUINO_UNIT_DECLARE_STRING ops, bool (*op)(const A& lhs, const B& rhs), ARDUINO_UNIT_DECLARE_STRING rhss, const B& rhs) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -501,7 +504,9 @@ void loop() {
     setup(), calls Test::once() */
 class TestOnce : public Test {
  public:
-  TestOnce(const __FlashStringHelper *name);
+#if ARDUINO_UNIT_USE_FLASH > 0
+  TestOnce(const __FlashStringHelper * name);
+#endif
   TestOnce(const char *name);
   void loop();
   virtual void once() = 0;
@@ -530,8 +535,9 @@ is in another file (or defined after the assertion on it). */
 #define externTesting(name) struct test_ ## name : Test { test_ ## name(); void loop(); }; extern test_##name test_##name##_instance
 
 // helper define for the operators below
-// #define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion<__typeof__(arg1),__typeof__(arg2)>(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)
-#define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)  
+#define assertOp(arg1,op,op_name,arg2) \
+  do {  if (!Test::assertion< ArduinoUnitArgType(arg1) , ArduinoUnitArgType(arg2) > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)
+// #define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)  
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)

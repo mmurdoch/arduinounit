@@ -1,16 +1,18 @@
 #include <Arduino.h>
 #include <ArduinoUnitUtility/ArduinoUnitString.h>
 
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
-ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
+#if ARDUINO_UNIT_USE_FLASH  > 0
 ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
-#else
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
+ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {}
+#else
+ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
+ArduinoUnitString::ArduinoUnitString(const String &_data) : data(_data.c_str()) {}
 #endif
 
 void ArduinoUnitString::read(void *destination, uint16_t offset, uint8_t length) const
 {
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+#if ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     memcpy_P(destination,(const /* PROGMEM */ char *)((data+offset)&0x7FFFFFFF),length);
   } else {
@@ -22,7 +24,7 @@ void ArduinoUnitString::read(void *destination, uint16_t offset, uint8_t length)
 }
 
 uint16_t ArduinoUnitString::length() const {
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+#if ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     return strlen_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF));
   } else {
@@ -35,7 +37,7 @@ uint16_t ArduinoUnitString::length() const {
 
 int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
 {
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+#if ARDUINO_UNIT_USE_FLASH  > 0
   switch ((flash()?2:0)|(to.flash()?1:0)) {
   case 0: return strcmp((const char *) data,(const char *) to.data);
   case 1: return -strcmp_P((const /* PROGMEM */ char *)(to.data&0x7FFFFFFF), (const char *) data);
@@ -66,7 +68,7 @@ int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
 }
 
 size_t ArduinoUnitString::printTo(Print &p) const {
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+#if ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
     return p.print((const __FlashStringHelper *)(data & 0x7FFFFFFF));
   } else {

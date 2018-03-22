@@ -25,14 +25,18 @@
          ); \
          ptr; \
        }))
-// #    define ARDUINO_UNIT_PSTR(STR) PSTR(STR)
-// #    define ARDUINO_UNIT_STRING(STR) (reinterpret_cast<const __FlashStringHelper *>(ARDUINO_UNIT_PSTR(STR)))
-#define ARDUINO_UNIT_STRING(STR) F(STR)
-#    define ARDUINO_UNIT_USE_FLASH_STRINGS 1
+#    define ARDUINO_UNIT_STRING(STR) (reinterpret_cast<const __FlashStringHelper *>(ARDUINO_UNIT_PSTR(STR)))
+#    define ARDUINO_UNIT_DECLARE_STRING const __FlashStringHelper *
+#    define ARDUINO_UNIT_USE_FLASH 1
 #  endif
 #endif
 
 #if !defined(ARDUINO_UNIT_STRING)
-#define ARDUINO_UNIT_STRING(STR) ((const char *)(STR))
-#define ARDUINO_UNIT_USE_FLASH_STRINGS 0
+#  define ARDUINO_UNIT_STRING(STR) ((const char *)(STR))
+#  define ARDUINO_UNIT_DECLARE_STRING const char *
+#  if defined(PROGMEM)
+#    define ARDUINO_UNIT_USE_FLASH 1
+#  else
+#    define ARDUINO_UNIT_USE_FLASH 0
+#  endif
 #endif

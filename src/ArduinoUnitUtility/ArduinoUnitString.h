@@ -7,14 +7,17 @@
 
 class ArduinoUnitString : public Printable {
  public:
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0
+#if ARDUINO_UNIT_USE_FLASH  > 0
   const uint32_t data;
   ArduinoUnitString(const __FlashStringHelper *_data);
+  ArduinoUnitString(const char *_data);
+  ArduinoUnitString(const String &_data);
 #else
   const char *data;
-#endif
   ArduinoUnitString(const char *_data);
-#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0  
+  ArduinoUnitString(const String &_data);
+#endif
+#if ARDUINO_UNIT_USE_FLASH  > 0  
   boolean inline flash() const { return ((data & 0x80000000) != 0); };
 #else
   boolean inline flash() const { return false; }

@@ -9,6 +9,19 @@ struct MkCompare
 
   static const TYPES SPECIAL[];
 
+  const char* typeName(TYPES T) {
+    switch(T) {
+    case GENERIC: return "GENERIC";
+    case CONST_CHAR_PTR: return "CONST_CHAR_PTR";
+    case FLASH_CHAR_PTR: return "FLASH_CHAR_PTR";
+    case CHAR_PTR: return "CHAR_PTR";
+    case SIZED_ARRAY: return "SIZED_ARRAY";
+    case GENERIC_ARRAY: return "GENERIC_ARRAY";
+    case STRING: return "STRING";
+    default: return "UNKNOWN";
+    };
+  }
+
   int phase;
   TYPES typeA;
   TYPES typeB;
@@ -110,7 +123,7 @@ struct MkCompare
 
   void mask() {
     if (masked()) {
-      out << "#if defined(F) || ARDUINO_UNIT_USE_FLASH  > 0" << std::endl;
+      out << "#if ARDUINO_UNIT_USE_FLASH  > 0" << std::endl;
     }
   }
 
@@ -292,7 +305,7 @@ int main(int argc, const char *argv[])
   if (includeFlash) {
     mk.out << "#include <ArduinoUnitUtility/Flash.h>" << std::endl;
   }
-
+  mk.out << "#include <ArduinoUnitUtility/ArduinoUnitWiden.h>" << std::endl;  
   if (includeString) {
     mk.out << "#include <WString.h>" << std::endl;
   }
@@ -318,19 +331,20 @@ int main(int argc, const char *argv[])
         
         if ((!includeString)
             && (mk.typeA == MkCompare::STRING || mk.typeB == MkCompare::STRING)) continue;
-        
+        std::cerr << "phase " << mk.phase << ": " << mk.typeName(mk.typeA) << " vs " << mk.typeName(mk.typeB) << std::endl;
         mk.print();
       }
     }
   }
 
-  mk.out << "template <typename A, typename B> int compareBetween(const A &a, const B &b) { return Compare<A,B>::between(a,b); }" << std::endl;
-  mk.out << "template <typename A, typename B> bool compareEqual(const A &a, const B &b) { return Compare<A,B>::equal(a,b); }" << std::endl;
-  mk.out << "template <typename A, typename B> bool compareNotEqual(const A &a, const B &b) { return Compare<A,B>::notEqual(a,b); }" << std::endl;
-  mk.out << "template <typename A, typename B> bool compareLess(const A &a, const B &b) { return Compare<A,B>::less(a,b); }" << std::endl;
-  mk.out << "template <typename A, typename B> bool compareMore(const A &a, const B &b) { return Compare<A,B>::more(a,b); }" << std::endl;  
-  mk.out << "template <typename A, typename B> bool compareLessOrEqual(const A &a, const B &b) { return Compare<A,B>::lessOrEqual(a,b); }" << std::endl;
-  mk.out << "template <typename A, typename B> bool compareMoreOrEqual(const A &a, const B &b) { return Compare<A,B>::moreOrEqual(a,b); }" << std::endl;  
+  static const char * versions [] = {"between","equal","notEqual","less","more","lessOrEqual","moreOrEqual"};
+  for (auto version : versions) {
+    std::string Version = version;
+    Version[0] = version[0]+'A'-'a';
+    const char *type = (Version == "Between") ? "int" : "bool";
+    mk.out << "template <typename A, typename B> " << type << " compare" << Version << "(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::" << version << "(a,b); }" << std::endl;
+    // mk.out << "template <typename A, typename B> " << type << " compare" << Version << "(const A &a, const B &b) { return Compare<A,B>::" << version << "(a,b); }" << std::endl;    
+  }
 
   return 0;
 }

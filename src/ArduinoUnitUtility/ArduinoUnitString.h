@@ -9,6 +9,7 @@ class ArduinoUnitString : public Printable {
  public:
 #if ARDUINO_UNIT_USE_FLASH  > 0
   const uint32_t data;
+  bool debug;
   ArduinoUnitString(const __FlashStringHelper *_data);
   ArduinoUnitString(const char *_data);
   ArduinoUnitString(const String &_data);

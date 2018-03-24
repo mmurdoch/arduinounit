@@ -456,7 +456,7 @@ void loop() {
   virtual ~Test();
 
   template <typename A, typename B>
-    static bool assertion(ARDUINO_UNIT_DECLARE_STRING file, uint16_t line, ARDUINO_UNIT_DECLARE_STRING lhss, const A& lhs, ARDUINO_UNIT_DECLARE_STRING ops, bool (*op)(const A& lhs, const B& rhs), ARDUINO_UNIT_DECLARE_STRING rhss, const B& rhs) {
+    static bool assertion(ARDUINO_UNIT_DECLARE_STRING file, uint16_t line, ARDUINO_UNIT_DECLARE_STRING lhss, const A& lhs, ARDUINO_UNIT_DECLARE_STRING ops, bool (*op)(const A& lhs, const B& rhs), ARDUINO_UNIT_DECLARE_STRING rhss, const B& rhs, void (*onmsg)(bool ok)=0) {
     bool ok = op(lhs,rhs);
     bool output = false;
 
@@ -476,6 +476,7 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
+      if (onmsg != 0) onmsg(ok);
       out->print(ARDUINO_UNIT_STRING("Assertion "));
       out->print(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
       out->print(ARDUINO_UNIT_STRING(": ("));
@@ -496,6 +497,14 @@ void loop() {
     }
 #endif
     return ok;
+  }
+};
+
+class ArduinoUnitPrinter {
+  template <typename T>
+    ArduinoUnitPrinter & operator<<(const T &x) {
+    ArduinoUnit::out->print(x);
+    return *this;
   }
 };
 
@@ -537,10 +546,10 @@ is in another file (or defined after the assertion on it). */
 // helper define for the operators below
 #define assertOp(arg1,op,op_name,arg2) \
   do {  if (!Test::assertion< ArduinoUnitArgType(arg1) , ArduinoUnitArgType(arg2) > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)
-// #define assertOp(arg1,op,op_name,arg2) do { if (!Test::assertion(ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2))) return; } while (0)  
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
+#define assertEqual(msg,arg1,arg2)       assertOp(msg,arg1,compareEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)

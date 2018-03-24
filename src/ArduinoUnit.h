@@ -500,14 +500,6 @@ void loop() {
   }
 };
 
-class ArduinoUnitPrinter {
-  template <typename T>
-    ArduinoUnitPrinter & operator<<(const T &x) {
-    ArduinoUnit::out->print(x);
-    return *this;
-  }
-};
-
 /** Class for creating a once-only test.  Test::run() on such a test
     calls Test::setup() once, and (if not already resolved from the
     setup(), calls Test::once() */
@@ -549,7 +541,6 @@ is in another file (or defined after the assertion on it). */
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertEqual(arg1,arg2)       assertOp(arg1,compareEqual,"==",arg2)
-#define assertEqual(msg,arg1,arg2)       assertOp(msg,arg1,compareEqual,"==",arg2)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
 #define assertNotEqual(arg1,arg2)    assertOp(arg1,compareNotEqual,"!=",arg2)

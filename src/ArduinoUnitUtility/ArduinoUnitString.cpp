@@ -2,9 +2,16 @@
 #include <ArduinoUnitUtility/ArduinoUnitString.h>
 
 #if ARDUINO_UNIT_USE_FLASH  > 0
-ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
-ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
-ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {}
+ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data), debug(false) {}
+ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) , debug(false) {}
+ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {
+  Serial.print("represented '");
+  Serial.print(_data);
+  Serial.print("' as '");
+  printTo(Serial);
+  Serial.println("'");
+  debug = false;
+}
 #else
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
 ArduinoUnitString::ArduinoUnitString(const String &_data) : data(_data.c_str()) {}
@@ -31,7 +38,7 @@ uint16_t ArduinoUnitString::length() const {
     return strlen((char*)(data));
   }
 #else
-    return strlen((char*)(data));  
+  return strlen((char*)(data));  
 #endif  
 }
 
@@ -39,9 +46,21 @@ int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
 {
 #if ARDUINO_UNIT_USE_FLASH  > 0
   switch ((flash()?2:0)|(to.flash()?1:0)) {
-  case 0: return strcmp((const char *) data,(const char *) to.data);
-  case 1: return -strcmp_P((const /* PROGMEM */ char *)(to.data&0x7FFFFFFF), (const char *) data);
-  case 2: return strcmp_P((const /* PROGMEM */ char *)(data&0x7FFFFFFF), (const char *) to.data);
+  case 0:
+    {
+      int ans = strcmp((const char *) data,(const char *) to.data);
+      return (ans == 0) ? 0 : (ans > 0) ? 1 : -1;
+    }
+  case 1:
+    {
+      int ans = strcmp_P((const char *) data, (const /* PROGMEM */ char *)(to.data&0x7FFFFFFF));
+      return (ans == 0) ? 0 : (ans > 0) ? 1 : -1;
+    }
+  case 2:
+    {
+      int ans = -strcmp_P((const char *) to.data, (const /* PROGMEM */ char *)(data&0x7FFFFFFF));
+      return (ans == 0) ? 0 : (ans > 0) ? 1 : -1;
+    }
   default:
     uint8_t a_buf[4],b_buf[4];
     const char *a_ptr = (const char *)(data&0x7FFFFFFF);
@@ -63,7 +82,8 @@ int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
     }
   }
 #else
-  return strcmp(data,to.data);
+  int ans = strcmp(data,to.data); 
+  return (ans == 0) ? 0 : (ans > 0) ? 1 : -1;
 #endif
 }
 
@@ -75,7 +95,7 @@ size_t ArduinoUnitString::printTo(Print &p) const {
     return p.print((char*)data);
   }
 #else
-    return p.print(data);  
+  return p.print(data);  
 #endif
 }
 

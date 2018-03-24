@@ -110,7 +110,7 @@ void process()
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!Serial) {} // Portability for Leonardo/Micro
   motd();
   while (configuring) {

@@ -45,6 +45,11 @@ struct MkCompare
   void testString(TYPES T, char name) {
     switch(T) {
     case GENERIC: out << "ArduinoUnitString(String( " << name << "))"; break;
+    default: out << "ArduinoUnitString(" << name << ")"; break;
+    }
+
+    /*    switch(T) {
+    case GENERIC: out << "ArduinoUnitString(String( " << name << "))"; break;
     case CONST_CHAR_PTR: out << "ArduinoUnitString(" << name << ")"; break;
     case FLASH_CHAR_PTR: out << "ArduinoUnitString(" << name << ")"; break;
     case CHAR_PTR: out << "ArduinoUnitString((const char *) " << name << ")"; break;
@@ -52,7 +57,7 @@ struct MkCompare
     case GENERIC_ARRAY: out << "ArduinoUnitString((const char *) " << name << ")"; break;
     case STRING: out << "ArduinoUnitString(" << name << ".c_str())"; break;
     default: break;
-    };
+    }; */
   }
 
   bool templateDeclareArg(TYPES T, char name, bool comma=false) {
@@ -142,21 +147,26 @@ struct MkCompare
   }
 
   virtual void between() {
-    out << "  inline static int between"; args(); out << std::endl;
+    out << "  inline static int8_t between"; args(); out << std::endl;
     out << "  {" << std:: endl;
     if (useStrcmp()) {
       if (typeA != FLASH_CHAR_PTR && typeB != FLASH_CHAR_PTR) {
         if (typeA == STRING) {
-          out << "    return a.compareTo(b);" << std::endl;
+          out << "    int ans = a.compareTo(b);" << std::endl;
+          out << "    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;" << std::endl;
         } else if (typeB == STRING) {
-          out << "    return -b.compareTo(a);" << std::endl;
+          out << "    int ans = -b.compareTo(a);" << std::endl;
+          out << "    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;" << std::endl;
         } else {
-          out << "    return strcmp(a,b);" << std::endl;
+          out << "    int ans = strcmp(a,b);" << std::endl;
+          out << "    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;" << std::endl;
         }
       } else if ((typeA != FLASH_CHAR_PTR && typeA != STRING) && typeB == FLASH_CHAR_PTR) {
-        out << "    return strcmp_P(a,(const char *)b);" << std::endl;
+          out << "    int ans = strcmp_P(a,(const char *)b);" << std::endl;
+          out << "    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;" << std::endl;
       } else if (typeA == FLASH_CHAR_PTR && (typeB != FLASH_CHAR_PTR && typeB != STRING)) {
-        out << "    return -strcmp_P(b,(const char *)a);" << std::endl;
+        out << "    int ans = -strcmp_P(b,(const char *)a);" << std::endl;
+        out << "    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;" << std::endl;
       } else {
         if (typeA < typeB) {
           out << "    return -Compare < "; templateArg(typeB,'b'); out << ","; templateArg(typeA,'a'); out << " >::between(b,a);" << std::endl;
@@ -302,6 +312,7 @@ int main(int argc, const char *argv[])
 
   mk.out << "#pragma once" << std::endl;
 
+  mk.out << "#include <stdint.h>" << std::endl;    
   if (includeFlash) {
     mk.out << "#include <ArduinoUnitUtility/Flash.h>" << std::endl;
   }
@@ -341,7 +352,7 @@ int main(int argc, const char *argv[])
   for (auto version : versions) {
     std::string Version = version;
     Version[0] = version[0]+'A'-'a';
-    const char *type = (Version == "Between") ? "int" : "bool";
+    const char *type = (Version == "Between") ? "int8_t" : "bool";
     mk.out << "template <typename A, typename B> " << type << " compare" << Version << "(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::" << version << "(a,b); }" << std::endl;
     // mk.out << "template <typename A, typename B> " << type << " compare" << Version << "(const A &a, const B &b) { return Compare<A,B>::" << version << "(a,b); }" << std::endl;    
   }

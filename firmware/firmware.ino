@@ -110,7 +110,7 @@ void process()
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while(!Serial) {} // Portability for Leonardo/Micro
   motd();
   while (configuring) {
@@ -599,4 +599,3 @@ test(iss47)
   assertNotEqual(iss47F,iss47e);
   assertNotEqual(iss47F,iss47f);  
 }
-

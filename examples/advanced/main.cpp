@@ -1,9 +1,9 @@
 #if !defined(ARDUINO)
 
+// only used for "en vitro" tests (not on actual board)
+
 #include <stdlib.h>
 #include <time.h>
-#include <time.h>
-
 #include <sys/time.h>
 
 struct timeval starttime;
@@ -36,7 +36,6 @@ unsigned long millis() {
   return secs*1000;
 }
 
-#endif
-
 #include "advanced.ino"
 
+#endif

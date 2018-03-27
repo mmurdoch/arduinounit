@@ -33,9 +33,4 @@
 * Use more standard file names (README.md, LICENSE, and CHANGELOG.md)
 * Use less likely to fail version of `while (!Serial) {}` in examples and documentation.
 * Make Test::TestString ArduinoUnitString, and refactor Compare to leverage that code.
-
-
-
-
-
-	
+* Add an optional lazy message last argument to every assert.

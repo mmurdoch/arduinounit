@@ -1,5 +1,7 @@
 #if defined(ARDUINO)
 #include <Arduino.h>
+#endif
+
 #include "ArduinoUnitString.h"
 
 #if ARDUINO_UNIT_USE_FLASH  > 0

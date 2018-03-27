@@ -454,7 +454,8 @@ testing(overall)
   }
 }
 
-char *iss47a="47";
+char _iss47a[3]={'4','7',0};
+char *iss47a=(char*) _iss47a;
 const char *iss47b="47";
 char iss47c[3]={'4','7',0};
 const char iss47d[3]={'4','7',0};
@@ -462,7 +463,8 @@ String iss47e="47";
 const char iss47f_P[] PROGMEM  = {"47"};
 const __FlashStringHelper *iss47f=(const __FlashStringHelper *)iss47f_P;
 
-char *iss47A="48";
+char _iss47A[3]={'4','8',0};
+char *iss47A=(char*) _iss47A;
 const char *iss47B="48";
 char iss47C[3]={'4','8',0};
 const char iss47D[3]={'4','8',0};

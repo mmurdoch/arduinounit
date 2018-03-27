@@ -20,6 +20,8 @@ uint8_t Test::min_verbosity = TEST_VERBOSITY_TESTS_SUMMARY;
 
 Print* Test::out = &Serial;
 
+void Test::noMessage() { }
+
 void Test::resolve() 
 {
   bool pass = current->state==DONE_PASS;

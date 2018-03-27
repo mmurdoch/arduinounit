@@ -39,6 +39,7 @@ And the following more-is-more features:
 1. Test names and assert strings are stored in flash (not RAM).
    - Test names can optionally be stored in either RAM or flash.
 1. assertions about other tests.
+1. optional message [Since 2.3.1]
 
 ## Getting Started
 
@@ -93,6 +94,27 @@ Test bad failed.
 Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
+# Message
+
+When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha,
+this is possible with any assertXXX() method by adding an additional third parameter to the assert.  For example,
+```
+test(cases)
+{
+  int x=3;
+  for (int k=0; k<4; ++k) {
+    assertNotEqual(x,k,"case k=" << k);
+  }
+}
+```
+will fail with the message
+```
+Assertion failed: (x=3) != (k=3), file basic.ino, line 20 [case k=3].
+```
+The additional message is only created if the assert actually needs to generate output (usually when it fails).
+It appears in the [] brackets at the end of the assert message.  Notice you can create fairly complex messages
+by chaining things you can print (like `Serial.print()`) between `<<` operators.  This is similar to the C++ ostream insertion operators, if you are familar with that.
+
 # Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:

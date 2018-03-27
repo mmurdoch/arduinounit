@@ -1,7 +1,6 @@
 #if defined(ARDUINO)
 #include <Arduino.h>
-#endif
-#include "ArduinoUnitUtility/ArduinoUnitString.h"
+#include "ArduinoUnitString.h"
 
 #if ARDUINO_UNIT_USE_FLASH  > 0
 ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}

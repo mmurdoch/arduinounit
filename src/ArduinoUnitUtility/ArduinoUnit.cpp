@@ -1,7 +1,8 @@
 #if defined(ARDUINO)
 #include <Arduino.h>
 #endif
-#include "ArduinoUnit.h"
+
+#include "../ArduinoUnit.h"
 
 const uint8_t Test::UNSETUP = 0;
 const uint8_t Test::LOOPING = 1;

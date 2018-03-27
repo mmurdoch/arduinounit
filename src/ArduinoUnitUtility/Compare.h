@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
-#include "ArduinoUnitUtility/Flash.h"
-#include "ArduinoUnitUtility/ArduinoUnitWiden.h"
+#include "Flash.h"
+#include "ArduinoUnitWiden.h"
 #if defined(ARDUINO)
 #  include <WString.h>
 #endif

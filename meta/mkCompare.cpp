@@ -314,9 +314,9 @@ int main(int argc, const char *argv[])
 
   mk.out << "#include <stdint.h>" << std::endl;    
   if (includeFlash) {
-    mk.out << "#include <ArduinoUnitUtility/Flash.h>" << std::endl;
+    mk.out << "#include \"ArduinoUnitUtility/Flash.h\"" << std::endl;
   }
-  mk.out << "#include <ArduinoUnitUtility/ArduinoUnitWiden.h>" << std::endl;  
+  mk.out << "#include \"ArduinoUnitUtility/ArduinoUnitWiden.h\"" << std::endl;  
   if (includeString) {
     mk.out << "#include <WString.h>" << std::endl;
   }

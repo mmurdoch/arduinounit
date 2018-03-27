@@ -115,6 +115,8 @@ The additional message is only created if the assert actually needs to generate 
 It appears in the [] brackets at the end of the assert message.  Notice you can create fairly complex messages
 by chaining things you can print (like `Serial.print()`) between `<<` operators.  This is similar to the C++ ostream insertion operators, if you are familar with that.
 
+The status of the test can be used (bool ok) when printing the message.  Under normal verbosity settings, ok will always be false, but more verbose settings can print assert messages even if they pass.
+
 # Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:

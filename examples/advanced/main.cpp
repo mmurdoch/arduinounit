@@ -5,17 +5,50 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/time.h>
+#include "ArduinoUnit.h"
 
 struct timeval starttime;
 
 void setup();
 void loop();
 
-int main() {
+int testsRemaining() {
+  int count = Test::getCurrentCount();
+  count -= Test::getCurrentSkipped();
+  count -= Test::getCurrentPassed();
+  count -= Test::getCurrentFailed();
+
+  return count;
+}
+
+
+int main(int argc, char *argv[]) {
   gettimeofday(&starttime, NULL);
   srand(time(0));
+  
   setup();
-  for (;;) loop();
+
+  // parse --exclude/-e <pattern> and --include/-i <pattern> commands
+  for (int i=1; i<argc; ++i) {
+    if (strcmp(argv[i],"--exclude")==0 || strcmp(argv[i],"-e")==0) {
+      ++i;
+      Test::exclude(argv[i]);
+      continue;
+    }
+    if (strcmp(argv[i],"--include")==0 || strcmp(argv[i],"-i")==0) {
+      ++i;
+      Test::include(argv[i]);
+      continue;
+    }
+    if (strcmp(argv[i],"--")==0) { break; }
+    std::cerr << "unknown argument '" << argv[i] << "'" << std::endl;
+    exit(1);
+  }
+
+  // instead of looping forever, loop while there are active tests
+  while (testsRemaining() > 0) {
+    loop();
+  }
   return 0;
 }
 

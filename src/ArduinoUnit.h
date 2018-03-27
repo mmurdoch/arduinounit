@@ -459,7 +459,7 @@ void loop() {
 
   virtual ~Test();
 
-  static void noMessage();
+  static void noMessage(bool ok);
 
   template <typename A, typename B, typename F>
     static bool assertion(ARDUINO_UNIT_DECLARE_STRING file, uint16_t line, ARDUINO_UNIT_DECLARE_STRING lhss, const A& lhs, ARDUINO_UNIT_DECLARE_STRING ops, bool (*op)(const A& lhs, const B& rhs), ARDUINO_UNIT_DECLARE_STRING rhss, const B& rhs, const F &onMessage) {
@@ -499,7 +499,7 @@ void loop() {
       out->print(file);
       out->print(ARDUINO_UNIT_STRING(", line "));
       out->print(line);
-      onMessage();
+      onMessage(ok);
       out->println(".");
     }
 #endif
@@ -546,7 +546,7 @@ is in another file (or defined after the assertion on it). */
 #define assertOpMsg(arg1,op,op_name,arg2, message)                               \
   do {  if (!Test::assertion< ArduinoUnitArgType(arg1) , ArduinoUnitArgType(arg2) > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
 
-#define ASSERT_OP_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&]()->void { Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
+#define ASSERT_OP_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
 #define ASSERT_OP_4(a1,op,op_name,arg2) assertOpMsg(a1,op,op_name,arg2,&Test::noMessage)
 
 // _f<MAXARGS+1>, where MAXARGS is the maximum number of arguments

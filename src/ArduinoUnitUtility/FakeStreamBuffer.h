@@ -22,11 +22,13 @@ SOFTWARE.
 
 #pragma once
 
+#if defined(ARDUINO)
 #include "Arduino.h"
+#endif
 #include "FakeStream.h"
 
 struct BufferNode {
-  byte value;
+  uint8_t value;
   BufferNode *next;
 };
 
@@ -64,7 +66,7 @@ class FakeStreamBuffer : public FakeStream {
          *
          * @param b the byte value
          **/
-        void nextByte(byte b);
+        void nextByte(uint8_t b);
 
         /**
          * Appends the current buffer of values to be read via read() or peek()
@@ -100,12 +102,12 @@ class FakeStreamBuffer : public FakeStream {
         BufferNode *_firstNode;
         BufferNode *_lastNode;
 
-        BufferNode* _createNode (byte value);
+        BufferNode* _createNode (uint8_t value);
         void _appendNode(BufferNode *node);
-        void _pushByte(byte value);
+        void _pushByte(uint8_t value);
         BufferNode* _popNode();
-        byte _nextByte();
+        uint8_t _nextByte();
         int _getBufferSize();
-        int _getBufferSize(byte stopAt);
+        int _getBufferSize(uint8_t stopAt);
         void _clearBuffer();
 };

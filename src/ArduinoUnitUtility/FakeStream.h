@@ -21,7 +21,12 @@ THE SOFTWARE.
 */
 #pragma once
 
+#if defined(ARDUINO)
 #include "Arduino.h"
+#else
+#include <string>
+#endif
+#include <stdint.h>
 
 /**
  * A fake stream which can be used in place of other streams
@@ -29,7 +34,11 @@ THE SOFTWARE.
  *
  * @author Matthew Murdoch
  */
-class FakeStream : public Stream {
+class FakeStream
+#if defined(ARDUINO)
+: public Stream
+#endif
+{
 public:
     /**
      * Creates a fake stream. Until nextByte() is called all bytes
@@ -67,7 +76,11 @@ public:
      *
      * @return the bytes written
      */
+#if defined(ARDUINO)    
     const String& bytesWritten();
+#else
+    const std::string& bytesWritten();
+#endif
     
     /**
      * Sets the next value to be read via read() or peek() to -1 (end-of-stream).
@@ -79,7 +92,7 @@ public:
      *
      * @param b the byte value
      */
-    void nextByte(byte b);
+    void nextByte(uint8_t b);
 
     /**
      * The number of bytes available to be read.
@@ -105,7 +118,12 @@ public:
     int peek();
 
 private:
+#if defined(ARDUINO)
     String _bytesWritten;
+#else
+    std::string _bytesWritten;
+#endif
+    
     int _nextByte;
 };
 

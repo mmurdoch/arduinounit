@@ -122,20 +122,50 @@ struct MkCompare
     unmask();
   };
 
-  bool masked() {
+  bool maskedFlash() {
     return typeA == FLASH_CHAR_PTR || typeB == FLASH_CHAR_PTR;
   }
 
-  void mask() {
-    if (masked()) {
+  bool maskedString() {
+    return typeA == STRING || typeB == STRING;
+  }
+
+  bool masked() {
+    return maskedFlash() || maskedString();
+  }
+
+  void maskFlash() {
+    if (maskedFlash()) {
       out << "#if ARDUINO_UNIT_USE_FLASH  > 0" << std::endl;
     }
   }
 
-  void unmask() {
-    if (masked()) {
+  void maskString() {
+    if (maskedString()) {
+      out << "#if defined(ARDUINO)" << std::endl;
+    }
+  }
+  
+  void mask() {
+    maskFlash();
+    maskString();
+  }
+  
+  void unmaskFlash() {
+    if (maskedFlash()) {
       out << "#endif" << std::endl;
     }
+  }
+
+  void unmaskString() {
+    if (maskedString()) {
+      out << "#endif" << std::endl;
+    }
+  }
+  
+  void unmask() {
+    unmaskString();
+    unmaskFlash();
   }
 
   virtual void args() {
@@ -318,7 +348,9 @@ int main(int argc, const char *argv[])
   }
   mk.out << "#include \"ArduinoUnitUtility/ArduinoUnitWiden.h\"" << std::endl;  
   if (includeString) {
-    mk.out << "#include <WString.h>" << std::endl;
+    mk.out << "#if defined(ARDUINO)" << std::endl;    
+    mk.out << "#  include <WString.h>" << std::endl;
+    mk.out << "#endif" << std::endl;        
   }
 
   mk.out << std::endl;

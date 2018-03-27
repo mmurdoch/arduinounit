@@ -7,8 +7,16 @@
 */
 
 #include <stdint.h>
+#if defined(ARDUINO)
 #include <WString.h>
 #include <Print.h>
+#define ArduinoUnitPrint(X) Test::out->print(X)
+#define ArduinoUnitPrintln(X) Test::out->println(X)
+#else
+#include <iostream>
+#define ArduinoUnitPrint(X) (*Test::out) << (X)
+#define ArduinoUnitPrintln(X) (*Test::out) << (X) << std::endl
+#endif
 
 #include "ArduinoUnitUtility/Flash.h"
 #include "ArduinoUnitUtility/ArduinoUnitWiden.h"
@@ -285,7 +293,10 @@ class Test
  public:
 
   struct Printer {
-    template <typename T> inline Printer &operator<<(const T &x) { out->print(x); return *this; }
+    template <typename T> inline Printer &operator<<(const T &x) {
+      ArduinoUnitPrint(x);
+      return *this;   
+    }
   };
 
   /** After the compile-time-mask TEST_MAX_VERBOSITY, this is a global
@@ -340,7 +351,11 @@ class Test
 
       in your setup().
   */
+#if defined(ARDUINO)
   static Print *out;
+#else
+  static std::ostream *out;
+#endif
 
   /** The current state of this test.  It is one of:
 
@@ -482,25 +497,25 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
-      out->print(ARDUINO_UNIT_STRING("Assertion "));
-      out->print(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
-      out->print(ARDUINO_UNIT_STRING(": "));
-      out->print(ARDUINO_UNIT_STRING("("));
-      out->print(lhss);
-      out->print(ARDUINO_UNIT_STRING("="));
-      out->print(lhs);
-      out->print(ARDUINO_UNIT_STRING(") "));
-      out->print(ops);
-      out->print(ARDUINO_UNIT_STRING(" ("));
-      out->print(rhss);
-      out->print(ARDUINO_UNIT_STRING("="));
-      out->print(rhs);
-      out->print(ARDUINO_UNIT_STRING("), file "));
-      out->print(file);
-      out->print(ARDUINO_UNIT_STRING(", line "));
-      out->print(line);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING("Assertion "));
+      ArduinoUnitPrint(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING(": "));
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING("("));
+      ArduinoUnitPrint(lhss);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING("="));
+      ArduinoUnitPrint(lhs);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING(") "));
+      ArduinoUnitPrint(ops);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING(" ("));
+      ArduinoUnitPrint(rhss);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING("="));
+      ArduinoUnitPrint(rhs);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING("), file "));
+      ArduinoUnitPrint(file);
+      ArduinoUnitPrint(ARDUINO_UNIT_STRING(", line "));
+      ArduinoUnitPrint(line);
       onMessage(ok);
-      out->println(".");
+      ArduinoUnitPrintln(ARDUINO_UNIT_STRING("."));
     }
 #endif
     return ok;

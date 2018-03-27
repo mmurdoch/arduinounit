@@ -5,14 +5,14 @@ test(loud_pass)
 {
   verbosity = TEST_VERBOSITY_ALL;
   int x=1;
-  assertEqual(x,1);
+  assertEqual(x,1,"ok is " << ok);
 }
 
 test(loud_fail)
 {
   verbosity = TEST_VERBOSITY_ALL;
   int x=1;
-  assertNotEqual(x,1);
+  assertNotEqual(x,1, "ok is " << ok);
 }
 
 test(loud_skip)

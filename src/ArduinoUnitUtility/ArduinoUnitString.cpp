@@ -1,13 +1,19 @@
+#if defined(ARDUINO)
 #include <Arduino.h>
+#endif
 #include "ArduinoUnitUtility/ArduinoUnitString.h"
 
 #if ARDUINO_UNIT_USE_FLASH  > 0
 ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
+#if defined(ARDUINO)
 ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {}
+#endif
 #else
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
+#if defined(ARDUINO)
 ArduinoUnitString::ArduinoUnitString(const String &_data) : data(_data.c_str()) {}
+#endif
 #endif
 
 void ArduinoUnitString::read(void *destination, uint16_t offset, uint8_t length) const
@@ -80,6 +86,7 @@ int8_t ArduinoUnitString::compare(const ArduinoUnitString &to) const
 #endif
 }
 
+#if defined(ARDUINO)
 size_t ArduinoUnitString::printTo(Print &p) const {
 #if ARDUINO_UNIT_USE_FLASH  > 0
   if ((data & 0x80000000) != 0) {
@@ -91,6 +98,13 @@ size_t ArduinoUnitString::printTo(Print &p) const {
   return p.print(data);  
 #endif
 }
+#else
+std::ostream & operator<<(std::ostream &out, const ArduinoUnitString &value) {
+  out << value.data;
+  return out;
+}
+#endif
+
 
 bool ArduinoUnitString::matches(const char *pattern) const {
   uint8_t np = strlen(pattern);

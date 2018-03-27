@@ -117,6 +117,12 @@ by chaining things you can print (like `Serial.print()`) between `<<` operators.
 
 The status of the test can be used (bool ok) when printing the message.  Under normal verbosity settings, ok will always be false, but more verbose settings can print assert messages even if they pass.
 
+# Bench Testing
+
+ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
+
+Note ArduinoUnit is not intended as a mocking library; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.
+
 # Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:

@@ -2,16 +2,9 @@
 #include "ArduinoUnitUtility/ArduinoUnitString.h"
 
 #if ARDUINO_UNIT_USE_FLASH  > 0
-ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data), debug(false) {}
-ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) , debug(false) {}
-ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {
-  Serial.print("represented '");
-  Serial.print(_data);
-  Serial.print("' as '");
-  printTo(Serial);
-  Serial.println("'");
-  debug = false;
-}
+ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data(0x80000000|(uint32_t)_data) {}
+ArduinoUnitString::ArduinoUnitString(const char *_data) : data((uint32_t)_data) {}
+ArduinoUnitString::ArduinoUnitString(const String &_data) : data((uint32_t)_data.c_str()) {}
 #else
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) {}
 ArduinoUnitString::ArduinoUnitString(const String &_data) : data(_data.c_str()) {}

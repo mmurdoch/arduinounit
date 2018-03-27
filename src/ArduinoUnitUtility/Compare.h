@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
-#include "ArduinoUnitUtility/Flash.h"
-#include "ArduinoUnitUtility/ArduinoUnitWiden.h"
+#include "Flash.h"
+#include "ArduinoUnitWiden.h"
 #include <WString.h>
 
 template  < typename A, typename B > struct Compare

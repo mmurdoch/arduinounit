@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <WString.h>
 #include <Print.h>
-#include "ArduinoUnitUtility/Flash.h"
+#include "Flash.h"
 
 class ArduinoUnitString : public Printable {
  public:

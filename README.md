@@ -3,8 +3,8 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-## Current Version 2.3.2-alpha
-[Download ArduinoUnit 2.3.2-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.2-alpha).
+## Current Version 2.3.3-alpha
+[Download ArduinoUnit 2.3.3-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.3-alpha).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
 of unit testing with the 1.x library over the last few years. It aims to be 
@@ -39,7 +39,8 @@ And the following more-is-more features:
 1. Test names and assert strings are stored in flash (not RAM).
    - Test names can optionally be stored in either RAM or flash.
 1. assertions about other tests.
-1. optional message [Since 2.3.1]
+1. optional footnote message [Since 2.3.1]
+1. en vitro builds (unit tests on developer system instead of embedded system) [Since 2.3.3]
 
 ## Getting Started
 
@@ -94,10 +95,10 @@ Test bad failed.
 Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
-# Message
+# Footnote Messages
 
 When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha,
-this is possible with any assertXXX() method by adding an additional third parameter to the assert.  For example,
+this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
 ```
 test(cases)
 {
@@ -117,7 +118,7 @@ by chaining things you can print (like `Serial.print()`) between `<<` operators.
 
 The status of the test can be used (bool ok) when printing the message.  Under normal verbosity settings, ok will always be false, but more verbose settings can print assert messages even if they pass.
 
-# Bench Testing
+# En Vitro Testing
 
 ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
 

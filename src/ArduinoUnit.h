@@ -12,16 +12,19 @@
 #include <Print.h>
 #define ArduinoUnitPrint(X) Test::out->print(X)
 #define ArduinoUnitPrintln(X) Test::out->println(X)
+#define ArduinoUnitOutType Print
 #else
+#include <string>
 #include <iostream>
 #define ArduinoUnitPrint(X) (*Test::out) << (X)
 #define ArduinoUnitPrintln(X) (*Test::out) << (X) << std::endl
+#define ArduinoUnitOutType std::ostream
 #endif
 
 #include "ArduinoUnitUtility/Flash.h"
+#include "ArduinoUnitUtility/Compare.h"
 #include "ArduinoUnitUtility/ArduinoUnitWiden.h"
 #include "ArduinoUnitUtility/ArduinoUnitString.h"
-#include "ArduinoUnitUtility/Compare.h"
 #include "ArduinoUnitUtility/FakeStream.h"
 #include "ArduinoUnitUtility/FakeStreamBuffer.h"
 #include "ArduinoUnitUtility/FreeMemory.h"
@@ -351,11 +354,7 @@ class Test
 
       in your setup().
   */
-#if defined(ARDUINO)
-  static Print *out;
-#else
-  static std::ostream *out;
-#endif
+  static ArduinoUnitOutType *out;
 
   /** The current state of this test.  It is one of:
 

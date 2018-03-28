@@ -53,6 +53,10 @@ int main(int argc, char *argv[]) {
 }
 
 #define F(X) X
+typedef const char *String;
+typedef char __FlashStringHelper;
+#define PROGMEM
+
 struct FakeSerial {
   std::string input;
   int at;
@@ -76,7 +80,6 @@ struct FakeSerial {
 
 FakeSerial Serial("run\n");
 
-
 int random(int n) { return rand() % n; }
 int random(int a, int b) { return a+rand() % (b-a+1); }
 
@@ -86,10 +89,6 @@ unsigned long millis() {
   double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
   return secs*1000;
 }
-
-typedef const char *String;
-typedef char __FlashStringHelper;
-#define PROGMEM
 
 #include "firmware.ino"
 

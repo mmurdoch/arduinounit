@@ -111,7 +111,7 @@ void Test::insert()
   { // keep list sorted
     Test **p = &Test::root;
     while ((*p) != 0) {
-      if (name.compare((*p)->name) <= 0) break;
+      if (name.compareTo((*p)->name) <= 0) break;
       p=&((*p)->next);
     }
     next=(*p);

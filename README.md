@@ -199,22 +199,9 @@ assertNotEqual(arg1,arg2)
 assertMoreOrEqual(arg1,arg2)
 assertMore(arg1,arg2)
 ```
-The following types are supported for these assertions:
-```
-String
-char *
-char []
-flash string literals, i.e. F("ok")
-char
-unsigned char
-int
-unsigned int
-long
-unsigned long
-double
-```
-All the string-like types (String, char *, char[] and flash string literals) can be used
-interchangeably in assertions, i.e.:
+Anything that can be compared via a '<' comparison beween them can be used.
+
+All the string-like types (String, char *, char[] and flash string literals) can be used interchangeably in assertions, i.e.:
 ```
 test(strings) {
    const char *cok="ok";
@@ -305,13 +292,18 @@ You can create your own modular tests by deriving from these classes.
 
 ```
 class MyTest : public Test {
-public:
-  MyTest(const __FlashStringHelper *name) : Test(name) {
+private:
+  void construct() {
     // TODO: construct named test.
     // This should be lightweight - it may be excluded
     //
     // You can set verbosity.
   }
+public:
+  MyTest(const char *name) : Test(name) {construct();}
+#if defined(F)
+  MyTest(const __FlashStringHelper *name) {construct();}
+#endif
   void setup() {
     // TODO: setup test
     // You can call pass(), fail(), or skip() to immediately resolve test

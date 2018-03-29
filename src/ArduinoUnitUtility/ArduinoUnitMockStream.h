@@ -27,13 +27,12 @@ THE SOFTWARE.
 
 #include <stddef.h>
 #include <stdint.h>
-#include <iostream>
-#include <string>
 
 #if defined(ARDUINO)
 #include <Stream.h>
 #else
-
+#include <string>
+#include <iostream>
 #include "ArduinoUnitMockWString.h"
 #include "ArduinoUnitMockPrint.h"
 

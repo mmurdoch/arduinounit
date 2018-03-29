@@ -51,7 +51,7 @@ void FakeStream::setToEndOfStream() {
     _nextByte = -1;
 }
 
-void FakeStream::nextByte(byte b) {
+void FakeStream::nextByte(uint8_t b) {
     _nextByte = b;
 }
 

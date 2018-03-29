@@ -1,4 +1,6 @@
-#if !defined(ARDUINO)
+#if defined(ARDUINO)
+#include <Arduino.h>
+#else
 #include <iostream>
 #endif
 

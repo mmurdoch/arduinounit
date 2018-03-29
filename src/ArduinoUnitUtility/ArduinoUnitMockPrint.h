@@ -30,11 +30,11 @@ THE SOFTWARE.
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include <iostream>
 
 #if defined(ARDUINO)
 #include <Print.h>
 #else
+#include <iostream>
 #include "ArduinoUnitMockPrintable.h"
 #include "ArduinoUnitMockWString.h"
 

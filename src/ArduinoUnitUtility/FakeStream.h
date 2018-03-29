@@ -21,12 +21,9 @@ THE SOFTWARE.
 */
 #pragma once
 
-#if defined(ARDUINO)
-#include "Arduino.h"
-#else
-#include <string>
-#endif
 #include <stdint.h>
+#include "ArduinoUnitMockWString.h"
+#include "ArduinoUnitMockStream.h"
 
 /**
  * A fake stream which can be used in place of other streams
@@ -34,10 +31,7 @@ THE SOFTWARE.
  *
  * @author Matthew Murdoch
  */
-class FakeStream
-#if defined(ARDUINO)
-: public Stream
-#endif
+class FakeStream : public Stream
 {
 public:
     /**
@@ -76,11 +70,8 @@ public:
      *
      * @return the bytes written
      */
-#if defined(ARDUINO)    
+
     const String& bytesWritten();
-#else
-    const std::string& bytesWritten();
-#endif
     
     /**
      * Sets the next value to be read via read() or peek() to -1 (end-of-stream).
@@ -118,11 +109,8 @@ public:
     int peek();
 
 private:
-#if defined(ARDUINO)
     String _bytesWritten;
-#else
     std::string _bytesWritten;
-#endif
     
     int _nextByte;
 };

@@ -5,29 +5,20 @@
   @file ArduinoUnit.h
 
 */
-
-#include <stdint.h>
-#if defined(ARDUINO)
-#include <WString.h>
-#include <Print.h>
-#define ArduinoUnitPrint(X) Test::out->print(X)
-#define ArduinoUnitPrintln(X) Test::out->println(X)
-#define ArduinoUnitOutType Print
-#else
-#include <string>
-#include <iostream>
-#define ArduinoUnitPrint(X) (*Test::out) << (X)
-#define ArduinoUnitPrintln(X) (*Test::out) << (X) << std::endl
-#define ArduinoUnitOutType std::ostream
-#endif
+#include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
+#include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
 
 #include "ArduinoUnitUtility/Flash.h"
 #include "ArduinoUnitUtility/Compare.h"
 #include "ArduinoUnitUtility/ArduinoUnitWiden.h"
 #include "ArduinoUnitUtility/ArduinoUnitString.h"
+
 #include "ArduinoUnitUtility/FakeStream.h"
 #include "ArduinoUnitUtility/FakeStreamBuffer.h"
 #include "ArduinoUnitUtility/FreeMemory.h"
+
+#define ArduinoUnitPrint(X) Test::out->print(X)
+#define ArduinoUnitPrintln(X) Test::out->println(X)
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2
@@ -297,7 +288,7 @@ class Test
 
   struct Printer {
     template <typename T> inline Printer &operator<<(const T &x) {
-      ArduinoUnitPrint(x);
+      ArduinoUnitPrint((const typename ArduinoUnitWiden<T>::type &)x);
       return *this;   
     }
   };
@@ -354,7 +345,7 @@ class Test
 
       in your setup().
   */
-  static ArduinoUnitOutType *out;
+  static Print *out;
 
   /** The current state of this test.  It is one of:
 
@@ -464,12 +455,11 @@ void loop() {
   */
   static void run();
 
-  static bool finished();
+  /** number of tests that have are not done (skipped, passed, or failed) */
+  static int remaining();
 
-#if ARDUINO_UNIT_USE_FLASH > 0
   // Construct a test with a given name and verbosity level
   Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
-#endif
 
   Test(const char *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);
 
@@ -528,9 +518,7 @@ void loop() {
     setup(), calls Test::once() */
 class TestOnce : public Test {
  public:
-#if ARDUINO_UNIT_USE_FLASH > 0
   TestOnce(const __FlashStringHelper * name);
-#endif
   TestOnce(const char *name);
   void loop();
   virtual void once() = 0;

@@ -1,4 +1,6 @@
+#include "ArduinoUnitMockPrintable.h"
+
 #if !defined(ARDUINO)
-Printable::~Printable();
+Printable::~Printable() {}
 #endif
 

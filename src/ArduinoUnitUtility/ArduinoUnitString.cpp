@@ -1,12 +1,6 @@
-#if defined(ARDUINO)
-#include <Arduino.h>
-#else
-#include <iostream>
-#endif
-
 #include "ArduinoUnitString.h"
 
-#if ARDUINO_UNIT_USE_FLASH > 0
+#if defined(PROGMEM)
 #define FLASH_MASK(...) __VA_ARGS__
 #define NO_FLASH_MASK(...)
 #else
@@ -15,46 +9,22 @@
 #endif
 
 ArduinoUnitString::ArduinoUnitString(const char *_data) : data(_data) FLASH_MASK(,inFlash(false)) {}
-
-
-#if ARDUINO_UNIT_USE_FLASH > 0
-ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data((const char *)_data), inFlash(true) {}
-#endif
-
-#if defined(ARDUINO)
+ArduinoUnitString::ArduinoUnitString(const __FlashStringHelper *_data) : data((const char *)_data) FLASH_MASK(,inFlash(true)) {}
 ArduinoUnitString::ArduinoUnitString(const String &_data) : data(_data.c_str()) FLASH_MASK(,inFlash(false)) {}
-#else
-ArduinoUnitString::ArduinoUnitString(const std::string &_data) : data(_data.c_str()) FLASH_MASK(,inFlash(false)) {}
-#endif
-
 void ArduinoUnitString::readTo(void *destination, uint16_t offset, uint8_t length) const
 {
-#if ARDUINO_UNIT_USE_FLASH  > 0
-  if (inFlash) {
-    memcpy_P(destination,data+offset,length);
-  } else {
-    memcpy(destination,data+offset,length);
-  }
-#else
+  FLASH_MASK(if (inFlash) { memcpy_P(destination,data+offset,length); return; });
   memcpy(destination,data+offset,length);
-#endif
 }
 
 uint16_t ArduinoUnitString::length() const {
-#if ARDUINO_UNIT_USE_FLASH  > 0
-  if (inFlash) {
-    return strlen_P(data);
-  } else {
-    return strlen(data);
-  }
-#else
+  FLASH_MASK(if (inFlash) { return strlen_P(data); });
   return strlen(data);  
-#endif  
 }
 
 int8_t ArduinoUnitString::compareTo(const ArduinoUnitString &to) const
 {
-#if ARDUINO_UNIT_USE_FLASH  > 0
+#if defined(PROGMEM)
   switch ((inFlash?2:0)|(to.inFlash?1:0)) {
   case 0:
     {
@@ -99,41 +69,10 @@ int8_t ArduinoUnitString::compareTo(const ArduinoUnitString &to) const
 #endif
 }
 
-#if defined(ARDUINO)
 size_t ArduinoUnitString::printTo(Print &p) const {
-#if ARDUINO_UNIT_USE_FLASH  > 0
-  if (inFlash) {
-    return p.print((const __FlashStringHelper *)data);
-  } else {
-    return p.print(data);
-  }
-#else
-  return p.print(data);  
-#endif
+  FLASH_MASK(if (inFlash) { return p.print((const __FlashStringHelper *)data); });
+  return p.print(data);
 }
-#else
-std::ostream & operator<<(std::ostream &out, const ArduinoUnitString &value) {
-#if ARDUINO_UNIT_USE_FLASH  > 0
-  if (inFlash) {
-    char tmp[128];
-    int n=value.length();
-    int m;
-    for (int i=0; i<n; i += m) {
-      int m=sizeof(tmp);
-      if (i+m > n) m=n-i;
-      value.readTo(tmp,i,m);
-      out.write(tmp,m);
-    }
-  } else {
-    out << value.data;
-  }
-#else
-  out << value.data;
-#endif
-  return out;
-}
-#endif
-
 
 bool ArduinoUnitString::matches(const char *pattern) const {
   uint8_t np = strlen(pattern);

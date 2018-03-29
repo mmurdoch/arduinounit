@@ -10,7 +10,7 @@ char * 	dtostrf (double __val, signed char __width, unsigned char __prec, char *
   char tmp[33];
   snprintf(tmp,sizeof(tmp), "%*.*lf", __width, __prec, __val);
   int n = strlen(tmp);
-  memcpy(__s, tmp, n);
+  memcpy(__s, tmp, n+1);
   return __s;
 }
 
@@ -49,7 +49,7 @@ char * ulltoa(unsigned long long value, char *buf, int base) {
     *p=0;
   }
   int n = strlen(tmp);
-  memcpy(buf, tmp, n);
+  memcpy(buf, tmp, n+1);
   return buf;
 }
 

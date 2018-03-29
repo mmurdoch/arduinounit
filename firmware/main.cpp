@@ -3,6 +3,7 @@
 // only used for "en vitro" tests (not on actual board)
 
 #include <stdlib.h>
+#include <iostream>
 #include <time.h>
 #include <sys/time.h>
 #include "ArduinoUnit.h"
@@ -11,16 +12,6 @@ struct timeval starttime;
 
 void setup();
 void loop();
-
-int testsRemaining() {
-  int count = Test::getCurrentCount();
-  count -= Test::getCurrentSkipped();
-  count -= Test::getCurrentPassed();
-  count -= Test::getCurrentFailed();
-
-  return count;
-}
-
 
 int main(int argc, char *argv[]) {
   gettimeofday(&starttime, NULL);
@@ -45,17 +36,11 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // instead of looping forever, loop while there are active tests
-  while (testsRemaining() > 0) {
+  while (Test::remaining() > 0) {
     loop();
   }
   return 0;
 }
-
-#define F(X) X
-typedef const char *String;
-typedef char __FlashStringHelper;
-#define PROGMEM
 
 struct FakeSerial {
   std::string input;

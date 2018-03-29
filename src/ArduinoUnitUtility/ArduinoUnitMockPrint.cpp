@@ -1,5 +1,6 @@
 #if !defined(ARDUINO)
 #include "ArduinoUnitMockPrint.h"
+#include <math.h>
 
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size)
@@ -14,15 +15,7 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 
 size_t Print::print(const __FlashStringHelper *ifsh)
 {
-  PGM_P p = reinterpret_cast<PGM_P>(ifsh);
-  size_t n = 0;
-  while (1) {
-    unsigned char c = pgm_read_byte(p++);
-    if (c == 0) break;
-    if (write(c)) n++;
-    else break;
-  }
-  return n;
+  return print((const char *) ifsh);
 }
 
 size_t Print::print(const String &s)
@@ -84,9 +77,7 @@ size_t Print::print(double n, int digits)
 
 size_t Print::println(const __FlashStringHelper *ifsh)
 {
-  size_t n = print(ifsh);
-  n += println();
-  return n;
+  return println((const char *) ifsh);
 }
 
 size_t Print::print(const Printable& x)

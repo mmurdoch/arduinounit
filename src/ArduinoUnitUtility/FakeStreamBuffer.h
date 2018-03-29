@@ -22,9 +22,6 @@ SOFTWARE.
 
 #pragma once
 
-#if defined(ARDUINO)
-#include "Arduino.h"
-#endif
 #include "FakeStream.h"
 
 struct BufferNode {

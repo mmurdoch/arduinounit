@@ -1,5 +1,5 @@
-#if defined(ARDUINO)
-#include <Arduino.h>
+#if !defined(ARDUINO)
+#include <iostream>
 #endif
 
 #include "../ArduinoUnit.h"
@@ -21,11 +21,23 @@ uint16_t Test::skipped = 0;
 uint8_t Test::max_verbosity = TEST_VERBOSITY_ALL;
 uint8_t Test::min_verbosity = TEST_VERBOSITY_TESTS_SUMMARY;
 
-#if defined(ARDUINO)
-Print* Test::out = &Serial;
-#else
-std::ostream * Test::out = &std::cout;
+#if !defined(ARDUINO)
+struct ArduinoUnitPrintCOut : Print {
+  size_t write(uint8_t c) {
+    char tmp[1];
+    tmp[0]=c;
+    std::cout.write(tmp,1);
+    return 1;
+  }
+  size_t write(const uint8_t *buffer, size_t size) {
+    std::cout.write((const char *)buffer,size);
+    return size;
+  }
+};
+static ArduinoUnitPrintCOut Serial;
 #endif
+
+Print* Test::out = &Serial;
 
 void Test::noMessage(bool ok) { (void) ok; }
 
@@ -91,13 +103,11 @@ void Test::remove()
   }
 }
 
-#if ARDUINO_UNIT_USE_FLASH > 0
 Test::Test(const __FlashStringHelper *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
 {
   insert();
 }
-#endif
 
 Test::Test(const char *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
@@ -126,8 +136,8 @@ void Test::skip() { state = DONE_SKIP; }
 
 void Test::setup() {};
 
-bool Test::finished() {
-  return count >= skipped + passed + failed;
+int Test::remaining() {
+  return count - (skipped + passed + failed);
 }
 
 void Test::run()
@@ -180,9 +190,7 @@ void Test::exclude(const char *pattern)
   }
 }
 
-#if ARDUINO_UNIT_USE_FLASH > 0
 TestOnce::TestOnce(const __FlashStringHelper *name) : Test(name) {}
-#endif
 
 TestOnce::TestOnce(const char *name) : Test(name) {}
 

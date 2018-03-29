@@ -9,13 +9,20 @@
 #include <sys/time.h>
 #include "ArduinoUnit.h"
 
-struct timeval starttime;
 unsigned long millis() {
+  static bool setup = false;
+  static struct timeval starttime;
   struct timeval now;
+  if (!setup) {
+    gettimeofday(&starttime, NULL);
+    setup = true;
+  }
   gettimeofday(&now, NULL);
-  double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
+  double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000.0
+    + (double)(now.tv_sec - starttime.tv_sec);
   return secs*1000;
 }
+
 int random(int n) { return rand() % n; }
 int random(int a, int b) { return a+rand() % (b-a+1); }
 
@@ -26,7 +33,6 @@ void setup();
 void loop();
 
 int main(int argc, char *argv[]) {
-  gettimeofday(&starttime, NULL);
   srand(time(0));
   
   setup();

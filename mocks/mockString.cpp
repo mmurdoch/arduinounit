@@ -1,31 +1,32 @@
-#include "ArduinoUnit.h"
-
+#include <stdlib.h>
+#include <iostream>
+#include <assert.h>
 #include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
 
-test(stringCons) {
+void testStringCons() {
   String hw1("hello world");
   String hw2(F("hello world"));
   String hw3(hw1);
 
-  assertEqual(hw1,hw2);
-  assertEqual(hw2,hw3);
-  assertEqual(hw3,hw1);    
+  assert(strcmp(hw1.c_str(),"hello world")==0);
+  assert(strcmp(hw2.c_str(),"hello world")==0);
+  assert(strcmp(hw3.c_str(),"hello world")==0);  
 }
 
-test(stringVals) {
-  for (int i=0; i<10; ++i) {
-    int x = rand();
-    String s(x);
-    char tmp[32];
-    snprintf(tmp,sizeof(tmp),"%d",x);
-    assertEqual(s,tmp);
-  }
+void testStringNums() {
+  String s1;
+  s1 += 42;
+  assert(strcmp(s1.c_str(),"42")==0);
+
+  String s2;
+  s2 += 42.1;
+  printf("s='%s'\n",s2.c_str());
+  assert(strcmp(s2.c_str(),"42.10")==0);  
 }
 
 int main() {
-  Test::min_verbosity = TEST_VERBOSITY_ALL;
-  while (!Test::finished()) {
-    Test::run();
-  }
+  testStringCons();
+  testStringNums();  
+  printf("ok\n");
   return 0;
 }

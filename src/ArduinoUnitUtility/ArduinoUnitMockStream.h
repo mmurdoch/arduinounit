@@ -7,6 +7,7 @@
 #include <Stream.h>
 #else
 
+#include "ArduinoUnitMockWString.h"
 #include "ArduinoUnitMockPrint.h"
 
 // This enumeration provides the lookahead options for parseInt(), parseFloat()
@@ -100,4 +101,5 @@ class Stream : public Print
 };
 
 #undef NO_IGNORE_CHAR
+
 #endif

@@ -6,6 +6,7 @@
 #include <WString.h>
 #include <Print.h>
 #else
+#include <string.h> // memcpy, memset, strlen, strcmp
 #include <iostream>
 #include <string>
 #endif

@@ -26,35 +26,18 @@ void testPrint() {
   assert(strcmp(sp.c_str(),"hello world!\r\n")==0);
 }
 
-struct PrintCppStream : Print {
-  std::ostream &out;
-  PrintCppStream(std::ostream &_out = std::cout) : out(_out) {}
-
-  size_t write(uint8_t c) {
-    char tmp[1];
-    tmp[0]=c;
-    out.write(tmp,1);
-    return 1;
-  }
-
-  size_t write(const uint8_t *buffer, size_t size) {
-    out.write((const char *)buffer,size);
-    return size;
-  }
-};
-
-void testPrintCppStream() {
+void testCppStreamPrint() {
   std::ostringstream oss;
-  PrintCppStream ps(oss);
-  ps.println("check 1");
-  ps.println("check 2");
+  CppStreamPrint sp(oss);
+  sp.println("check 1");
+  sp.println("check 2");
   std::string ans = oss.str();
   assert(ans == "check 1\r\ncheck 2\r\n");
 }
 
 int main() {
   testPrint();
-  testPrintCppStream();  
+  testCppStreamPrint();
   printf("ok\n");
 }
 

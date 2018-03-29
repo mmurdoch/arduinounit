@@ -254,5 +254,17 @@ size_t Print::printFloat(double number, uint8_t digits)
   return n;
 }
 
+
+CppStreamPrint::CppStreamPrint(std::ostream &_out) : out(_out) {}
+size_t CppStreamPrint::write(uint8_t c) {
+  out.put((char) c);
+  return 1;
+}
+
+size_t CppStreamPrint::write(const uint8_t *buffer, size_t size) {
+  out.write((const char *)buffer,size);
+  return size;
+}
+
 #endif
 

@@ -22,22 +22,11 @@ uint8_t Test::max_verbosity = TEST_VERBOSITY_ALL;
 uint8_t Test::min_verbosity = TEST_VERBOSITY_TESTS_SUMMARY;
 
 #if !defined(ARDUINO)
-struct ArduinoUnitPrintCOut : Print {
-  size_t write(uint8_t c) {
-    char tmp[1];
-    tmp[0]=c;
-    std::cout.write(tmp,1);
-    return 1;
-  }
-  size_t write(const uint8_t *buffer, size_t size) {
-    std::cout.write((const char *)buffer,size);
-    return size;
-  }
-};
-static ArduinoUnitPrintCOut Serial;
+static CppStreamPrint Serial;
 #endif
 
 Print* Test::out = &Serial;
+
 
 void Test::noMessage(bool ok) { (void) ok; }
 

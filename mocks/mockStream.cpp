@@ -53,51 +53,6 @@ void testStream() {
   assert(strcmp(w.c_str()," world!\r\n")==0);
 }
 
-struct CppIOStream : Stream {
-  std::istream &in;
-  std::ostream &out;
-  std::string buffered;
-  
-  CppIOStream(std::istream &_in = std::cin, std::ostream &_out = std::cout) : in(_in), out(_out) {}
-
-  int available() {
-    if (buffered.size() < 32) {
-      char tmp[32];
-      size_t status = in.readsome(tmp,sizeof(tmp));
-      if (status > 0) {
-        buffered.append(tmp,status);
-      }
-    }
-    return buffered.size();
-  }
-
-  virtual int read() {
-    if (buffered.size() > 0) {
-      int ans = buffered[0];
-      buffered.erase(0,1);
-      return ans;
-    }
-    return in.get();
-  }
-  
-  virtual int peek() {
-    return in.peek();
-  }
-  
-
-  size_t write(uint8_t c) {
-    char tmp[1];
-    tmp[0]=c;
-    out.write(tmp,1);
-    return 1;
-  }
-
-  size_t write(const uint8_t *buffer, size_t size) {
-    out.write((const char *)buffer,size);
-    return size;
-  }
-};
-
 void testCppIOStream() {
   std::istringstream iss("test");  
   std::ostringstream oss;

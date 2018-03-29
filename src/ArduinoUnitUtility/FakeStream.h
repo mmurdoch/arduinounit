@@ -110,8 +110,6 @@ public:
 
 private:
     String _bytesWritten;
-    std::string _bytesWritten;
-    
     int _nextByte;
 };
 

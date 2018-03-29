@@ -27,6 +27,8 @@ THE SOFTWARE.
 
 #include <stddef.h>
 #include <stdint.h>
+#include <iostream>
+#include <string>
 
 #if defined(ARDUINO)
 #include <Stream.h>
@@ -126,5 +128,20 @@ class Stream : public Print
 };
 
 #undef NO_IGNORE_CHAR
+
+struct CppIOStream : Stream {
+  std::istream &in;
+  std::ostream &out;
+  std::string buffered;
+  
+  CppIOStream(std::istream &_in = std::cin, std::ostream &_out = std::cout);
+
+  int available();
+  int read();
+  int peek();
+  size_t write(uint8_t c);
+  size_t write(const uint8_t *buffer, size_t size);
+};
+
 
 #endif

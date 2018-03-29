@@ -341,4 +341,42 @@ int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
   return -1;
 }
 
+CppIOStream::CppIOStream(std::istream &_in, std::ostream &_out) : in(_in), out(_out) {}
+
+int CppIOStream::available() {
+  if (buffered.size() < 32) {
+    char tmp[32];
+    size_t status = in.readsome(tmp,sizeof(tmp));
+    if (status > 0) {
+      buffered.append(tmp,status);
+    }
+  }
+  return buffered.size();
+}
+
+int CppIOStream::read() {
+  if (buffered.size() > 0) {
+    int ans = buffered[0];
+    buffered.erase(0,1);
+    return ans;
+  }
+  return in.get();
+}
+
+int CppIOStream::peek() {
+  return in.peek();
+}
+
+size_t CppIOStream::write(uint8_t c) {
+  char tmp[1];
+  tmp[0]=c;
+  out.write(tmp,1);
+  return 1;
+}
+
+size_t CppIOStream::write(const uint8_t *buffer, size_t size) {
+  out.write((const char *)buffer,size);
+  return size;
+}
+
 #endif

@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <iostream>
 
 #if defined(ARDUINO)
 #include <Print.h>
@@ -112,5 +113,13 @@ class Print
 
     virtual void flush() { /* Empty implementation for backward compatibility */ }
 };
+
+struct CppStreamPrint : Print {
+  std::ostream &out;
+  CppStreamPrint(std::ostream &_out = std::cout);
+  size_t write(uint8_t c);
+  size_t write(const uint8_t *buffer, size_t size);
+};
+
 
 #endif

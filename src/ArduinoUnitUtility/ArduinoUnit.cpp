@@ -126,6 +126,10 @@ void Test::skip() { state = DONE_SKIP; }
 
 void Test::setup() {};
 
+bool Test::finished() {
+  return count >= skipped + passed + failed;
+}
+
 void Test::run()
 {
   for (Test **p = &root; (*p) != 0; ) {

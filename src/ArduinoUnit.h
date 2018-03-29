@@ -464,6 +464,8 @@ void loop() {
   */
   static void run();
 
+  static bool finished();
+
 #if ARDUINO_UNIT_USE_FLASH > 0
   // Construct a test with a given name and verbosity level
   Test(const __FlashStringHelper *_name, uint8_t _verbosity = TEST_VERBOSITY_TESTS_ALL|TEST_VERBOSITY_ASSERTIONS_FAILED);

@@ -1,12 +1,7 @@
 #pragma once
 
-#if defined(ARDUINO)
-#include "WString.h"
-#else
-#include <string>
-#endif
+#include "ArduinoUnitMockWString.h"
 
-#include "Flash.h"
 class ArduinoUnitString;
 
 // these are used to narrow the number of specializations the templates generate
@@ -26,18 +21,11 @@ template< > struct ArduinoUnitWiden < unsigned char > { typedef unsigned int typ
 template< > struct ArduinoUnitWiden < short > { typedef int type; };
 template< > struct ArduinoUnitWiden < unsigned short > { typedef unsigned int type; };
 template< > struct ArduinoUnitWiden < float > { typedef double type; };
-#if ARDUINO_UNIT_USE_FLASH > 0
 template< > struct ArduinoUnitWiden < __FlashStringHelper * > { typedef ArduinoUnitString type; };
-#endif
-#if defined(ARDUINO)
 template< > struct ArduinoUnitWiden < String > { typedef ArduinoUnitString type; };
-#else
-template< > struct ArduinoUnitWiden < std::string > { typedef ArduinoUnitString type; };
-#endif
 template< > struct ArduinoUnitWiden < char * > { typedef ArduinoUnitString type; };
 template< > struct ArduinoUnitWiden < char [] > { typedef ArduinoUnitString type; };
 template<int N> struct ArduinoUnitWiden < char [N] > { typedef ArduinoUnitString type; };
 
 #define ArduinoUnitType(T) ArduinoUnitWiden < ArduinoUnitRemoveConstTemplate < ArduinoUnitRemoveReferenceTemplate < T >::type >::type >::type
 #define ArduinoUnitArgType(X) ArduinoUnitType(__typeof__(X))
-

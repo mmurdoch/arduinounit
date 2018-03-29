@@ -379,4 +379,7 @@ size_t CppIOStream::write(const uint8_t *buffer, size_t size) {
   return size;
 }
 
+void CppIOStream::begin(long baud) { (void) baud; }
+bool CppIOStream::operator!() const { return false; }
+
 #endif

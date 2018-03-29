@@ -4,11 +4,23 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 #include <time.h>
 #include <sys/time.h>
 #include "ArduinoUnit.h"
 
 struct timeval starttime;
+unsigned long millis() {
+  struct timeval now;
+  gettimeofday(&now, NULL);
+  double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
+  return secs*1000;
+}
+int random(int n) { return rand() % n; }
+int random(int a, int b) { return a+rand() % (b-a+1); }
+
+std::istringstream in("run\n");
+CppIOStream Serial(in,std::cout);
 
 void setup();
 void loop();
@@ -18,6 +30,8 @@ int main(int argc, char *argv[]) {
   srand(time(0));
   
   setup();
+
+  Test::out = &Serial;
 
   // parse --exclude/-e <pattern> and --include/-i <pattern> commands
   for (int i=1; i<argc; ++i) {
@@ -40,39 +54,6 @@ int main(int argc, char *argv[]) {
     loop();
   }
   return 0;
-}
-
-struct FakeSerial {
-  std::string input;
-  int at;
-  FakeSerial(const std::string &_input) : input(_input), at(0) {}
-  void begin(long baud) { (void) baud; }
-  bool operator!() const { return false; }
-  template <typename T> void print(const T& x) {
-    std::cout << x;
-  }
-  template <typename T> void println(const T& x) {
-    std::cout << x << std::endl;
-  }
-  void println() {
-    std::cout << std::endl;
-  }
-
-  bool available() { return at < input.size(); }
-
-  int read() { if (at < input.size()) { ++at; return input[at-1]; } else { return -1; } }
-};
-
-FakeSerial Serial("run\n");
-
-int random(int n) { return rand() % n; }
-int random(int a, int b) { return a+rand() % (b-a+1); }
-
-unsigned long millis() {
-  struct timeval now;
-  gettimeofday(&now, NULL);
-  double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
-  return secs*1000;
 }
 
 #include "firmware.ino"

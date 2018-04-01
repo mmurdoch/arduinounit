@@ -2,15 +2,18 @@
 #include "WString.h"
 #else
 
+#include "Flash.h"
 
 #define F(stringLiteral) ARDUINO_UNIT_STRING(stringLiteral)
 
 class __FlashStringHelper;
 
+class StringSumHelper;
+
 class String
 {
  private: void assign(const char *str, unsigned int len);
-  
+ private: String(const char * str, unsigned int len);
  public: String(const char * str="");
  public: String(const String &str);
  public: String(const __FlashStringHelper *str);
@@ -26,20 +29,26 @@ class String
  public: unsigned int length() const;
  public: String& operator= (const char *str);
  public: String& operator= (const String &str);
- public: String& operator= (const String &str);
  public: String& operator= (String &&str);
  public: String& operator= (StringSumHelper && str);
  public: unsigned char concat(const char *x);
  public: unsigned char concat(const __FlashStringHelper *x);  
  public: unsigned char concat(const String &x);
  public: unsigned char concat(char x);    
- public: unsigned char concat(unsigned char x);  
- public: unsigned char concat(int x);    
- public: unsigned char concat(unsigned int x);  
- public: unsigned char concat(long x);    
- public: unsigned char concat(unsigned long x);  
- public: unsigned char concat(float x);    
- public: unsigned char concat(double x);
+ public: unsigned char concat(unsigned char x) { return concat(x,10); }
+ private: unsigned char concat(unsigned char x, unsigned char base);    
+ public: unsigned char concat(int x) { return concat(x,10); };
+ private: unsigned char concat(int x, unsigned char base);    
+ public: unsigned char concat(unsigned int x) { return concat(x,10); };
+ private: unsigned char concat(unsigned int x, unsigned char base);      
+ public: unsigned char concat(long x) { return concat(x,10); }
+ private: unsigned char concat(long x, unsigned char base);        
+ public: unsigned char concat(unsigned long x) { return concat(x,10); }
+ private: unsigned char concat(unsigned long x, unsigned char base);          
+ public: unsigned char concat(float x) { return concat(x,2); }
+ private: unsigned char concat(float x, unsigned char decimalPlaces);
+ public: unsigned char concat(double x) { return concat(x,2); }
+ private: unsigned char concat(double x, unsigned char decimalPlaces);  
  public: String& operator += (const char *str);
  public: String& operator += (const __FlashStringHelper *str);  
  public: String& operator += (const String &str);
@@ -106,13 +115,14 @@ class String
  public: void replace(const String &find, const String &replace);
  public: void remove(unsigned int i);
  public: void remove(unsigned int begin, unsigned int end);
+ private: void insert(unsigned int at, const String &str);
  public: void toLowerCase();
  public: void toUpperCase();
  public: void trim();
 
  public: long toInt() const;
- public: toFloat() const;
- public: toDouble() const;
+ public: float toFloat() const;
+ public: double toDouble() const;
 
  protected: char *buffer;
  protected: unsigned int capacity;
@@ -120,23 +130,25 @@ class String
  protected: void init();
  protected: void invalidate();
  protected: unsigned char changeBuffer(unsigned int maxStrLen);
- protected: concat(const char *str, unsigned int length);
+ private: unsigned char concatOk(const char *str, unsigned int length);  
+ protected: void concat(const char *str, unsigned int length);
  protected: String& copy(const char *str, unsigned int length);
- protected: String& copy(const char __FlashStringHelper *str, unsigned int length);
+ protected: String& copy(const __FlashStringHelper *str, unsigned int length);
  protected: void move(String &rhs);
+ public: ~String();
 };
 
 struct StringSumHelper : String {
- public: String(const String &x) : String(x) {}
- public: String(const char *x) : String(x) {}  
- public: String(unsigned char) : String(x) {}
- public: String(char x) : String(x) {}
- public: String(unsigned char x) : String(x) {}
- public: String(int x) : String(x) {}
- public: String(unsigned int x) : String(x) {}
- public: String(long x) : String(x) {}
- public: String(unsigned long x) : String(x) {}
- public: String(float x) : String(x) {}
- public: String(double x) : String(x) {}
+ public: StringSumHelper(const String &x) : String(x) {}
+ public: StringSumHelper(const char *x) : String(x) {}  
+ public: StringSumHelper(char x) : String(x) {}
+ public: StringSumHelper(unsigned char x) : String(x) {}
+ public: StringSumHelper(int x) : String(x) {}
+ public: StringSumHelper(unsigned int x) : String(x) {}
+ public: StringSumHelper(long x) : String(x) {}
+ public: StringSumHelper(unsigned long x) : String(x) {}
+ public: StringSumHelper(float x) : String(x) {}
+ public: StringSumHelper(double x) : String(x) {}
 };
 
+#endif

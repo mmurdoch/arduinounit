@@ -12,7 +12,6 @@ class StringSumHelper;
 
 class String
 {
- private: void assign(const char *str, unsigned int len);
  private: String(const char * str, unsigned int len);
  public: String(const char * str="");
  public: String(const String &str);
@@ -109,8 +108,8 @@ class String
  public: int lastIndexOf(char c, unsigned int offset) const;
  public: int lastIndexOf(const String &str) const;  
  public: int lastIndexOf(const String &str, unsigned int offset) const;
- public: String substring(unsigned int i);
- public: String substring(unsigned int begin, unsigned int end);
+ public: String substring(unsigned int i) const;
+ public: String substring(unsigned int begin, unsigned int end) const;
  public: void replace(char find, char replace);
  public: void replace(const String &find, const String &replace);
  public: void remove(unsigned int i);

@@ -6,16 +6,20 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
+#include <stdio.h>
 
 void String::concat(const char *str, unsigned int _len) {
   concatOk(str,_len);
 }
 
 unsigned char String::concatOk(const char *str, unsigned int _len) {
-  if (capacity < len+_len) {
+  if (capacity < len+_len || buffer == 0) {
     unsigned int _capacity = (len+_len)*5/4+4;
     char *_buffer = (char*) realloc(buffer, _capacity+1);
-    if (_buffer == 0) return false;
+    if (_buffer == 0) {
+      invalidate();
+      return false;
+    }
 
     // move str ref if it was moved in the realloc...
     if (buffer != 0 && str != 0 && buffer <= str && str <= buffer+capacity) {
@@ -25,7 +29,7 @@ unsigned char String::concatOk(const char *str, unsigned int _len) {
     buffer=_buffer;
   }
   if (str != 0) {
-    memcpy(buffer+len,str,_len);
+    memmove(buffer+len,str,_len);
   } else {
     memset(buffer+len,0,_len);
   }
@@ -37,16 +41,18 @@ unsigned char String::concatOk(const char *str, unsigned int _len) {
 unsigned char String::concat(long value, unsigned char base) {
   long x = value;
   int sz = 0;
-  if (x < 0) {++sz; x = -x; }
+  unsigned long p = 1;
+  if (x < 0) {++sz; x = -x; p = p*10; }
   do { ++sz; x=x/base; } while (x != 0);
   unsigned at = len;
   if (concatOk((const char *) 0, sz)) {
     x=value;
-    if (x < 0) { buffer[at++]='-'; x= -x; }
+    if (x < 0) { buffer[at++]='-'; x= -x; --sz; }
+    at += sz;
     do {
       int d = x % base;
       char c = (d < 10) ? d+'0' : d+'a'-10;
-      buffer[at++]=c;
+      buffer[--at]=c;
       x = x/base;
     } while (x != 0);
     return true;
@@ -62,10 +68,11 @@ unsigned char String::concat(unsigned long value, unsigned char base) {
   unsigned at = len;
   if (concatOk((const char *) 0, sz)) {
     x=value;
+    at += sz;
     do {
       int d = x % base;
       char c = (d < 10) ? d+'0' : d+'a'-10;
-      buffer[at++]=c;
+      buffer[--at]=c;
       x = x/base;
     } while (x != 0);
     return true;
@@ -75,45 +82,10 @@ unsigned char String::concat(unsigned long value, unsigned char base) {
 }
 
 unsigned char String::concat(double value, unsigned char precision) {
-  double x = value;
-  unsigned char p = precision;
-  if (x < 0) { x = -x; }
-  double q=1; 
-  while (p > 0) { q=q*10; --p; }
-  x = floor(x*q+0.5);
-  int sz=(value < 0) + (precision+1);
-  while (x >= q) { q=q*10; ++sz; }
-  unsigned at = len;
-  x = x/q;
-  if (concatOk((const char *) 0, sz)) {
-    if (value < 0) {
-      buffer[at++]='-';
-      --sz;
-    }
-    while (sz > 0) {
-      x=10*x;
-      unsigned char d=floor(x);
-      x=x-d;
-      buffer[at++]=d+'0';
-      --sz;
-      if (sz == precision + 1) {
-        buffer[at++]='.';
-        --sz;
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
+  char tmp[precision+64];
+  snprintf(tmp,precision+64,"%1.*lf",precision,value);
+  return concatOk(tmp,strlen(tmp));
 }
-
-// String(unsigned int _capacity, const char *fmt,...) {
-//   va_list args;
-//   va_start(args, fmt);
-//   capacity = _capacity;
-//   buffer = (char*) malloc(capacity+1);
-//   vsnprintf(buffer,capacity+1,format,args);
-// }
 
 String::String(const char *_buffer, unsigned int _len)
   : buffer(0), capacity(0), len(0) {
@@ -126,11 +98,7 @@ String::String(const String &str) : String(str.buffer,str.len) {}
 
 String::String(const __FlashStringHelper *str) : String((const char *) str){}
 
-String::String(char x)
-  : buffer(0), capacity(0), len(0) {
-  concat((const char *)0,1);
-  buffer[0] = x;
-}
+String::String(char x) : String((const char *) 0,1) { buffer[0]=x; }
 
 String::String(unsigned char x, unsigned char base)
   : buffer(0), capacity(0), len(0) {
@@ -169,12 +137,13 @@ String::String(double x, unsigned char decimalPlaces)
 
 unsigned char String::reserve(unsigned int _capacity) {
   char *_buffer = (char *) realloc(buffer,_capacity+1);
-  if (_buffer != 0) {
-    buffer=_buffer;
-    capacity=_capacity;
-    return true;
-  } else {
+  if (_buffer == 0) {
+    invalidate();
     return false;
+  } else {
+    buffer = _buffer;
+    capacity = _capacity;
+    return true;
   }
 }
 
@@ -383,7 +352,7 @@ void String::getBytes(unsigned char *buf, unsigned int size, unsigned int offset
 
   int n = len-offset;
   if (n > size-1) n = size-1;
-  memcpy(buf,buffer+offset,n);
+  memmove(buf,buffer+offset,n);
   buf[n]=0;
 }
 
@@ -421,11 +390,12 @@ int String::indexOf(const String &str, unsigned int offset) const {
 }
 
 int String::lastIndexOf(char c) const {
-  return lastIndexOf(c,len);
+  return (len > 0) ? lastIndexOf(c,len-1) : -1;
 }
 
 int String::lastIndexOf(char c, unsigned int offset) const {
-  if (offset > len) offset = len;
+  if (len == 0) return -1;
+  if (offset >= len) offset = len-1;
   for (;;) {
     if (buffer[offset] == c) return offset;
     if (offset == 0) return -1;
@@ -442,18 +412,18 @@ int String::lastIndexOf(const String &str, unsigned int offset) const {
   if (str.len == 0) return offset;
   if (str.len == 1) return lastIndexOf(str.buffer[0],offset);
   for (;;) {
-    int at = lastIndexOf(str.buffer[len-1],offset);
-    if (at == -1 || at < str.len) return -1;
-    if (strncmp(buffer+at-str.len,str.buffer,str.len-1)==0) return at - (str.len-1);
+    int at = lastIndexOf(str.buffer[str.len-1],offset);
+    if (at == -1 || at < str.len-1) return -1;
+    if (strncmp(buffer+at-(str.len-1),str.buffer,str.len-1)==0) return at - (str.len-1);
     offset = at-1;
   }
 }
 
-String String::substring(unsigned int i) {
+String String::substring(unsigned int i) const {
   return substring(i,len);
 }
 
-String String::substring(unsigned int begin, unsigned int end) {
+String String::substring(unsigned int begin, unsigned int end) const {
   if (begin > len) begin=len;
   if (end > len) end = len;
   return String(buffer+begin,end-begin);
@@ -479,8 +449,8 @@ void String::replace(const String &find, const String &replace) {
 void String::insert(unsigned at, const String &str) {
   if (str.len > 0) {
     concat((const char *) 0,str.len);
-    memcpy(buffer+at+str.len,buffer+at,len-str.len);
-    memcpy(buffer+at,str.buffer,str.len);
+    memmove(buffer+at+str.len,buffer+at,len-str.len);
+    memmove(buffer+at,str.buffer,str.len);
   }
 }
 
@@ -492,7 +462,7 @@ void String::remove(unsigned int begin, unsigned int end) {
   if (begin > len) begin=len;
   if (end > len) end = len;
   if (end <= begin) return;
-  memcpy(buffer+begin,buffer+end,len-end);
+  memmove(buffer+begin,buffer+end,len-end);
   len = len-(end-begin);
   buffer[len]=0;
 }
@@ -515,7 +485,7 @@ void String::trim() {
   remove(0,i);
   i = len-1;
   while (i > 0 && isspace(buffer[i])) --i;
-  remove(i,len);
+  remove(i+1,len);
 }
 
 long String::toInt() const { return atol(buffer); }

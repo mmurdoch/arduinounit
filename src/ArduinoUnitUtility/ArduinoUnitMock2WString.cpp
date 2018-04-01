@@ -20,8 +20,8 @@ unsigned char String::concat(const char *str, unsigned int _len) {
   } else {
     memset(buffer+len,0,_len);
   }
-  buffer[len+_len]=0;
   len += _len;
+  buffer[len]=0;
   return true;
 }
 
@@ -188,18 +188,12 @@ String& String::operator= (const String &str) {
 }
 
 String& String::operator= (String &&str) {
-  len=str.len;
-  capacity=str.capacity;
-  buffer=str.buffer;
-  str.len=0;
-  str.capacity=0;
-  str.buffer=0;
+  move(str);
   return *this;  
 }
 
 String& String::operator= (StringSumHelper && str) {
-  len=0;
-  concat(str.buffer,str.len);
+  move(str);
   return *this;
 }
 
@@ -395,43 +389,112 @@ int String::lastIndexOf(const String &str, unsigned int offset) const {
   }
 }
 
-public: String substring(unsigned int i);
- public: String substring(unsigned int begin, unsigned int end);
- public: void replace(char find, char replace);
- public: void replace(const String &find, const String &replace);
- public: void remove(unsigned int i);
- public: void remove(unsigned int begin, unsigned int end);
- public: void toLowerCase();
- public: void toUpperCase();
- public: void trim();
+String String::substring(unsigned int i) {
+  return substring(i,len);
+}
 
- public: long toInt() const;
- public: toFloat() const;
- public: toDouble() const;
+String String::substring(unsigned int begin, unsigned int end) {
+  if (begin > len) begin=len;
+  if (end > len) end = len;
+  return String(buffer+begin,end-begin);
+}
 
- protected: char *buffer;
- protected: unsigned int capacity;
- protected: unsigned int len;
- protected: void init();
- protected: void invalidate();
- protected: unsigned char changeBuffer(unsigned int maxStrLen);
- protected: concat(const char *str, unsigned int length);
- protected: String& copy(const char *str, unsigned int length);
- protected: String& copy(const char __FlashStringHelper *str, unsigned int length);
- protected: void move(String &rhs);
-};
+void String::replace(char find, char replace) {
+  for (int i=0; i<len; ++i) {
+    if (buffer[i] == find) buffer[i]=replace;
+  }
+}
 
-struct StringSumHelper : String {
- public: String(const String &x) : String(x) {}
- public: String(const char *x) : String(x) {}  
- public: String(unsigned char) : String(x) {}
- public: String(char x) : String(x) {}
- public: String(unsigned char x) : String(x) {}
- public: String(int x) : String(x) {}
- public: String(unsigned int x) : String(x) {}
- public: String(long x) : String(x) {}
- public: String(unsigned long x) : String(x) {}
- public: String(float x) : String(x) {}
- public: String(double x) : String(x) {}
-};
+void String::replace(const String &find, const String &replace) {
+  unsigned int offset = 0;
+  for (;;) {
+    int at = indexOf(find,offset);
+    if (at == -1) break;
+    remove(at,at+find.len);
+    insert(at,replace);
+    offset = at + replace.len;
+  }
+}
 
+void String::insert(unsigned at, const String &replace) {
+  if (replace.len > 0) {
+    concat((const char *) 0,replace.len);
+    memcpy(buffer+at+replace.len,buffer+at,buffer.len-replace.len);
+    memcpy(buffer+at,replace.buffer,replace.len);
+  }
+}
+
+void String::remove(unsigned int i) {
+  remove(i,len);
+}
+
+void String::remove(unsigned int begin, unsigned int end) {
+  if (begin > len) begin=len;
+  if (end > len) end = len;
+  if (end <= begin) return;
+  memcpy(buffer+begin,buffer+end,len-end);
+  len = len-(end-begin);
+  buffer[len]=0;
+}
+
+void String::toLowerCase() {
+  for (int i=0; i<len; ++i) {
+    buffer[i]=tolower(buffer[i]);
+  }
+}
+
+void String::toUpperCase() {
+  for (int i=0; i<len; ++i) {
+    buffer[i]=toupper(buffer[i]);
+  }
+}
+
+void String::trim() {
+  int i = 0;
+  while (i < len && isspace(buffer[i])) ++i;
+  remove(0,i);
+  i = len-1;
+  while (i > 0 && isspace(buffer[i])) --i;
+  remove(i,len);
+}
+
+long String::toInt() const { return atol(buffer); }
+float String::toFloat() const { return atof(buffer); }
+double String::toDouble() const { return atof(buffer); }
+
+void String::init() { /* what */ }
+void String::invalidate() { /* what */ }
+unsigned char String::changeBuffer(unsigned int _capacity) {
+  char *_buffer = realloc(buffer,_capacity);
+  if (_buffer != 0) {
+    capacity = _capacity;
+    buffer = _buffer;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+String& copy(const char *str, unsigned int length) {
+  len=0;
+  concat(str,length);
+}
+
+String& copy(const char __FlashStringHelper *str, unsigned int length) {
+  len=0;
+  concat((const char *) str,length);
+}
+
+void String::move(String &rhs) {
+  if (this == &rhs) return;
+
+  free(buffer);
+  buffer=rhs.buffer;
+  len=rhs.len;
+  capacity=rhs.capacity;
+  rhs.buffer=0;
+  rhs.capacity=0;
+  rhs.len=0;
+}
+
+#endif

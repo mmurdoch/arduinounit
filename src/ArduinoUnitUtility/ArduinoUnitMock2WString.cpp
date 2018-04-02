@@ -82,8 +82,9 @@ unsigned char String::concat(unsigned long value, unsigned char base) {
 }
 
 unsigned char String::concat(double value, unsigned char precision) {
-  char tmp[precision+64];
-  snprintf(tmp,precision+64,"%1.*lf",precision,value);
+  int sz = log10(fabs(value)+1)+1+precision+4;
+  char tmp[sz];
+  snprintf(tmp,sz,"%1.*lf",precision,value);
   return concatOk(tmp,strlen(tmp));
 }
 

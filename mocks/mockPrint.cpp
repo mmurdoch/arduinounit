@@ -2,8 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
-#include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
-#include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
+#include "ArduinoUnitUtility/ArduinoUnitMock2WString.h"
+#include "ArduinoUnitUtility/ArduinoUnitMock2Print.h"
 
 struct StringPrint : Print, String {
   size_t write(uint8_t c) {

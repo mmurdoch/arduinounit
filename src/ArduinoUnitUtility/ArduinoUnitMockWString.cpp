@@ -1,788 +1,548 @@
-#if !defined(ARDUINO)
-#include "ArduinoUnitMockWString.h"
+#include "ArduinoUnitMock2WString.h"
 
-#include <stdio.h>
-#include <string.h>
+#if ! defined(ARDUINO)
+
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 #include <ctype.h>
+#include <stdio.h>
 
-char * 	dtostrf (double __val, signed char __width, unsigned char __prec, char *__s) {
-  char tmp[33];
-  snprintf(tmp,sizeof(tmp), "%*.*lf", __width, __prec, __val);
-  int n = strlen(tmp);
-  memcpy(__s, tmp, n+1);
-  return __s;
+void String::concat(const char *str, unsigned int _len) {
+  concatOk(str,_len);
 }
 
-char * lltoa(long long value, char *buf, int base) {
-  char *p=buf;
-  if (value < 0) {
-    *p = '-'; ++p; value = -value;
+unsigned char String::concatOk(const char *str, unsigned int _len) {
+  if (capacity < len+_len || buffer == 0) {
+    unsigned int _capacity = (len+_len)*5/4+4;
+    char *_buffer = (char*) realloc(buffer, _capacity+1);
+    if (_buffer == 0) {
+      invalidate();
+      return false;
+    }
+
+    // move str ref if it was moved in the realloc...
+    if (buffer != 0 && str != 0 && buffer <= str && str <= buffer+capacity) {
+      str = str + (_buffer - buffer);
+    }
+    capacity=_capacity;
+    buffer=_buffer;
   }
-  ulltoa(value,p,base);
-  return buf;
+  if (str != 0) {
+    memmove(buffer+len,str,_len);
+  } else {
+    memset(buffer+len,0,_len);
+  }
+  len += _len;
+  buffer[len]=0;
+  return true;
 }
 
-char * ltoa(long value, char *buf, int base) {
-  return lltoa(value,buf,base);
-}
-
-char * itoa(int value, char *buf, int base) {
-  return lltoa(value,buf,base);
-}
-
-char * ulltoa(unsigned long long value, char *buf, int base) {
-  char tmp[66];
-  if (base == 10) {
-    snprintf(tmp,sizeof(tmp), "%llu", value);
-  } else if (base == 16) {
-    snprintf(tmp,sizeof(tmp), "%llx", value);
-  } else if (base == 8) {
-    snprintf(tmp,sizeof(tmp), "%llo", value);
-  } else if (base == 2) {
-    char *p = tmp;
+unsigned char String::concat(long value, unsigned char base) {
+  long x = value;
+  int sz = 0;
+  unsigned long p = 1;
+  if (x < 0) {++sz; x = -x; p = p*10; }
+  do { ++sz; x=x/base; } while (x != 0);
+  unsigned at = len;
+  if (concatOk((const char *) 0, sz)) {
+    x=value;
+    if (x < 0) { buffer[at++]='-'; x= -x; --sz; }
+    at += sz;
     do {
-      *p = (value & 1) ? '1' : '0';
-      ++p;
-      value >>= 1;
-    } while (value != 0);
-    *p=0;
+      int d = x % base;
+      char c = (d < 10) ? d+'0' : d+'a'-10;
+      buffer[--at]=c;
+      x = x/base;
+    } while (x != 0);
+    return true;
+  } else {
+    return false;
   }
-  int n = strlen(tmp);
-  memcpy(buf, tmp, n+1);
-  return buf;
 }
 
-char * ultoa(unsigned long value, char *buf, int base) {
-  return ulltoa(value,buf,base);
+unsigned char String::concat(unsigned long value, unsigned char base) {
+  unsigned long x = value;
+  int sz = 0;
+  do { ++sz; x=x/base; } while (x != 0);
+  unsigned at = len;
+  if (concatOk((const char *) 0, sz)) {
+    x=value;
+    at += sz;
+    do {
+      int d = x % base;
+      char c = (d < 10) ? d+'0' : d+'a'-10;
+      buffer[--at]=c;
+      x = x/base;
+    } while (x != 0);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-char * utoa(unsigned value, char *buf, int base) {
-  return ulltoa(value,buf,base);
+unsigned char String::concat(double value, unsigned char precision) {
+  int sz = log10(fabs(value)+1)+1+precision+4;
+  char tmp[sz];
+  snprintf(tmp,sz,"%1.*lf",precision,value);
+  return concatOk(tmp,strlen(tmp));
 }
 
+String::String(const char *_buffer, unsigned int _len)
+  : buffer(0), capacity(0), len(0) {
+  concat(_buffer,_len);
+}
+
+String::String(const char *str) : String(str,strlen(str)) {}
+
+String::String(const String &str) : String(str.buffer,str.len) {}
+
+String::String(const __FlashStringHelper *str) : String((const char *) str){}
 
+String::String(char x) : String((const char *) 0,1) { buffer[0]=x; }
 
-/*********************************************/
-/*  Constructors                             */
-/*********************************************/
+String::String(unsigned char x, unsigned char base)
+  : buffer(0), capacity(0), len(0) {
+  concat((unsigned long) x, base);
+}
+
+String::String(int x, unsigned char base)
+  : buffer(0), capacity(0), len(0) {
+  concat((long) x, base);
+}
 
-String::String(const char *cstr)
-{
-	init();
-	if (cstr) copy(cstr, strlen(cstr));
+String::String(unsigned int x, unsigned char base)
+  : buffer(0), capacity(0), len(0) {
+  concat((unsigned long) x, base);
 }
 
-String::String(const String &value)
-{
-	init();
-	*this = value;
+String::String(long x, unsigned char base)
+  : buffer(0), capacity(0), len(0) {
+  concat((long) x, base);
 }
 
-String::String(const __FlashStringHelper *pstr)
-{
-	init();
-	*this = pstr;
+String::String(unsigned long x, unsigned char base)
+  : buffer(0), capacity(0), len(0) {
+  concat((unsigned long) x, base);
 }
 
-String::String(String &&rval)
-{
-	init();
-	move(rval);
+String::String(float x, unsigned char decimalPlaces)
+  : buffer(0), capacity(0), len(0) {
+  concat((double) x, decimalPlaces);
 }
 
-String::String(StringSumHelper &&rval)
-{
-	init();
-	move(rval);
+String::String(double x, unsigned char decimalPlaces)
+  : buffer(0), capacity(0), len(0) {
+  concat((double) x, decimalPlaces);
 }
 
-String::String(char c)
-{
-	init();
-	char buf[2];
-	buf[0] = c;
-	buf[1] = 0;
-	*this = buf;
+unsigned char String::reserve(unsigned int _capacity) {
+  char *_buffer = (char *) realloc(buffer,_capacity+1);
+  if (_buffer == 0) {
+    invalidate();
+    return false;
+  } else {
+    buffer = _buffer;
+    capacity = _capacity;
+    return true;
+  }
 }
 
-String::String(unsigned char value, unsigned char base)
-{
-	init();
-	char buf[1 + 8 * sizeof(unsigned char)];
-	utoa(value, buf, base);
-	*this = buf;
+unsigned int String::length() const { return len; }
+
+String& String::operator= (const char *str) {
+  len=0;
+  concat(str,strlen(str));
+  return *this;  
 }
 
-String::String(int value, unsigned char base)
-{
-	init();
-	char buf[2 + 8 * sizeof(int)];
-	itoa(value, buf, base);
-	*this = buf;
+String& String::operator= (const String &str) {
+  len = 0;
+  concat(str.buffer,str.len);
+  return *this;  
 }
 
-String::String(unsigned int value, unsigned char base)
-{
-	init();
-	char buf[1 + 8 * sizeof(unsigned int)];
-	utoa(value, buf, base);
-	*this = buf;
+String& String::operator= (String &&str) {
+  move(str);
+  return *this;  
 }
 
-String::String(long value, unsigned char base)
-{
-	init();
-	char buf[2 + 8 * sizeof(long)];
-	ltoa(value, buf, base);
-	*this = buf;
+String& String::operator= (StringSumHelper && str) {
+  move(str);
+  return *this;
 }
 
-String::String(unsigned long value, unsigned char base)
-{
-	init();
-	char buf[1 + 8 * sizeof(unsigned long)];
-	ultoa(value, buf, base);
-	*this = buf;
+unsigned char String::concat(const char *x) {
+  return concatOk(x,strlen(x));
+}
+unsigned char String::concat(const __FlashStringHelper *x) {
+  return concatOk((const char *) x, strlen((const char *)x));
 }
+unsigned char String::concat(const String &x) {
+  return concatOk(x.buffer,x.len);
+}
 
-String::String(float value, unsigned char decimalPlaces)
-{
-	init();
-	char buf[33];
-	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
-}
-
-String::String(double value, unsigned char decimalPlaces)
-{
-	init();
-	char buf[33];
-	*this = dtostrf(value, (decimalPlaces + 2), decimalPlaces, buf);
-}
-
-String::~String()
-{
-	free(buffer);
-}
-
-/*********************************************/
-/*  Memory Management                        */
-/*********************************************/
-
-inline void String::init(void)
-{
-	buffer = NULL;
-	capacity = 0;
-	len = 0;
-}
-
-void String::invalidate(void)
-{
-	if (buffer) free(buffer);
-	buffer = NULL;
-	capacity = len = 0;
-}
-
-unsigned char String::reserve(unsigned int size)
-{
-	if (buffer && capacity >= size) return 1;
-	if (changeBuffer(size)) {
-		if (len == 0) buffer[0] = 0;
-		return 1;
-	}
-	return 0;
-}
-
-unsigned char String::changeBuffer(unsigned int maxStrLen)
-{
-	char *newbuffer = (char *)realloc(buffer, maxStrLen + 1);
-	if (newbuffer) {
-		buffer = newbuffer;
-		capacity = maxStrLen;
-		return 1;
-	}
-	return 0;
-}
-
-/*********************************************/
-/*  Copy and Move                            */
-/*********************************************/
-
-String & String::copy(const char *cstr, unsigned int length)
-{
-	if (!reserve(length)) {
-		invalidate();
-		return *this;
-	}
-	len = length;
-	strcpy(buffer, cstr);
-	return *this;
-}
-
-String & String::copy(const __FlashStringHelper *pstr, unsigned int length)
-{
-	if (!reserve(length)) {
-		invalidate();
-		return *this;
-	}
-	len = length;
-	strcpy(buffer, (const char *)pstr);
-	return *this;
-}
-
-void String::move(String &rhs)
-{
-	if (buffer) {
-		if (rhs && capacity >= rhs.len) {
-			strcpy(buffer, rhs.buffer);
-			len = rhs.len;
-			rhs.len = 0;
-			return;
-		} else {
-			free(buffer);
-		}
-	}
-	buffer = rhs.buffer;
-	capacity = rhs.capacity;
-	len = rhs.len;
-	rhs.buffer = NULL;
-	rhs.capacity = 0;
-	rhs.len = 0;
-}
-
-String & String::operator = (const String &rhs)
-{
-	if (this == &rhs) return *this;
-	
-	if (rhs.buffer) copy(rhs.buffer, rhs.len);
-	else invalidate();
-	
-	return *this;
-}
-
-String & String::operator = (String &&rval)
-{
-	if (this != &rval) move(rval);
-	return *this;
+unsigned char String::concat(char x) {
+  if (concatOk((const char *) 0, 1)) {
+    buffer[len-1]=x;
+    return true;
+  } else {
+    return false;
+  }
 }
-
-String & String::operator = (StringSumHelper &&rval)
-{
-	if (this != &rval) move(rval);
-	return *this;
-}
 
-String & String::operator = (const char *cstr)
-{
-	if (cstr) copy(cstr, strlen(cstr));
-	else invalidate();
-	
-	return *this;
-}
-
-String & String::operator = (const __FlashStringHelper *pstr)
-{
-	if (pstr) copy(pstr, strlen((const char *)pstr));
-	else invalidate();
-
-	return *this;
-}
-
-/*********************************************/
-/*  concat                                   */
-/*********************************************/
-
-unsigned char String::concat(const String &s)
-{
-	return concat(s.buffer, s.len);
-}
-
-unsigned char String::concat(const char *cstr, unsigned int length)
-{
-	unsigned int newlen = len + length;
-	if (!cstr) return 0;
-	if (length == 0) return 1;
-	if (!reserve(newlen)) return 0;
-	strcpy(buffer + len, cstr);
-	len = newlen;
-	return 1;
-}
-
-unsigned char String::concat(const char *cstr)
-{
-	if (!cstr) return 0;
-	return concat(cstr, strlen(cstr));
-}
-
-unsigned char String::concat(char c)
-{
-	char buf[2];
-	buf[0] = c;
-	buf[1] = 0;
-	return concat(buf, 1);
-}
-
-unsigned char String::concat(unsigned char num)
-{
-	char buf[1 + 3 * sizeof(unsigned char)];
-	itoa(num, buf, 10);
-	return concat(buf, strlen(buf));
-}
+unsigned char String::concat(unsigned char x,  unsigned char base) {
+  return concat((unsigned long) x, base);
+}
 
-unsigned char String::concat(int num)
-{
-	char buf[2 + 3 * sizeof(int)];
-	itoa(num, buf, 10);
-	return concat(buf, strlen(buf));
-}
+unsigned char String::concat(int x, unsigned char base) {
+  return concat((long) x,base); 
+}
+unsigned char String::concat(unsigned int x, unsigned char base) {
+  return concat((unsigned long) x, base);
+}
+unsigned char String::concat(float x, unsigned char decimalPlaces) {
+  return concat((double) x, decimalPlaces);
+}
 
-unsigned char String::concat(unsigned int num)
-{
-	char buf[1 + 3 * sizeof(unsigned int)];
-	utoa(num, buf, 10);
-	return concat(buf, strlen(buf));
-}
+String& String::operator += (const char *x) {
+  concat(x);
+  return *this;
+}
+String& String::operator += (const __FlashStringHelper *x) {
+  concat(x);
+  return *this;
+};  
+String& String::operator += (const String &x) {
+  concat(x);
+  return *this;
+}
 
-unsigned char String::concat(long num)
-{
-	char buf[2 + 3 * sizeof(long)];
-	ltoa(num, buf, 10);
-	return concat(buf, strlen(buf));
+String& String::operator += (char x) {
+  concat(x);
+  return *this;
 }
 
-unsigned char String::concat(unsigned long num)
-{
-	char buf[1 + 3 * sizeof(unsigned long)];
-	ultoa(num, buf, 10);
-	return concat(buf, strlen(buf));
+String& String::operator += (unsigned char x) {
+  concat(x);
+  return *this;
 }
 
-unsigned char String::concat(float num)
-{
-	char buf[20];
-	char* string = dtostrf(num, 4, 2, buf);
-	return concat(string, strlen(string));
+String& String::operator += (int x) {
+  concat(x);
+  return *this;
 }
 
-unsigned char String::concat(double num)
-{
-	char buf[20];
-	char* string = dtostrf(num, 4, 2, buf);
-	return concat(string, strlen(string));
+String& String::operator += (unsigned int x) {
+  concat(x);
+  return *this;
 }
 
-unsigned char String::concat(const __FlashStringHelper * str)
-{
-	if (!str) return 0;
-	int length = strlen((const char *) str);
-	if (length == 0) return 1;
-	unsigned int newlen = len + length;
-	if (!reserve(newlen)) return 0;
-	strcpy(buffer + len, (const char *) str);
-	len = newlen;
-	return 1;
+String& String::operator += (long x) {
+  concat(x);
+  return *this;  
 }
 
-/*********************************************/
-/*  Concatenate                              */
-/*********************************************/
+String& String::operator += (unsigned long x) {
+  concat(x);
+  return *this;
+}
 
-StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(rhs.buffer, rhs.len)) a.invalidate();
-	return a;
+String& String::operator += (float x) {
+  concat(x);
+  return *this;
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!cstr || !a.concat(cstr, strlen(cstr))) a.invalidate();
-	return a;
+String& String::operator += (double x) {
+  concat(x);
+  return *this;
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, char c)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(c)) a.invalidate();
-	return a;
+StringSumHelper& operator + (const StringSumHelper &sum, const char *x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, const __FlashStringHelper *x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
 }
+StringSumHelper& operator + (const StringSumHelper &sum, const String &x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, char x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, unsigned char x) { 
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, int x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, unsigned int x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, long x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, unsigned long x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, float x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
+StringSumHelper& operator + (const StringSumHelper &sum, double x) {
+  StringSumHelper &a = const_cast < StringSumHelper& >(sum);
+  a += x;
+  return a;
+}
 
-StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+int String::compareTo(const String &to) const {
+  return strcmp(buffer, to.buffer);
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, int num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+unsigned char String::equals(const String &to) const { return compareTo(to) == 0; }
+unsigned char String::equals(const char *to) const { return strcmp(buffer,to) ==0; }
+unsigned char String::operator == (const String &to) const { return strcmp(buffer,to.buffer) == 0; }
+unsigned char String::operator == (const  char *to) const { return strcmp(buffer,to) == 0; }
+unsigned char String::operator != (const String &to) const { return strcmp(buffer,to.buffer) != 0; }
+unsigned char String::operator != (const char *to) const { return strcmp(buffer,to) != 0; }
+unsigned char String::operator > (const String &to) const { return strcmp(buffer,to.buffer) > 0; }
+unsigned char String::operator < (const String &to) const { return strcmp(buffer,to.buffer) < 0; }
+unsigned char String::operator >= (const String &to) const { return strcmp(buffer,to.buffer) >=0; }
+unsigned char String::operator <= (const String &to) const { return strcmp(buffer,to.buffer) <= 0; } 
+  
+unsigned char String::equalsIgnoreCase(const String &to) const {
+  return strcasecmp(buffer,to.buffer) == 0;
 }
+unsigned char String::startsWith(const String &str) const {
+  return strncmp(buffer,str.buffer,str.len) == 0;
+}
+unsigned char String::startsWith(const String &str, unsigned int offset) const {
+  if (offset > len) return false;
+  return strncmp(buffer+offset,str.buffer,str.len) == 0;
+}
+unsigned char String::endsWith(const String &str) const {
+  if (str.len > len) return false;
+  return strncmp(buffer+len-str.len,str.buffer,str.len) == 0;
+}
 
-StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+char String::charAt(unsigned int i) const { return i < len ? buffer[i] : 0; }
+void String::setCharAt(unsigned int i, char c) { if (i<len) buffer[i]=c; }
+char String::operator[] (unsigned int i) const { return i < len ? buffer[i] : 0; }
+char& String::operator[] (unsigned int i) { static char err; return (i<len) ? buffer[i] : err; }
+void String::getBytes(unsigned char *buf, unsigned int size, unsigned int offset) const {
+  if (buf == 0 || size == 0) return;
+
+  int n = len-offset;
+  if (n > size-1) n = size-1;
+  memmove(buf,buffer+offset,n);
+  buf[n]=0;
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, long num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+void String::toCharArray(char *buf, unsigned int size, unsigned int offset) const {
+  getBytes((unsigned char*)buf, size, offset);
 }
+
+const char *String::c_str() const { return buffer; }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+char* String::begin() { return buffer; }
+char* String::end() { return buffer+len; }
+const char* String::begin() const { return buffer; }
+const char* String::end() const { return buffer + len; }
+
+int String::indexOf(char c) const { return indexOf(c,0); }
+
+int String::indexOf(char c, unsigned int offset) const {
+  if (offset > len) return -1;
+  const char *p = strchr(buffer+offset,c);
+  return (p != 0 && p-buffer <=len) ? p-buffer : -1;
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, float num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+int String::indexOf(const String &str) const {
+  return indexOf(str,0);
 }
+int String::indexOf(const String &str, unsigned int offset) const {
+  if (str.len == 0) return offset <= len ? offset : -1;
+  if (str.len == 1) return indexOf(str.buffer[0],offset);
+  for (;;) {
+    int at = indexOf(str.buffer[0],offset);
+    if (at == -1 || at > len-str.len) return -1;
+    if (strncmp(buffer+at+1,str.buffer+1,str.len-1) == 0) return at;
+    offset = at + 1;
+  }
+}
 
-StringSumHelper & operator + (const StringSumHelper &lhs, double num)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(num)) a.invalidate();
-	return a;
+int String::lastIndexOf(char c) const {
+  return (len > 0) ? lastIndexOf(c,len-1) : -1;
 }
 
-StringSumHelper & operator + (const StringSumHelper &lhs, const __FlashStringHelper *rhs)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (!a.concat(rhs))	a.invalidate();
-	return a;
+int String::lastIndexOf(char c, unsigned int offset) const {
+  if (len == 0) return -1;
+  if (offset >= len) offset = len-1;
+  for (;;) {
+    if (buffer[offset] == c) return offset;
+    if (offset == 0) return -1;
+    --offset;
+  }
 }
 
-/*********************************************/
-/*  Comparison                               */
-/*********************************************/
+int String::lastIndexOf(const String &str) const {
+  return lastIndexOf(str,len);
+}
 
-int String::compareTo(const String &s) const
-{
-	if (!buffer || !s.buffer) {
-		if (s.buffer && s.len > 0) return 0 - *(unsigned char *)s.buffer;
-		if (buffer && len > 0) return *(unsigned char *)buffer;
-		return 0;
-	}
-	return strcmp(buffer, s.buffer);
+int String::lastIndexOf(const String &str, unsigned int offset) const {
+  if (offset > len) offset = len;
+  if (str.len == 0) return offset;
+  if (str.len == 1) return lastIndexOf(str.buffer[0],offset);
+  for (;;) {
+    int at = lastIndexOf(str.buffer[str.len-1],offset);
+    if (at == -1 || at < str.len-1) return -1;
+    if (strncmp(buffer+at-(str.len-1),str.buffer,str.len-1)==0) return at - (str.len-1);
+    offset = at-1;
+  }
 }
 
-unsigned char String::equals(const String &s2) const
-{
-	return (len == s2.len && compareTo(s2) == 0);
+String String::substring(unsigned int i) const {
+  return substring(i,len);
 }
 
-unsigned char String::equals(const char *cstr) const
-{
-	if (len == 0) return (cstr == NULL || *cstr == 0);
-	if (cstr == NULL) return buffer[0] == 0;
-	return strcmp(buffer, cstr) == 0;
+String String::substring(unsigned int begin, unsigned int end) const {
+  if (begin > len) begin=len;
+  if (end > len) end = len;
+  return String(buffer+begin,end-begin);
 }
 
-unsigned char String::operator<(const String &rhs) const
-{
-	return compareTo(rhs) < 0;
+void String::replace(char find, char replace) {
+  for (int i=0; i<len; ++i) {
+    if (buffer[i] == find) buffer[i]=replace;
+  }
 }
 
-unsigned char String::operator>(const String &rhs) const
-{
-	return compareTo(rhs) > 0;
+void String::replace(const String &find, const String &replace) {
+  unsigned int offset = 0;
+  for (;;) {
+    int at = indexOf(find,offset);
+    if (at == -1) break;
+    remove(at,at+find.len);
+    insert(at,replace);
+    offset = at + replace.len;
+  }
 }
 
-unsigned char String::operator<=(const String &rhs) const
-{
-	return compareTo(rhs) <= 0;
+void String::insert(unsigned at, const String &str) {
+  if (str.len > 0) {
+    concat((const char *) 0,str.len);
+    memmove(buffer+at+str.len,buffer+at,len-str.len);
+    memmove(buffer+at,str.buffer,str.len);
+  }
 }
 
-unsigned char String::operator>=(const String &rhs) const
-{
-	return compareTo(rhs) >= 0;
+void String::remove(unsigned int i) {
+  remove(i,len);
 }
 
-unsigned char String::equalsIgnoreCase( const String &s2 ) const
-{
-	if (this == &s2) return 1;
-	if (len != s2.len) return 0;
-	if (len == 0) return 1;
-	const char *p1 = buffer;
-	const char *p2 = s2.buffer;
-	while (*p1) {
-		if (tolower(*p1++) != tolower(*p2++)) return 0;
-	} 
-	return 1;
+void String::remove(unsigned int begin, unsigned int end) {
+  if (begin > len) begin=len;
+  if (end > len) end = len;
+  if (end <= begin) return;
+  memmove(buffer+begin,buffer+end,len-end);
+  len = len-(end-begin);
+  buffer[len]=0;
 }
 
-unsigned char String::startsWith( const String &s2 ) const
-{
-	if (len < s2.len) return 0;
-	return startsWith(s2, 0);
+void String::toLowerCase() {
+  for (int i=0; i<len; ++i) {
+    buffer[i]=tolower(buffer[i]);
+  }
 }
 
-unsigned char String::startsWith( const String &s2, unsigned int offset ) const
-{
-	if (offset > len - s2.len || !buffer || !s2.buffer) return 0;
-	return strncmp( &buffer[offset], s2.buffer, s2.len ) == 0;
+void String::toUpperCase() {
+  for (int i=0; i<len; ++i) {
+    buffer[i]=toupper(buffer[i]);
+  }
 }
 
-unsigned char String::endsWith( const String &s2 ) const
-{
-	if ( len < s2.len || !buffer || !s2.buffer) return 0;
-	return strcmp(&buffer[len - s2.len], s2.buffer) == 0;
+void String::trim() {
+  int i = 0;
+  while (i < len && isspace(buffer[i])) ++i;
+  remove(0,i);
+  i = len-1;
+  while (i > 0 && isspace(buffer[i])) --i;
+  remove(i+1,len);
 }
 
-/*********************************************/
-/*  Character Access                         */
-/*********************************************/
+long String::toInt() const { return atol(buffer); }
+float String::toFloat() const { return atof(buffer); }
+double String::toDouble() const { return atof(buffer); }
 
-char String::charAt(unsigned int loc) const
-{
-	return operator[](loc);
+void String::init() {
+  buffer = 0;
+  len = 0;
+  capacity = 0;
 }
 
-void String::setCharAt(unsigned int loc, char c) 
-{
-	if (loc < len) buffer[loc] = c;
+void String::invalidate() {
+  if (buffer != 0) free(buffer);
+  buffer = 0;
+  len = 0;
+  capacity = 0;
 }
 
-char & String::operator[](unsigned int index)
-{
-	static char dummy_writable_char;
-	if (index >= len || !buffer) {
-		dummy_writable_char = 0;
-		return dummy_writable_char;
-	}
-	return buffer[index];
+unsigned char String::changeBuffer(unsigned int _capacity) {
+  char *_buffer = (char*) realloc(buffer,_capacity);
+  if (_buffer != 0) {
+    capacity = _capacity;
+    buffer = _buffer;
+    return true;
+  } else {
+    return false;
+  }
 }
 
-char String::operator[]( unsigned int index ) const
-{
-	if (index >= len || !buffer) return 0;
-	return buffer[index];
+String& String::copy(const char *str, unsigned int length) {
+  len=0;
+  concat(str,length);
+  return *this;
 }
 
-void String::getBytes(unsigned char *buf, unsigned int bufsize, unsigned int index) const
-{
-	if (!bufsize || !buf) return;
-	if (index >= len) {
-		buf[0] = 0;
-		return;
-	}
-	unsigned int n = bufsize - 1;
-	if (n > len - index) n = len - index;
-	strncpy((char *)buf, buffer + index, n);
-	buf[n] = 0;
+String& String::copy(const __FlashStringHelper *str, unsigned int length) {
+  len=0;
+  concat((const char *) str,length);
+  return *this;
 }
 
-/*********************************************/
-/*  Search                                   */
-/*********************************************/
+void String::move(String &rhs) {
+  if (this == &rhs) return;
 
-int String::indexOf(char c) const
-{
-	return indexOf(c, 0);
+  free(buffer);
+  buffer=rhs.buffer;
+  len=rhs.len;
+  capacity=rhs.capacity;
+  rhs.buffer=0;
+  rhs.capacity=0;
+  rhs.len=0;
 }
 
-int String::indexOf( char ch, unsigned int fromIndex ) const
-{
-	if (fromIndex >= len) return -1;
-	const char* temp = strchr(buffer + fromIndex, ch);
-	if (temp == NULL) return -1;
-	return temp - buffer;
-}
-
-int String::indexOf(const String &s2) const
-{
-	return indexOf(s2, 0);
-}
-
-int String::indexOf(const String &s2, unsigned int fromIndex) const
-{
-	if (fromIndex >= len) return -1;
-	const char *found = strstr(buffer + fromIndex, s2.buffer);
-	if (found == NULL) return -1;
-	return found - buffer;
-}
-
-int String::lastIndexOf( char theChar ) const
-{
-	return lastIndexOf(theChar, len - 1);
-}
-
-int String::lastIndexOf(char ch, unsigned int fromIndex) const
-{
-	if (fromIndex >= len) return -1;
-	char tempchar = buffer[fromIndex + 1];
-	buffer[fromIndex + 1] = '\0';
-	char* temp = strrchr( buffer, ch );
-	buffer[fromIndex + 1] = tempchar;
-	if (temp == NULL) return -1;
-	return temp - buffer;
-}
-
-int String::lastIndexOf(const String &s2) const
-{
-	return lastIndexOf(s2, len - s2.len);
-}
-
-int String::lastIndexOf(const String &s2, unsigned int fromIndex) const
-{
-  	if (s2.len == 0 || len == 0 || s2.len > len) return -1;
-	if (fromIndex >= len) fromIndex = len - 1;
-	int found = -1;
-	for (char *p = buffer; p <= buffer + fromIndex; p++) {
-		p = strstr(p, s2.buffer);
-		if (!p) break;
-		if ((unsigned int)(p - buffer) <= fromIndex) found = p - buffer;
-	}
-	return found;
-}
-
-String String::substring(unsigned int left, unsigned int right) const
-{
-	if (left > right) {
-		unsigned int temp = right;
-		right = left;
-		left = temp;
-	}
-	String out;
-	if (left >= len) return out;
-	if (right > len) right = len;
-	char temp = buffer[right];  // save the replaced character
-	buffer[right] = '\0';	
-	out = buffer + left;  // pointer arithmetic
-	buffer[right] = temp;  //restore character
-	return out;
-}
-
-/*********************************************/
-/*  Modification                             */
-/*********************************************/
-
-void String::replace(char find, char replace)
-{
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		if (*p == find) *p = replace;
-	}
-}
-
-void String::replace(const String& find, const String& replace)
-{
-	if (len == 0 || find.len == 0) return;
-	int diff = replace.len - find.len;
-	char *readFrom = buffer;
-	char *foundAt;
-	if (diff == 0) {
-		while ((foundAt = strstr(readFrom, find.buffer)) != NULL) {
-			memcpy(foundAt, replace.buffer, replace.len);
-			readFrom = foundAt + replace.len;
-		}
-	} else if (diff < 0) {
-		char *writeTo = buffer;
-		while ((foundAt = strstr(readFrom, find.buffer)) != NULL) {
-			unsigned int n = foundAt - readFrom;
-			memcpy(writeTo, readFrom, n);
-			writeTo += n;
-			memcpy(writeTo, replace.buffer, replace.len);
-			writeTo += replace.len;
-			readFrom = foundAt + find.len;
-			len += diff;
-		}
-		strcpy(writeTo, readFrom);
-	} else {
-		unsigned int size = len; // compute size needed for result
-		while ((foundAt = strstr(readFrom, find.buffer)) != NULL) {
-			readFrom = foundAt + find.len;
-			size += diff;
-		}
-		if (size == len) return;
-		if (size > capacity && !changeBuffer(size)) return; // XXX: tell user!
-		int index = len - 1;
-		while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
-			readFrom = buffer + index + find.len;
-			memmove(readFrom + diff, readFrom, len - (readFrom - buffer));
-			len += diff;
-			buffer[len] = 0;
-			memcpy(buffer + index, replace.buffer, replace.len);
-			index--;
-		}
-	}
-}
-
-void String::remove(unsigned int index){
-	// Pass the biggest integer as the count. The remove method
-	// below will take care of truncating it at the end of the
-	// string.
-	remove(index, (unsigned int)-1);
-}
-
-void String::remove(unsigned int index, unsigned int count){
-	if (index >= len) { return; }
-	if (count <= 0) { return; }
-	if (count > len - index) { count = len - index; }
-	char *writeTo = buffer + index;
-	len = len - count;
-	strncpy(writeTo, buffer + index + count,len - index);
-	buffer[len] = 0;
-}
-
-void String::toLowerCase(void)
-{
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		*p = tolower(*p);
-	}
-}
-
-void String::toUpperCase(void)
-{
-	if (!buffer) return;
-	for (char *p = buffer; *p; p++) {
-		*p = toupper(*p);
-	}
-}
-
-void String::trim(void)
-{
-	if (!buffer || len == 0) return;
-	char *begin = buffer;
-	while (isspace(*begin)) begin++;
-	char *end = buffer + len - 1;
-	while (isspace(*end) && end >= begin) end--;
-	len = end + 1 - begin;
-	if (begin > buffer) memcpy(buffer, begin, len);
-	buffer[len] = 0;
-}
-
-/*********************************************/
-/*  Parsing / Conversion                     */
-/*********************************************/
-
-long String::toInt(void) const
-{
-	if (buffer) return atol(buffer);
-	return 0;
-}
-
-float String::toFloat(void) const
-{
-	return float(toDouble());
-}
-
-double String::toDouble(void) const
-{
-	if (buffer) return atof(buffer);
-	return 0;
+String::~String() {
+  if (buffer != 0) free(buffer);
 }
+
 #endif

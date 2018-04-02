@@ -3,8 +3,8 @@
 #include <sstream>
 #include <assert.h>
 #include <limits.h>
-#include "ArduinoUnitUtility/ArduinoUnitMock2WString.h"
-#include "ArduinoUnitUtility/ArduinoUnitMock2Print.h"
+#include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
+#include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
 
 std::string str(const char *s) { return s; }
 std::string str(const std::string &s) { return s; }

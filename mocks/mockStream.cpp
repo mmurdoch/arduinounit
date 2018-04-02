@@ -61,11 +61,11 @@ void testStream() {
   { StringStream ss("test"); ASSERT_IEQ(ss.peek(),'t'); ASSERT_IEQ(ss.available(),4); ASSERT_IEQ(ss.read(),'t'); ASSERT_IEQ(ss.available(),3); } 
   { StringStream ss; ss.print("hello"); ss.print(' '); ss.print("world"); ss.println("!"); ASSERT_SEQ(ss,"hello world!\r\n"); }
   { StringStream ss("hello world!\r\n"); char tmp[5]; ss.readBytes(tmp,sizeof(tmp)); assert(strncmp(tmp,"hello",sizeof(tmp))==0); String w = ss.readString(); ASSERT_SEQ(w," world!\r\n"); }
-  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "te"),1); ASSERT_SEQ(ss,"st"); }
-  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "es"),1); ASSERT_SEQ(ss,"t"); }
-  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.find((char*) "abc"),1); ASSERT_SEQ(ss,"d"); }
-  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "abc",(char*) "aaa"),0); ASSERT_SEQ(ss,"bcd"); }
-  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "aaa",(char*) "abc"),1); ASSERT_SEQ(ss,"bcd"); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "te"),1); ASSERT_SEQ(ss.readString(),"st"); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "es"),1); ASSERT_SEQ(ss.readString(),"t"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.find((char*) "abc"),1); ASSERT_SEQ(ss.readString(),"d"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "abc",(char*) "aaa"),0); ASSERT_SEQ(ss.readString(),"bcd"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "aaa",(char*) "abc"),1); ASSERT_SEQ(ss.readString(),"bcd"); }
   { StringStream ss("42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),42); }
   { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),0); }
   { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_WHITESPACE),42); }  

@@ -2,8 +2,20 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
+#include <limits.h>
 #include "ArduinoUnitUtility/ArduinoUnitMock2WString.h"
 #include "ArduinoUnitUtility/ArduinoUnitMock2Print.h"
+
+std::string str(const char *s) { return s; }
+std::string str(const std::string &s) { return s; }
+std::string str(const String &s) { return s.c_str(); }
+
+void err() {
+  std::cout << "err" << std::endl;
+}
+#define ASSERT_SEQ(A,B) { std::string a=str(A); std::string b=str(B); if (a != b) { std::cout << "(" << #A << "=='" << a << "')!=(" << #B << "=='" << b << "') on line " << __LINE__ << std::endl; err(); } }
+
+#define ASSERT_IEQ(A,B) { int a=(A); int b=(B); if (a != b) { std::cout << "(" << #A << "==" << a << ")!=(" << #B << "==" << b << ") on line " << __LINE__ << std::endl; err(); } }
 
 struct StringPrint : Print, String {
   size_t write(uint8_t c) {
@@ -15,15 +27,28 @@ struct StringPrint : Print, String {
     concat((const char*)buffer,size);
     return size;
   }
+  int availableForWrite() { return INT_MAX;  }
 };
 
 void testPrint() {
-  StringPrint sp;
-  sp.print("hello");
-  sp.print(' ');
-  sp.print("world");
-  sp.println("!");  
-  assert(strcmp(sp.c_str(),"hello world!\r\n")==0);
+  { StringPrint sp; ASSERT_SEQ(sp,""); }
+  { StringPrint sp; sp.print("hello"); sp.print(' '); sp.print("world"); sp.println("!"); ASSERT_SEQ(sp,"hello world!\r\n"); }  
+  { StringPrint sp; sp.write('x'); ASSERT_SEQ(sp,"x"); }
+  { StringPrint sp; sp.write((const uint8_t *)"test",4); ASSERT_SEQ(sp,"test"); }
+  { StringPrint sp; sp.print(F("test")); ASSERT_SEQ(sp,"test"); }
+  { StringPrint sp; sp.print(String("test")); ASSERT_SEQ(sp,"test"); }
+  { StringPrint sp; sp.print("test"); ASSERT_SEQ(sp,"test"); }
+  { StringPrint sp; sp.print('x'); ASSERT_SEQ(sp,"x"); }
+  { StringPrint sp; sp.print('x'); ASSERT_SEQ(sp,"x"); }
+  { StringPrint sp; sp.print((unsigned char) 10); ASSERT_SEQ(sp,"10"); }
+  { StringPrint sp; sp.print((unsigned char) 0x6b,HEX); ASSERT_SEQ(sp,"6b"); }
+  { StringPrint sp; sp.print((int) 0); ASSERT_SEQ(sp,"0"); }  
+  { StringPrint sp; sp.print((int) 123456); ASSERT_SEQ(sp,"123456"); }
+  { StringPrint sp; sp.print((int) -123456); ASSERT_SEQ(sp,"-123456"); }  
+  { StringPrint sp; sp.print((double) 123.456); ASSERT_SEQ(sp,"123.46"); }
+  { StringPrint sp; sp.print((double) -123.456); ASSERT_SEQ(sp,"-123.46"); } 
+  { StringPrint sp; sp.println(42); ASSERT_SEQ(sp,"42\r\n"); } 
+  { StringPrint sp; sp.println(); ASSERT_SEQ(sp,"\r\n"); }
 }
 
 void testCppStreamPrint() {

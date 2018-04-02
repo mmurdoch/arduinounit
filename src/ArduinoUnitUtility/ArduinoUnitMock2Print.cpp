@@ -7,6 +7,7 @@
 #else
 #include <iostream>
 #include <math.h>
+#include <limits.h>
 #include "ArduinoUnitMock2Printable.h"
 #include "ArduinoUnitMock2WString.h"
 #include "ArduinoUnitMock2Print.h"
@@ -32,14 +33,15 @@
 #define BIN 2
 
 size_t Print::printNumber(unsigned long value, unsigned char base, bool isSigned) {
-  unsigned long x = value;
   int sz = 0;
   bool neg = isSigned && (((long) value) < 0);
   if (neg) { ++sz; value = -value; }
+  unsigned long x = value;
   do { ++sz; x=x/base; } while (x != 0);
   char buffer[sz+1];
-  if (neg) buffer[0]='-';
-  unsigned at = sz;
+  buffer[sz]=0;
+  int at = sz;
+  if (neg) { buffer[0]='-'; }
 
   x=value;
   do {
@@ -48,14 +50,13 @@ size_t Print::printNumber(unsigned long value, unsigned char base, bool isSigned
     buffer[--at]=c;
     x = x/base;
   } while (x != 0);
-  buffer[sz]=0;
   return print(buffer);
 }
 
 size_t Print::printFloat(double value, uint8_t decimalPoints) {
   int sz = log10(fabs(value)+1)+1+decimalPoints+4;
   char tmp[sz];
-  snprintf(tmp,sz+1,"%*lf",decimalPoints,value);
+  snprintf(tmp,sz,"%1.*lf",decimalPoints,value);
   return write((const uint8_t*)tmp,strlen(tmp));
 }
 
@@ -120,6 +121,10 @@ size_t CppStreamPrint::write(uint8_t c) {
 size_t CppStreamPrint::write(const uint8_t *buffer, size_t size) {
   out.write((const char *)buffer,size);
   return size;
+}
+
+int CppStreamPrint::availableForWrite() {
+  return INT_MAX;
 }
 
 #endif

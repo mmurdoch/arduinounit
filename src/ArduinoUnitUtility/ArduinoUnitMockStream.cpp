@@ -99,7 +99,7 @@ long Stream::parseInt(LookaheadMode lookahead, char ignore)
         delayMicroseconds(1);
         continue;
       }
-      return value;
+      return neg ? -value : value;
     }
     c = peek();
     if (c == ignore) { read(); continue; }
@@ -108,7 +108,7 @@ long Stream::parseInt(LookaheadMode lookahead, char ignore)
     case 0:
       if (lookahead == SKIP_WHITESPACE && isblank(c)) { read(); continue; }
       else if (lookahead == SKIP_ALL && ! (((c >= '0' && c <= '9') || (c=='-')))) { read(); continue; }
-      else if (! (((c >= '0' && c <= '9') || (c=='-')))) { return value; }
+      else if (! (((c >= '0' && c <= '9') || (c=='-')))) { return neg ? -value : value; }
       if (c == '-') { neg=true; read(); state = 1; continue; } else { state = 1; continue; }
       break;
     case 1:

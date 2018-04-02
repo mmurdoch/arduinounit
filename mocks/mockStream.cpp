@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
+#include <math.h>
 #include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
 #include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
 #include "ArduinoUnitUtility/ArduinoUnitMockStream.h"
@@ -17,6 +18,10 @@ void err() {
 
 #define ASSERT_IEQ(A,B) { int a=(A); int b=(B); if (a != b) { std::cout << "(" << #A << "==" << a << ")!=(" << #B << "==" << b << ") on line " << __LINE__ << std::endl; err(); } }
 
+#define ASSERT_DEQ(A,B) { double a=(A); double b=(B); if (fabs(b-a) > 1e-9) { std::cout << "(" << #A << "==" << a << ")!=(" << #B << "==" << b << ") on line " << __LINE__ << " [err=" << b-a << "]"<<  std::endl; err(); } }
+
+#define ASSERT_FEQ(A,B) { float a=(A); float b=(B); if (fabs(b-a) > 1e-5) { std::cout << "(" << #A << "==" << a << ")!=(" << #B << "==" << b << ") on line " << __LINE__ << " [err=" << b-a << "]"<<  std::endl; err(); } }
+
 struct StringStream : Stream, String {
   size_t write(uint8_t c) {
     uint8_t tmp[1];
@@ -29,7 +34,7 @@ struct StringStream : Stream, String {
   }
 
   int at;
-  StringStream() { at = 0; }
+  StringStream(const char *str="") : String(str) { at = 0; setTimeout(0); }
   int available() { return length() - at; }
   virtual int read() {
     if (at < length()) {
@@ -50,19 +55,30 @@ struct StringStream : Stream, String {
 };
 
 void testStream() {
-  StringStream ss;
+  { StringStream ss; ASSERT_IEQ(ss.available(),0); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.available(),4); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.read(),'t'); ASSERT_IEQ(ss.available(),3); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.peek(),'t'); ASSERT_IEQ(ss.available(),4); ASSERT_IEQ(ss.read(),'t'); ASSERT_IEQ(ss.available(),3); } 
+  { StringStream ss; ss.print("hello"); ss.print(' '); ss.print("world"); ss.println("!"); ASSERT_SEQ(ss,"hello world!\r\n"); }
+  { StringStream ss("hello world!\r\n"); char tmp[5]; ss.readBytes(tmp,sizeof(tmp)); assert(strncmp(tmp,"hello",sizeof(tmp))==0); String w = ss.readString(); ASSERT_SEQ(w," world!\r\n"); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "te"),1); ASSERT_SEQ(ss,"st"); }
+  { StringStream ss("test"); ASSERT_IEQ(ss.find((char*) "es"),1); ASSERT_SEQ(ss,"t"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.find((char*) "abc"),1); ASSERT_SEQ(ss,"d"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "abc",(char*) "aaa"),0); ASSERT_SEQ(ss,"bcd"); }
+  { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "aaa",(char*) "abc"),1); ASSERT_SEQ(ss,"bcd"); }
+  { StringStream ss("42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),42); }
+  { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),0); }
+  { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_WHITESPACE),42); }  
+  { StringStream ss("-42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),-42); }
+  { StringStream ss("?!#-42"); ASSERT_IEQ(ss.parseInt(SKIP_ALL),-42); }
+  { StringStream ss("?!#42"); ASSERT_IEQ(ss.parseInt(SKIP_ALL),42); }
 
-  ss.print("hello");
-  ss.print(' ');
-  ss.print("world");
-  ss.println("!");
-  ASSERT_SEQ(ss,"hello world!\r\n");
-
-  char tmp[5];
-  ss.readBytes(tmp,sizeof(tmp));
-  assert(strncmp(tmp,"hello",sizeof(tmp))==0);  
-  String w = ss.readString();
-  ASSERT_SEQ(w," world!\r\n");
+  { StringStream ss("42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_NONE),42.3); }
+  { StringStream ss(" 42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_NONE),0); }
+  { StringStream ss(" 42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_WHITESPACE),42.3); }  
+  { StringStream ss("-42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_NONE),-42.3); }
+  { StringStream ss("?!#-42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_ALL),-42.3); }
+  { StringStream ss("?!#42.3"); ASSERT_FEQ(ss.parseFloat(SKIP_ALL),42.3); }
 }
 
 void testCppIOStream() {

@@ -66,6 +66,8 @@ void testStream() {
   { StringStream ss("caaabcd"); ASSERT_IEQ(ss.find((char*) "abc"),1); ASSERT_SEQ(ss.readString(),"d"); }
   { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "abc",(char*) "aaa"),0); ASSERT_SEQ(ss.readString(),"bcd"); }
   { StringStream ss("caaabcd"); ASSERT_IEQ(ss.findUntil((char*) "aaa",(char*) "abc"),1); ASSERT_SEQ(ss.readString(),"bcd"); }
+  { StringStream ss("aaaabaaad"); ASSERT_IEQ(ss.findUntil((char*) "aab",(char*) "aba"),1); ASSERT_SEQ(ss.readString(),"aaad"); }
+  { StringStream ss("aaaabaaad"); ASSERT_IEQ(ss.findUntil((char*) "aad",(char*) "aab"),0); ASSERT_SEQ(ss.readString(),"aaad"); }  
   { StringStream ss("42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),42); }
   { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_NONE),0); }
   { StringStream ss(" 42"); ASSERT_IEQ(ss.parseInt(SKIP_WHITESPACE),42); }  

@@ -1,4 +1,4 @@
-#include "ArduinoUnitMock2WString.h"
+#include "ArduinoUnitMockWString.h"
 
 #if ! defined(ARDUINO)
 

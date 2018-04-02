@@ -8,8 +8,8 @@
 #include <Print.h>
 #else
 #include <iostream>
-#include "ArduinoUnitMock2Printable.h"
-#include "ArduinoUnitMock2WString.h"
+#include "ArduinoUnitMockPrintable.h"
+#include "ArduinoUnitMockWString.h"
 
 #ifdef DEC
 #undef DEC

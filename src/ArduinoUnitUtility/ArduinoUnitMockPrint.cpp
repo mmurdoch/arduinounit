@@ -8,9 +8,9 @@
 #include <iostream>
 #include <math.h>
 #include <limits.h>
-#include "ArduinoUnitMock2Printable.h"
-#include "ArduinoUnitMock2WString.h"
-#include "ArduinoUnitMock2Print.h"
+#include "ArduinoUnitMockPrintable.h"
+#include "ArduinoUnitMockWString.h"
+#include "ArduinoUnitMockPrint.h"
 
 #ifdef DEC
 #undef DEC

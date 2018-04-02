@@ -1,344 +1,250 @@
-/*
-
-The MIT License
-
-Copyright (c) 2018 David A. Mellis, Cristian Maglie, Chris--A <chris@genx.biz>, Jim Leonard, Martino Facchin, Matthijs Kooijman, mattb5906 <mattb5906@talktalk.net>, per1234 <accounts@perglass.com>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
 #if !defined(ARDUINO)
 
-#include <time.h>
-#include <sys/time.h>
-
+#include "ArduinoUnitMockTime.h"
 #include "ArduinoUnitMockStream.h"
 
-#define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
+Stream::Stream() : timeout(DEFAULT_TIMEOUT) {}
 
-struct ArduinoUnitMockStreamTimer {
-  struct timeval starttime;
-  
-  ArduinoUnitMockStreamTimer() {
-    gettimeofday(&starttime, NULL);    
-  }
-  
-  unsigned long millis() {
-    struct timeval now;
-    gettimeofday(&now, NULL);
-    double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
-    return secs*1000;
-  }
-};
-
-static ArduinoUnitMockStreamTimer streamTimer;
-static unsigned long millis() { return streamTimer.millis(); }
-
-// protected method to read stream with timeout
-int Stream::timedRead()
+void Stream::setTimeout(unsigned long _timeout)
 {
-  int c;
-  _startMillis = millis();
-  do {
-    c = read();
-    if (c >= 0) return c;
-  } while(millis() - _startMillis < _timeout);
-  return -1;     // -1 indicates timeout
+  timeout = _timeout;
 }
 
-// protected method to peek stream with timeout
-int Stream::timedPeek()
+unsigned long Stream::getTimeout() const { return timeout; }
+
+bool Stream::find(char *target)
 {
-  int c;
-  _startMillis = millis();
-  do {
-    c = peek();
-    if (c >= 0) return c;
-  } while(millis() - _startMillis < _timeout);
-  return -1;     // -1 indicates timeout
+  return findUntil(target, strlen(target),0,0);
 }
 
-// returns peek of the next digit in the stream or -1 if timeout
-// discards non-numeric characters
-int Stream::peekNextDigit(LookaheadMode lookahead, bool detectDecimal)
+bool Stream::find(uint8_t *target)
 {
-  int c;
-  while (1) {
-    c = timedPeek();
-
-    if( c < 0 ||
-        c == '-' ||
-        (c >= '0' && c <= '9') ||
-        (detectDecimal && c == '.')) return c;
-
-    switch( lookahead ){
-        case SKIP_NONE: return -1; // Fail code.
-        case SKIP_WHITESPACE:
-            switch( c ){
-                case ' ':
-                case '\t':
-                case '\r':
-                case '\n': break;
-                default: return -1; // Fail code.
-            }
-        case SKIP_ALL:
-            break;
-    }
-    read();  // discard non-numeric
-  }
+  return findUntil((char*) target, strlen((char *)target),0,0);
 }
 
-// Public Methods
-//////////////////////////////////////////////////////////////
-
-void Stream::setTimeout(unsigned long timeout)  // sets the maximum number of milliseconds to wait
-{
-  _timeout = timeout;
-}
-
- // find returns true if the target string is found
-bool  Stream::find(char *target)
-{
-  return findUntil(target, strlen(target), NULL, 0);
-}
-
-// reads data from the stream until the target string of given length is found
-// returns true if target string is found, false if timed out
 bool Stream::find(char *target, size_t length)
 {
-  return findUntil(target, length, NULL, 0);
+  return findUntil(target,strlen(target),0,0);
 }
 
-// as find but search ends if the terminator string is found
-bool  Stream::findUntil(char *target, char *terminator)
+bool Stream::findUntil(char *target, char *terminator)
 {
-  return findUntil(target, strlen(target), terminator, strlen(terminator));
+  return findUntil(target,target != 0 ? strlen(target) : 0,terminator,terminator != 0 ? strlen(terminator) : 0);
 }
 
-// reads data from the stream until the target string of the given length is found
-// search terminated if the terminator string is found
-// returns true if target string is found, false if terminated or timed out
-bool Stream::findUntil(char *target, size_t targetLen, char *terminator, size_t termLen)
+bool Stream::findUntil(uint8_t *target, char *terminator)
 {
-  if (terminator == NULL) {
-    MultiTarget t[1] = {{target, targetLen, 0}};
-    return findMulti(t, 1) == 0 ? true : false;
-  } else {
-    MultiTarget t[2] = {{target, targetLen, 0}, {terminator, termLen, 0}};
-    return findMulti(t, 2) == 0 ? true : false;
+  return findUntil((char *)target,target != 0 ? strlen((char *)target) : 0,terminator,terminator != 0 ? strlen(terminator) : 0);
+}
+
+
+bool Stream::findUntil(char *str0, size_t len0, char *str1, size_t len1)
+{
+  int at0 = 0;
+  int at1 = 0;
+
+  if (str0 == 0) { str0=0; len0=~0; }
+  if (str1 == 0) { str1=0; len1=~0; }
+  
+  unsigned long start = millis();
+  
+  for (;;) {
+    if (at0 == len0) return true;
+    if (at1 == len1) return false;
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return false;
+    }
+    char c = peek();
+    if (str0 != 0) {
+      if (c == str0[at0]) {
+        ++at0;
+      } else {
+        int at;
+        for (at=at0; at > 0; --at) {
+          if (str0[at-1] == c && strncmp(str0,str0+(at0-at),at0-at) == 0) { break; }
+        }
+        at0=at;
+      }
+    }
+    if (str1 != 0) {
+      if (c == str1[at1]) {
+        ++at1;
+      } else {
+        int at;
+        for (at=at1; at > 0; --at) {
+          if (str1[at-1] == c && strncmp(str1,str1+(at1-at),at1-at) == 0) { break; }
+        }
+        at1=at;
+      }
+    }
+    read();
   }
 }
 
-// returns the first valid (long) integer value from the current position.
-// lookahead determines how parseInt looks ahead in the stream.
-// See LookaheadMode enumeration at the top of the file.
-// Lookahead is terminated by the first character that is not a valid part of an integer.
-// Once parsing commences, 'ignore' will be skipped in the stream.
 long Stream::parseInt(LookaheadMode lookahead, char ignore)
 {
-  bool isNegative = false;
   long value = 0;
+  bool neg = false;
   int c;
+  int state = 0;
+  unsigned long start = millis();
 
-  c = peekNextDigit(lookahead, false);
-  // ignore non numeric leading characters
-  if(c < 0)
-    return 0; // zero returned if timeout
+  for (;;) {
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return value;
+    }
+    c = peek();
+    if (c == ignore) { read(); continue; }
 
-  do{
-    if(c == ignore)
-      ; // ignore this character
-    else if(c == '-')
-      isNegative = true;
-    else if(c >= '0' && c <= '9')        // is c a digit?
-      value = value * 10 + c - '0';
-    read();  // consume the character we got with peek
-    c = timedPeek();
+    switch(state) {
+    case 0:
+      if (lookahead == SKIP_WHITESPACE && isblank(c)) { read(); continue; }
+      else if (lookahead == SKIP_ALL && ! (((c >= '0' && c <= '9') || (c=='-')))) { read(); continue; }
+      else if (! (((c >= '0' && c <= '9') || (c=='-')))) { return value; }
+      if (c == '-') { neg=true; read(); state = 1; continue; } else { state = 1; continue; }
+      break;
+    case 1:
+      if (c >= '0' && c <= '9') {
+        value = value*10 + (c-'0');
+        read();
+        continue;
+      } else {
+        return neg ? -value : value;
+      }
+    }
   }
-  while( (c >= '0' && c <= '9') || c == ignore );
-
-  if(isNegative)
-    value = -value;
-  return value;
 }
 
-// as parseInt but returns a floating point value
 float Stream::parseFloat(LookaheadMode lookahead, char ignore)
 {
-  bool isNegative = false;
-  bool isFraction = false;
-  long value = 0;
+  double value = 0, den = 1;
+  bool neg = false;
   int c;
-  float fraction = 1.0;
+  int state = 0;
+  unsigned long start = millis();
 
-  c = peekNextDigit(lookahead, true);
-    // ignore non numeric leading characters
-  if(c < 0)
-    return 0; // zero returned if timeout
-
-  do{
-    if(c == ignore)
-      ; // ignore
-    else if(c == '-')
-      isNegative = true;
-    else if (c == '.')
-      isFraction = true;
-    else if(c >= '0' && c <= '9')  {      // is c a digit?
-      value = value * 10 + c - '0';
-      if(isFraction)
-         fraction *= 0.1;
+  for (;;) {
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return neg ? -value : value;
     }
-    read();  // consume the character we got with peek
-    c = timedPeek();
-  }
-  while( (c >= '0' && c <= '9')  || (c == '.' && !isFraction) || c == ignore );
 
-  if(isNegative)
-    value = -value;
-  if(isFraction)
-    return value * fraction;
-  else
-    return value;
+    c = peek();
+    if (c == ignore) { read(); continue; }
+
+    switch(state) {
+    case 0:
+      if (lookahead == SKIP_WHITESPACE && isblank(c)) { read(); continue; }
+      else if (lookahead == SKIP_ALL && ! (((c >= '0' && c <= '9') || (c=='-'||c=='.')))) { read(); continue; }
+      else if (! (((c >= '0' && c <= '9') || (c=='-'||c=='.')))) { return value; }
+      if (c == '-') { neg=true; read(); state = 1; continue; } else { state = 1; continue; }
+      break;
+    case 1:
+      if (c >= '0' && c <= '9') {
+        value = value*10 + (c-'0');
+        read();
+        continue;
+      } else if (c == '.') {
+        read();
+        state = 2;
+        continue;
+      } else {
+        return neg ? -value : value;
+      }
+    case 2:
+      if (c >= '0' && c <= '9') {
+        den=10*den;
+        value = value + (c-'0')/den;
+        read();
+        continue;
+      } else {
+        return neg ? -value : value;
+      }
+    }
+  }
 }
 
-// read characters from stream into buffer
-// terminates if length characters have been read, or timeout (see setTimeout)
-// returns the number of characters placed in the buffer
-// the buffer is NOT null terminated.
-//
 size_t Stream::readBytes(char *buffer, size_t length)
 {
-  size_t count = 0;
-  while (count < length) {
-    int c = timedRead();
-    if (c < 0) break;
-    *buffer++ = (char)c;
-    count++;
+  unsigned long start = millis();
+  size_t size = 0;
+
+  for (;;) {
+    if (size >= length) return size;
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return size;
+    }
+    buffer[size++]=read();
   }
-  return count;
 }
 
-
-// as readBytes with terminator character
-// terminates if length characters have been read, timeout, or if the terminator character  detected
-// returns the number of characters placed in the buffer (0 means no valid data found)
 
 size_t Stream::readBytesUntil(char terminator, char *buffer, size_t length)
 {
-  if (length < 1) return 0;
-  size_t index = 0;
-  while (index < length) {
-    int c = timedRead();
-    if (c < 0 || c == terminator) break;
-    *buffer++ = (char)c;
-    index++;
+  unsigned long start = millis();
+  size_t size = 0;
+
+  for (;;) {
+    if (size >= length) return size;
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return size;
+    }
+    if (peek() == terminator) return size;
+    buffer[size++]=read();
   }
-  return index; // return number of characters, not including null terminator
 }
+
 
 String Stream::readString()
 {
-  String ret;
-  int c = timedRead();
-  while (c >= 0)
-  {
-    ret += (char)c;
-    c = timedRead();
+  unsigned long start = millis();  
+  String ans;
+  for (;;) {
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
+        continue;
+      }
+      return ans;
+    }
+    ans.concat((char) read());
   }
-  return ret;
 }
 
 String Stream::readStringUntil(char terminator)
 {
-  String ret;
-  int c = timedRead();
-  while (c >= 0 && c != terminator)
-  {
-    ret += (char)c;
-    c = timedRead();
-  }
-  return ret;
-}
-
-int Stream::findMulti( struct Stream::MultiTarget *targets, int tCount) {
-  // any zero length target string automatically matches and would make
-  // a mess of the rest of the algorithm.
-  for (struct MultiTarget *t = targets; t < targets+tCount; ++t) {
-    if (t->len <= 0)
-      return t - targets;
-  }
-
-  while (1) {
-    int c = timedRead();
-    if (c < 0)
-      return -1;
-
-    for (struct MultiTarget *t = targets; t < targets+tCount; ++t) {
-      // the simple case is if we match, deal with that first.
-      if (c == t->str[t->index]) {
-        if (++t->index == t->len)
-          return t - targets;
-        else
-          continue;
-      }
-
-      // if not we need to walk back and see if we could have matched further
-      // down the stream (ie '1112' doesn't match the first position in '11112'
-      // but it will match the second position so we can't just reset the current
-      // index to 0 when we find a mismatch.
-      if (t->index == 0)
+  unsigned long start = millis();  
+  String ans;
+  for (;;) {
+    if (!available()) {
+      if (millis()-start < timeout) {
+        delayMicroseconds(1);
         continue;
-
-      int origIndex = t->index;
-      do {
-        --t->index;
-        // first check if current char works against the new current index
-        if (c != t->str[t->index])
-          continue;
-
-        // if it's the only char then we're good, nothing more to check
-        if (t->index == 0) {
-          t->index++;
-          break;
-        }
-
-        // otherwise we need to check the rest of the found string
-        int diff = origIndex - t->index;
-        size_t i;
-        for (i = 0; i < t->index; ++i) {
-          if (t->str[i] != t->str[i + diff])
-            break;
-        }
-
-        // if we successfully got through the previous loop then our current
-        // index is good.
-        if (i == t->index) {
-          t->index++;
-          break;
-        }
-
-        // otherwise we just try the next index
-      } while (t->index);
+      }
+      return ans;
     }
+    if (peek() == terminator) return ans;
+    ans.concat((char) read());
   }
-  // unreachable
-  return -1;
 }
 
 CppIOStream::CppIOStream(std::istream &_in, std::ostream &_out) : in(_in), out(_out) {}

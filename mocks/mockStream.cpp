@@ -6,6 +6,17 @@
 #include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
 #include "ArduinoUnitUtility/ArduinoUnitMockStream.h"
 
+std::string str(const char *s) { return s; }
+std::string str(const std::string &s) { return s; }
+std::string str(const String &s) { return s.c_str(); }
+
+void err() {
+  std::cout << "err" << std::endl;
+}
+#define ASSERT_SEQ(A,B) { std::string a=str(A); std::string b=str(B); if (a != b) { std::cout << "(" << #A << "=='" << a << "')!=(" << #B << "=='" << b << "') on line " << __LINE__ << std::endl; err(); } }
+
+#define ASSERT_IEQ(A,B) { int a=(A); int b=(B); if (a != b) { std::cout << "(" << #A << "==" << a << ")!=(" << #B << "==" << b << ") on line " << __LINE__ << std::endl; err(); } }
+
 struct StringStream : Stream, String {
   size_t write(uint8_t c) {
     uint8_t tmp[1];
@@ -45,12 +56,13 @@ void testStream() {
   ss.print(' ');
   ss.print("world");
   ss.println("!");
-  assert(strcmp(ss.c_str(),"hello world!\r\n")==0);
+  ASSERT_SEQ(ss,"hello world!\r\n");
+
   char tmp[5];
   ss.readBytes(tmp,sizeof(tmp));
   assert(strncmp(tmp,"hello",sizeof(tmp))==0);  
   String w = ss.readString();
-  assert(strcmp(w.c_str()," world!\r\n")==0);
+  ASSERT_SEQ(w," world!\r\n");
 }
 
 void testCppIOStream() {

@@ -36,6 +36,7 @@
 * Add an optional lazy message last argument to every assert.
 * Add building outside of arduino environment
 * Significant reduction of code implementation and compiled size (Compare.h is now small)
-* Add minimal mock.
+* Add minimal mock builds on dev (in vitro) platform
+
 
 

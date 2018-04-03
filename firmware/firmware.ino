@@ -8,6 +8,10 @@
 #error __LINE__ value is incorrect!
 #endif
 
+#ifndef PROGMEM
+#define PROGMEM
+#endif
+
 
 char line[80];
 bool configuring = true;

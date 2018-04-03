@@ -118,11 +118,20 @@ by chaining things you can print (like `Serial.print()`) between `<<` operators.
 
 The status of the test can be used (bool ok) when printing the message.  Under normal verbosity settings, ok will always be false, but more verbose settings can print assert messages even if they pass.
 
-# En Vitro Testing
+# En Vitro Testing (Advanced)
 
 ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
 
-Note ArduinoUnit is not intended as a mocking library; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.
+Note ArduinoUnit has very limited mocking features; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.  In particular the only features provided (because of dependencies on these by ArduinoUnit) are:
+```
+millis()
+micros()
+String
+Print
+Printable
+Stream # public components only
+```
+These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment, there are two additional objects, `CppStreamPrint` and `CppIOStream`, which wrap C++ `std::ostream` (and `std::istream` for `CppIOStream`).  This simplifies creating tests in the mocking environments.  Look at the advanced example and test firmware for guidance.
 
 # Verbosity
 

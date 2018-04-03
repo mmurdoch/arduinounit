@@ -37,14 +37,14 @@ void FakeStreamBuffer::setToEndOfStream() {
     _pushByte(-1);
 }
 
-void FakeStreamBuffer::nextByte(byte b) {
+void FakeStreamBuffer::nextByte(uint8_t b) {
     _pushByte(b);
 }
 
 void FakeStreamBuffer::nextBytes(const char *s) {
     int next = 0;
     while (s[next] != 0) {
-        nextByte((byte)s[next]);
+        nextByte((uint8_t)s[next]);
         next++;
     }
 }
@@ -71,7 +71,7 @@ int FakeStreamBuffer::peek() {
   return -1;
 }
 
-BufferNode* FakeStreamBuffer::_createNode (byte value) {
+BufferNode* FakeStreamBuffer::_createNode (uint8_t value) {
     BufferNode *node = (BufferNode*)malloc(sizeof(BufferNode));
     node->value = value;
     node->next = NULL;
@@ -90,7 +90,7 @@ void FakeStreamBuffer::_appendNode(BufferNode *node) {
     }
 }
 
-void FakeStreamBuffer::_pushByte (byte value) {
+void FakeStreamBuffer::_pushByte (uint8_t value) {
     BufferNode *node = _createNode (value);
     _appendNode(node);
 }
@@ -103,8 +103,8 @@ BufferNode* FakeStreamBuffer::_popNode() {
     return node;
 }
 
-byte FakeStreamBuffer::_nextByte() {
-    byte ret = -1;
+uint8_t FakeStreamBuffer::_nextByte() {
+    uint8_t ret = -1;
     BufferNode *node = _popNode();
     if (node != NULL) {
         ret = node->value;
@@ -116,7 +116,7 @@ byte FakeStreamBuffer::_nextByte() {
 int FakeStreamBuffer::_getBufferSize () {
     return _getBufferSize(-1);
 }
-int FakeStreamBuffer::_getBufferSize (byte stopAt) {
+int FakeStreamBuffer::_getBufferSize (uint8_t stopAt) {
     int count = 0;
     BufferNode *node = _firstNode;
     while (node != 0 && node->value != stopAt) {

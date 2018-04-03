@@ -3,29 +3,30 @@
 // only used for "en vitro" tests (not on actual board)
 
 #include <stdlib.h>
-#include <time.h>
 #include <sys/time.h>
+#include <time.h>
 #include "ArduinoUnit.h"
+#include "ArduinoUnitMock.h"
 
-struct timeval starttime;
+int random(int n) {
+  static bool setup = false;
+  if (!setup) {
+    srand(time(0));
+    setup = true;
+  }
+  return rand() % n;
+}
+
+int random(int a, int b) {
+  return a+rand() % (b-a+1);
+}
 
 void setup();
 void loop();
 
-int testsRemaining() {
-  int count = Test::getCurrentCount();
-  count -= Test::getCurrentSkipped();
-  count -= Test::getCurrentPassed();
-  count -= Test::getCurrentFailed();
-
-  return count;
-}
-
+CppIOStream Serial;
 
 int main(int argc, char *argv[]) {
-  gettimeofday(&starttime, NULL);
-  srand(time(0));
-  
   setup();
 
   // parse --exclude/-e <pattern> and --include/-i <pattern> commands
@@ -46,27 +47,10 @@ int main(int argc, char *argv[]) {
   }
 
   // instead of looping forever, loop while there are active tests
-  while (testsRemaining() > 0) {
+  while (Test::remaining() > 0) {
     loop();
   }
   return 0;
-}
-
-#define F(X) X
-struct FakeSerial {
-  void begin(long baud) { (void) baud; }
-  bool operator!() const { return false; }
-} Serial;
-
-
-int random(int n) { return rand() % n; }
-int random(int a, int b) { return a+rand() % (b-a+1); }
-
-unsigned long millis() {
-  struct timeval now;
-  gettimeofday(&now, NULL);
-  double secs = (double)(now.tv_usec - starttime.tv_usec) / 1000000 + (double)(now.tv_sec - starttime.tv_sec);
-  return secs*1000;
 }
 
 #include "advanced.ino"

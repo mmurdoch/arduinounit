@@ -3,8 +3,8 @@ ArduinoUnit
 
 Unit test framework for arduino projects.
 
-## Current Version 2.3.4-alpha
-[Download ArduinoUnit 2.3.4-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.4-alpha).
+## Current Version 2.3.5-alpha
+[Download ArduinoUnit 2.3.5-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.5-alpha).
 
 ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
 of unit testing with the 1.x library over the last few years. It aims to be 

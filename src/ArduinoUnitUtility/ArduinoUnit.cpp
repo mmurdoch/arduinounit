@@ -53,33 +53,33 @@ void Test::resolve()
     output = output || (fail && TEST_VERBOSITY(TESTS_FAILED));
 
     if (output) {
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("Test "));
-      ArduinoUnitPrint(name);
+      Test::out->print(ARDUINO_UNIT_STRING("Test "));
+      Test::out->print(name);
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED)
-      if (skip) { ArduinoUnitPrintln(ARDUINO_UNIT_STRING(" skipped.")); }
+      if (skip) { Test::out->println(ARDUINO_UNIT_STRING(" skipped.")); }
 #endif
       
 #if TEST_VERBOSITY_EXISTS(TESTS_PASSED)
-      if (pass) { ArduinoUnitPrintln(ARDUINO_UNIT_STRING(" passed.")); }
+      if (pass) { Test::out->println(ARDUINO_UNIT_STRING(" passed.")); }
 #endif
       
 #if TEST_VERBOSITY_EXISTS(TESTS_FAILED)
-      if (fail) { ArduinoUnitPrintln(ARDUINO_UNIT_STRING(" failed.")); }
+      if (fail) { Test::out->println(ARDUINO_UNIT_STRING(" failed.")); }
 #endif
     }
 #endif
   }
 #if TEST_VERBOSITY_EXISTS(TESTS_SUMMARY)
   if (root == 0 && TEST_VERBOSITY(TESTS_SUMMARY)) {
-    ArduinoUnitPrint(ARDUINO_UNIT_STRING("Test summary: "));
-    ArduinoUnitPrint(passed);
-    ArduinoUnitPrint(ARDUINO_UNIT_STRING(" passed, "));
-    ArduinoUnitPrint(failed);
-    ArduinoUnitPrint(ARDUINO_UNIT_STRING(" failed, and "));
-    ArduinoUnitPrint(skipped);
-    ArduinoUnitPrint(ARDUINO_UNIT_STRING(" skipped, out of "));
-    ArduinoUnitPrint(count);
-    ArduinoUnitPrintln(ARDUINO_UNIT_STRING(" test(s)."));
+    Test::out->print(ARDUINO_UNIT_STRING("Test summary: "));
+    Test::out->print(passed);
+    Test::out->print(ARDUINO_UNIT_STRING(" passed, "));
+    Test::out->print(failed);
+    Test::out->print(ARDUINO_UNIT_STRING(" failed, and "));
+    Test::out->print(skipped);
+    Test::out->print(ARDUINO_UNIT_STRING(" skipped, out of "));
+    Test::out->print(count);
+    Test::out->println(ARDUINO_UNIT_STRING(" test(s)."));
   }
 #endif
 }

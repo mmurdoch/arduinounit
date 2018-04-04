@@ -17,8 +17,26 @@
 #include "ArduinoUnitUtility/FakeStreamBuffer.h"
 #include "ArduinoUnitUtility/FreeMemory.h"
 
-#define ArduinoUnitPrint(X) Test::out->print(X)
-#define ArduinoUnitPrintln(X) Test::out->println(X)
+#define ArduinoUnitMacroArgs0(null,f,...) f
+#define ArduinoUnitMacroArgs1(null,a1,f,...) f
+#define ArduinoUnitMacroArgs2(null,a1,a2,f,...) f
+#define ArduinoUnitMacroArgs3(null,a1,a2,a3,f,...) f
+#define ArduinoUnitMacroArgs4(null,a1,a2,a3,a4,f,...) f
+#define ArduinoUnitMacroArgs5(null,a1,a2,a3,a4,a5,f,...) f
+
+#define ArduinoUnitMacroRecompose0(args) ArduinoUnitMacroArgs0 args
+#define ArduinoUnitMacroRecompose1(args) ArduinoUnitMacroArgs1 args
+#define ArduinoUnitMacroRecompose2(args) ArduinoUnitMacroArgs2 args
+#define ArduinoUnitMacroRecompose3(args) ArduinoUnitMacroArgs3 args
+#define ArduinoUnitMacroRecompose4(args) ArduinoUnitMacroArgs4 args
+#define ArduinoUnitMacroRecompose5(args) ArduinoUnitMacroArgs5 args
+
+#define ArduinoUnitMacroChoose0(f,...) ArduinoUnitMacroRecompose0((null,##__VA_ARGS__,f ## 0,))
+#define ArduinoUnitMacroChoose1(f,...) ArduinoUnitMacroRecompose1((null,##__VA_ARGS__,f ## 1, f ## 0,))
+#define ArduinoUnitMacroChoose2(f,...) ArduinoUnitMacroRecompose2((null,##__VA_ARGS__,f ## 2,f ## 1, f ## 0,))
+#define ArduinoUnitMacroChoose3(f,...) ArduinoUnitMacroRecompose3((null,##__VA_ARGS__,f ## 3, f ## 2,f ## 1, f ## 0,))
+#define ArduinoUnitMacroChoose4(f,...) ArduinoUnitMacroRecompose4((null,##__VA_ARGS__,f ## 4, f ## 3, f ## 2,f ## 1, f ## 0,)
+#define ArduinoUnitMacroChoose5(f,...) ArduinoUnitMacroRecompose5((null,##__VA_ARGS__,f ## 5, f ## 4, f ## 3, f ## 2,f ## 1, f ## 0,))
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2
@@ -288,7 +306,7 @@ class Test
 
   struct Printer {
     template <typename T> inline Printer &operator<<(const T &x) {
-      ArduinoUnitPrint((const typename ArduinoUnitWiden<T>::type &)x);
+      Test::out->print((const typename ArduinoUnitWiden<T>::type &)x);
       return *this;   
     }
   };
@@ -488,25 +506,25 @@ void loop() {
 
 #if TEST_VERBOSITY_EXISTS(ASSERTIONS_FAILED) || TEST_VERBOSITY_EXISTS(ASSERTIONS_PASSED)
     if (output) {
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("Assertion "));
-      ArduinoUnitPrint(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING(": "));
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("("));
-      ArduinoUnitPrint(lhss);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("="));
-      ArduinoUnitPrint(lhs);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING(") "));
-      ArduinoUnitPrint(ops);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING(" ("));
-      ArduinoUnitPrint(rhss);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("="));
-      ArduinoUnitPrint(rhs);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING("), file "));
-      ArduinoUnitPrint(file);
-      ArduinoUnitPrint(ARDUINO_UNIT_STRING(", line "));
-      ArduinoUnitPrint(line);
+      Test::out->print(ARDUINO_UNIT_STRING("Assertion "));
+      Test::out->print(ok ? ARDUINO_UNIT_STRING("passed") : ARDUINO_UNIT_STRING("failed"));
+      Test::out->print(ARDUINO_UNIT_STRING(": "));
+      Test::out->print(ARDUINO_UNIT_STRING("("));
+      Test::out->print(lhss);
+      Test::out->print(ARDUINO_UNIT_STRING("="));
+      Test::out->print(lhs);
+      Test::out->print(ARDUINO_UNIT_STRING(") "));
+      Test::out->print(ops);
+      Test::out->print(ARDUINO_UNIT_STRING(" ("));
+      Test::out->print(rhss);
+      Test::out->print(ARDUINO_UNIT_STRING("="));
+      Test::out->print(rhs);
+      Test::out->print(ARDUINO_UNIT_STRING("), file "));
+      Test::out->print(file);
+      Test::out->print(ARDUINO_UNIT_STRING(", line "));
+      Test::out->print(line);
       onMessage(ok);
-      ArduinoUnitPrintln(ARDUINO_UNIT_STRING("."));
+      Test::out->println(ARDUINO_UNIT_STRING("."));
     }
 #endif
     return ok;
@@ -550,99 +568,54 @@ is in another file (or defined after the assertion on it). */
 #define assertOpMsg(arg1,op,op_name,arg2, message)                               \
   do {  if (!Test::assertion< ArduinoUnitArgType(arg1) , ArduinoUnitArgType(arg2) > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
 
-#define ASSERT_OP_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
-#define ASSERT_OP_4(a1,op,op_name,arg2) assertOpMsg(a1,op,op_name,arg2,&Test::noMessage)
-
-// _f<MAXARGS+1>, where MAXARGS is the maximum number of arguments
-#define ASSERT_OP_FUNCTION(_f1, _f2, _f3, _f4, _f5, _f6, ...) _f6
-#define ASSERT_OP_RECOMPOSER(argsWithParentheses) ASSERT_OP_FUNCTION argsWithParentheses
-#define ASSERT_OP_CHOOSE(...) ASSERT_OP_RECOMPOSER((__VA_ARGS__, ASSERT_OP_5, ASSERT_OP_4, ASSERT_OP_3, ASSERT_OP_2, ASSERT_OP_1, ))
-// MAXARGS commas
-#define ASSERT_OP_NO_ARG_EXPANDER() ,,,,,ASSERT_OP_0
-#define ASSERT_OP_MACRO_CHOOSER(...) ASSERT_OP_CHOOSE(ASSERT_OP_NO_ARG_EXPANDER __VA_ARGS__ ())
-#define assertOp(...) ASSERT_OP_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
-
-#define ASSERT_EQ_3(a,b,message)        ASSERT_OP_5(a,compareEqual,"==",b,message)
-#define ASSERT_EQ_2(a,b)                ASSERT_OP_4(a,compareEqual,"==",b)
-#define ASSERT_EQ_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_EQ_RECOMPOSER(argsWithParentheses) ASSERT_EQ_FUNCTION argsWithParentheses
-#define ASSERT_EQ_CHOOSE(...) ASSERT_EQ_RECOMPOSER((__VA_ARGS__, ASSERT_EQ_3, ASSERT_EQ_2, ASSERT_EQ_1, ))
-#define ASSERT_EQ_NO_ARG_EXPANDER() ,,,ASSERT_EQ_0
-#define ASSERT_EQ_MACRO_CHOOSER(...) ASSERT_EQ_CHOOSE(ASSERT_EQ_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertOp_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
+#define assertOp_4(a1,op,op_name,arg2) assertOpMsg(a1,op,op_name,arg2,&Test::noMessage)
 
 //** macro generates optional output and calls fail() followed by a return if false. */
-#define assertEqual(...) ASSERT_EQ_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertOp(...) ArduinoUnitMacroChoose5(assertOp_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_NE_3(a,b,message)        ASSERT_OP_5(a,compareNotEqual,"!=",b,message)
-#define ASSERT_NE_2(a,b)                ASSERT_OP_4(a,compareNotEqual,"!=",b)
-#define ASSERT_NE_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_NE_RECOMPOSER(argsWithParentheses) ASSERT_NE_FUNCTION argsWithParentheses
-#define ASSERT_NE_CHOOSE(...) ASSERT_NE_RECOMPOSER((__VA_ARGS__, ASSERT_NE_3, ASSERT_NE_2, ASSERT_NE_1, ))
-#define ASSERT_NE_NO_ARG_EXPANDER() ,,,ASSERT_NE_0
-#define ASSERT_NE_MACRO_CHOOSER(...) ASSERT_NE_CHOOSE(ASSERT_NE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertEqual_3(a,b,message)        assertOp_5(a,compareEqual,"==",b,message)
+#define assertEqual_2(a,b)                assertOp_4(a,compareEqual,"==",b)
 
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertNotEqual(...) ASSERT_NE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertEqual(...) ArduinoUnitMacroChoose3(assertEqual_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_LT_3(a,b,message)        ASSERT_OP_5(a,compareLess,"<",b,message)
-#define ASSERT_LT_2(a,b)                ASSERT_OP_4(a,compareLess,"<",b)
-#define ASSERT_LT_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_LT_RECOMPOSER(argsWithParentheses) ASSERT_LT_FUNCTION argsWithParentheses
-#define ASSERT_LT_CHOOSE(...) ASSERT_LT_RECOMPOSER((__VA_ARGS__, ASSERT_LT_3, ASSERT_LT_2, ASSERT_LT_1, ))
-#define ASSERT_LT_NO_ARG_EXPANDER() ,,,ASSERT_LT_0
-#define ASSERT_LT_MACRO_CHOOSER(...) ASSERT_LT_CHOOSE(ASSERT_LT_NO_ARG_EXPANDER __VA_ARGS__ ())
-/** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLess(...)        ASSERT_LT_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertNotEqual_3(a,b,message)        assertOp_5(a,compareNotEqual,"!=",b,message)
+#define assertNotEqual_2(a,b)                assertOp_4(a,compareNotEqual,"!=",b)
 
-#define ASSERT_GT_3(a,b,message)        ASSERT_OP_5(a,compareMore,">",b,message)
-#define ASSERT_GT_2(a,b)                ASSERT_OP_4(a,compareMore,">",b)
-#define ASSERT_GT_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_GT_RECOMPOSER(argsWithParentheses) ASSERT_GT_FUNCTION argsWithParentheses
-#define ASSERT_GT_CHOOSE(...) ASSERT_GT_RECOMPOSER((__VA_ARGS__, ASSERT_GT_3, ASSERT_GT_2, ASSERT_GT_1, ))
-#define ASSERT_GT_NO_ARG_EXPANDER() ,,,ASSERT_GT_0
-#define ASSERT_GT_MACRO_CHOOSER(...) ASSERT_GT_CHOOSE(ASSERT_GT_NO_ARG_EXPANDER __VA_ARGS__ ())
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMore(...)        ASSERT_GT_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertNotEqual(...) ArduinoUnitMacroChoose3(assertNotEqual_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_LE_3(a,b,message)        ASSERT_OP_5(a,compareLessOrEqual,"<=",b,message)
-#define ASSERT_LE_2(a,b)                ASSERT_OP_4(a,compareLessOrEqual,"<=",b)
-#define ASSERT_LE_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_LE_RECOMPOSER(argsWithParentheses) ASSERT_LE_FUNCTION argsWithParentheses
-#define ASSERT_LE_CHOOSE(...) ASSERT_LE_RECOMPOSER((__VA_ARGS__, ASSERT_LE_3, ASSERT_LE_2, ASSERT_LE_1, ))
-#define ASSERT_LE_NO_ARG_EXPANDER() ,,,ASSERT_LE_0
-#define ASSERT_LE_MACRO_CHOOSER(...) ASSERT_LE_CHOOSE(ASSERT_LE_NO_ARG_EXPANDER __VA_ARGS__ ())
-/** macro generates optional output and calls fail() followed by a return if false. */
-#define assertLessOrEqual(...) ASSERT_LE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_GE_3(a,b,message)        ASSERT_OP_5(a,compareMoreOrEqual,">=",b,message)
-#define ASSERT_GE_2(a,b)                ASSERT_OP_4(a,compareMoreOrEqual,">=",b)
-#define ASSERT_GE_FUNCTION(_f1, _f2, _f3, _f4, ...) _f4
-#define ASSERT_GE_RECOMPOSER(argsWithParentheses) ASSERT_GE_FUNCTION argsWithParentheses
-#define ASSERT_GE_CHOOSE(...) ASSERT_GE_RECOMPOSER((__VA_ARGS__, ASSERT_GE_3, ASSERT_GE_2, ASSERT_GE_1, ))
-#define ASSERT_GE_NO_ARG_EXPANDER() ,,,ASSERT_GE_0
-#define ASSERT_GE_MACRO_CHOOSER(...) ASSERT_GE_CHOOSE(ASSERT_GE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertLess_3(a,b,message)        assertOp_5(a,compareLess,"<",b,message)
+#define assertLess_2(a,b)                assertOp_4(a,compareLess,"<",b)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertMoreOrEqual(...) ASSERT_GE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertLess(...) ArduinoUnitMacroChoose3(assertLess_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TRUE_2(a,message)        ASSERT_OP_5(a,compareEqual,"==",true,message)
-#define ASSERT_TRUE_1(a)                ASSERT_OP_4(a,compareEqual,"==",true)
-#define ASSERT_TRUE_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TRUE_RECOMPOSER(argsWithParentheses) ASSERT_TRUE_FUNCTION argsWithParentheses
-#define ASSERT_TRUE_CHOOSE(...) ASSERT_TRUE_RECOMPOSER((__VA_ARGS__, ASSERT_TRUE_2, ASSERT_TRUE_1, ))
-#define ASSERT_TRUE_NO_ARG_EXPANDER() ,,ASSERT_TRUE_0
-#define ASSERT_TRUE_MACRO_CHOOSER(...) ASSERT_TRUE_CHOOSE(ASSERT_TRUE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertMore_3(a,b,message)        assertOp_5(a,compareMore,">",b,message)
+#define assertMore_2(a,b)                assertOp_4(a,compareMore,">",b)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTrue(...) ASSERT_TRUE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertMore(...) ArduinoUnitMacroChoose3(assertMore_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_FALSE_2(a,message)        ASSERT_OP_5(a,compareEqual,"==",false,message)
-#define ASSERT_FALSE_1(a)                ASSERT_OP_4(a,compareEqual,"==",false)
-#define ASSERT_FALSE_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_FALSE_RECOMPOSER(argsWithParentheses) ASSERT_FALSE_FUNCTION argsWithParentheses
-#define ASSERT_FALSE_CHOOSE(...) ASSERT_FALSE_RECOMPOSER((__VA_ARGS__, ASSERT_FALSE_2, ASSERT_FALSE_1, ))
-#define ASSERT_FALSE_NO_ARG_EXPANDER() ,,ASSERT_FALSE_0
-#define ASSERT_FALSE_MACRO_CHOOSER(...) ASSERT_FALSE_CHOOSE(ASSERT_FALSE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertLessOrEqual_3(a,b,message)        assertOp_5(a,compareLessOrEqual,"<=",b,message)
+#define assertLessOrEqual_2(a,b)                assertOp_4(a,compareLessOrEqual,"<=",b)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertFalse(...) ASSERT_FALSE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertLessOrEqual(...) ArduinoUnitMacroChoose3(assertLessOrEqual_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertMoreOrEqual_3(a,b,message)        assertOp_5(a,compareMoreOrEqual,">=",b,message)
+#define assertMoreOrEqual_2(a,b)                assertOp_4(a,compareMoreOrEqual,">=",b)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertMoreOrEqual(...) ArduinoUnitMacroChoose3(assertMoreOrEqual_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertTrue_2(a,message)        assertOp_5(a,compareEqual,"==",true,message)
+#define assertTrue_1(a)                assertOp_4(a,compareEqual,"==",true)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertTrue(...) ArduinoUnitMacroChoose2(assertTrue_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertFalse_2(a,message)        assertOp_5(a,compareEqual,"==",false,message)
+#define assertFalse_1(a)                assertOp_4(a,compareEqual,"==",false)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertFalse(...) ArduinoUnitMacroChoose2(assertFalse_, ## __VA_ARGS__)(__VA_ARGS__)
 
 #define checkTestDone(name) (test_##name##_instance.state >= Test::DONE_SKIP)
 
@@ -667,82 +640,42 @@ is in another file (or defined after the assertion on it). */
 /** check condition only */
 #define checkTestNotSkip(name) (test_##name##_instance.state != Test::DONE_SKIP)
 
-#define ASSERT_TEST_DONE_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareMoreOrEqual,">=",Test::DONE_SKIP,message)
-#define ASSERT_TEST_DONE_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareMoreOrEqual,">=",Test::DONE_SKIP)
-#define ASSERT_TEST_DONE_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_DONE_RECOMPOSER(argsWithParentheses) ASSERT_TEST_DONE_FUNCTION argsWithParentheses
-#define ASSERT_TEST_DONE_CHOOSE(...) ASSERT_TEST_DONE_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_DONE_2, ASSERT_TEST_DONE_1, ))
-#define ASSERT_TEST_DONE_NO_ARG_EXPANDER() ,,ASSERT_TEST_DONE_0
-#define ASSERT_TEST_DONE_MACRO_CHOOSER(...) ASSERT_TEST_DONE_CHOOSE(ASSERT_TEST_DONE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestDone_2(name,message)        assertOp_5(test_##name##_instance.state,compareMoreOrEqual,">=",Test::DONE_SKIP,message)
+#define assertTestDone_1(name)                assertOp_4(test_##name##_instance.state,compareMoreOrEqual,">=",Test::DONE_SKIP)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTestDone(...) ASSERT_TEST_DONE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestDone(...) ArduinoUnitMacroChoose2(assertTestDone_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_NOT_DONE_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareLess,"<",Test::DONE_SKIP,message)
-#define ASSERT_TEST_NOT_DONE_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareLess,"<",Test::DONE_SKIP)
-#define ASSERT_TEST_NOT_DONE_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_NOT_DONE_RECOMPOSER(argsWithParentheses) ASSERT_TEST_NOT_DONE_FUNCTION argsWithParentheses
-#define ASSERT_TEST_NOT_DONE_CHOOSE(...) ASSERT_TEST_NOT_DONE_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_NOT_DONE_2, ASSERT_TEST_NOT_DONE_1, ))
-#define ASSERT_TEST_NOT_DONE_NO_ARG_EXPANDER() ,,ASSERT_TEST_NOT_DONE_0
-#define ASSERT_TEST_NOT_DONE_MACRO_CHOOSER(...) ASSERT_TEST_NOT_DONE_CHOOSE(ASSERT_TEST_NOT_DONE_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestNotDone_2(name,message)        assertOp_5(test_##name##_instance.state,compareLess,"<",Test::DONE_SKIP,message)
+#define assertTestNotDone_1(name)                assertOp_4(test_##name##_instance.state,compareLess,"<",Test::DONE_SKIP)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTestNotDone(...) ASSERT_TEST_NOT_DONE_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestNotDone(...) ArduinoUnitMacroChoose2(assertTestNotDone_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_PASS_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_PASS,message)
-#define ASSERT_TEST_PASS_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_PASS)
-#define ASSERT_TEST_PASS_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_PASS_RECOMPOSER(argsWithParentheses) ASSERT_TEST_PASS_FUNCTION argsWithParentheses
-#define ASSERT_TEST_PASS_CHOOSE(...) ASSERT_TEST_PASS_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_PASS_2, ASSERT_TEST_PASS_1, ))
-#define ASSERT_TEST_PASS_NO_ARG_EXPANDER() ,,ASSERT_TEST_PASS_0
-#define ASSERT_TEST_PASS_MACRO_CHOOSER(...) ASSERT_TEST_PASS_CHOOSE(ASSERT_TEST_PASS_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestPass_2(name,message)        assertOp_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_PASS,message)
+#define assertTestPass_1(name)                assertOp_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_PASS)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTestPass(...) ASSERT_TEST_PASS_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestPass(...) ArduinoUnitMacroChoose2(assertTestPass_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_NOT_PASS_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_PASS,message)
-#define ASSERT_TEST_NOT_PASS_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_PASS)
-#define ASSERT_TEST_NOT_PASS_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_NOT_PASS_RECOMPOSER(argsWithParentheses) ASSERT_TEST_NOT_PASS_FUNCTION argsWithParentheses
-#define ASSERT_TEST_NOT_PASS_CHOOSE(...) ASSERT_TEST_NOT_PASS_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_NOT_PASS_2, ASSERT_TEST_NOT_PASS_1, ))
-#define ASSERT_TEST_NOT_PASS_NO_ARG_EXPANDER() ,,ASSERT_TEST_NOT_PASS_0
-#define ASSERT_TEST_NOT_PASS_MACRO_CHOOSER(...) ASSERT_TEST_NOT_PASS_CHOOSE(ASSERT_TEST_NOT_PASS_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestNotPass_2(name,message)        assertOp_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_PASS,message)
+#define assertTestNotPass_1(name)                assertOp_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_PASS)
 /** macro generates optional output and calls pass() followed by a return if false. */
-#define assertTestNotPass(...) ASSERT_TEST_NOT_PASS_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestNotPass(...) ArduinoUnitMacroChoose2(assertTestNotPass_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_FAIL_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_FAIL,message)
-#define ASSERT_TEST_FAIL_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_FAIL)
-#define ASSERT_TEST_FAIL_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_FAIL_RECOMPOSER(argsWithParentheses) ASSERT_TEST_FAIL_FUNCTION argsWithParentheses
-#define ASSERT_TEST_FAIL_CHOOSE(...) ASSERT_TEST_FAIL_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_FAIL_2, ASSERT_TEST_FAIL_1, ))
-#define ASSERT_TEST_FAIL_NO_ARG_EXPANDER() ,,ASSERT_TEST_FAIL_0
-#define ASSERT_TEST_FAIL_MACRO_CHOOSER(...) ASSERT_TEST_FAIL_CHOOSE(ASSERT_TEST_FAIL_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestFail_2(name,message)        assertOp_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_FAIL,message)
+#define assertTestFail_1(name)                assertOp_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_FAIL)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTestFail(...) ASSERT_TEST_FAIL_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestFail(...) ArduinoUnitMacroChoose2(assertTestFail_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_NOT_FAIL_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_FAIL,message)
-#define ASSERT_TEST_NOT_FAIL_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_FAIL)
-#define ASSERT_TEST_NOT_FAIL_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_NOT_FAIL_RECOMPOSER(argsWithParentheses) ASSERT_TEST_NOT_FAIL_FUNCTION argsWithParentheses
-#define ASSERT_TEST_NOT_FAIL_CHOOSE(...) ASSERT_TEST_NOT_FAIL_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_NOT_FAIL_2, ASSERT_TEST_NOT_FAIL_1, ))
-#define ASSERT_TEST_NOT_FAIL_NO_ARG_EXPANDER() ,,ASSERT_TEST_NOT_FAIL_0
-#define ASSERT_TEST_NOT_FAIL_MACRO_CHOOSER(...) ASSERT_TEST_NOT_FAIL_CHOOSE(ASSERT_TEST_NOT_FAIL_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestNotFail_2(name,message)        assertOp_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_FAIL,message)
+#define assertTestNotFail_1(name)                assertOp_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_FAIL)
 /** macro generates optional output and calls fail() followed by a return if false. */
-#define assertTestNotFail(...) ASSERT_TEST_NOT_FAIL_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestNotFail(...) ArduinoUnitMacroChoose2(assertTestNotFail_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_SKIP_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_SKIP,message)
-#define ASSERT_TEST_SKIP_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_SKIP)
-#define ASSERT_TEST_SKIP_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_SKIP_RECOMPOSER(argsWithParentheses) ASSERT_TEST_SKIP_FUNCTION argsWithParentheses
-#define ASSERT_TEST_SKIP_CHOOSE(...) ASSERT_TEST_SKIP_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_SKIP_2, ASSERT_TEST_SKIP_1, ))
-#define ASSERT_TEST_SKIP_NO_ARG_EXPANDER() ,,ASSERT_TEST_SKIP_0
-#define ASSERT_TEST_SKIP_MACRO_CHOOSER(...) ASSERT_TEST_SKIP_CHOOSE(ASSERT_TEST_SKIP_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestSkip_2(name,message)        assertOp_5(test_##name##_instance.state,compareEqual,"==",Test::DONE_SKIP,message)
+#define assertTestSkip_1(name)                assertOp_4(test_##name##_instance.state,compareEqual,"==",Test::DONE_SKIP)
 /** macro generates optional output and calls skip() followed by a return if false. */
-#define assertTestSkip(...) ASSERT_TEST_SKIP_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestSkip(...) ArduinoUnitMacroChoose2(assertTestSkip_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define ASSERT_TEST_NOT_SKIP_2(name,message)        ASSERT_OP_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_SKIP,message)
-#define ASSERT_TEST_NOT_SKIP_1(name)                ASSERT_OP_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_SKIP)
-#define ASSERT_TEST_NOT_SKIP_FUNCTION(_f1, _f2, _f3, ...) _f3
-#define ASSERT_TEST_NOT_SKIP_RECOMPOSER(argsWithParentheses) ASSERT_TEST_NOT_SKIP_FUNCTION argsWithParentheses
-#define ASSERT_TEST_NOT_SKIP_CHOOSE(...) ASSERT_TEST_NOT_SKIP_RECOMPOSER((__VA_ARGS__, ASSERT_TEST_NOT_SKIP_2, ASSERT_TEST_NOT_SKIP_1, ))
-#define ASSERT_TEST_NOT_SKIP_NO_ARG_EXPANDER() ,,ASSERT_TEST_NOT_SKIP_0
-#define ASSERT_TEST_NOT_SKIP_MACRO_CHOOSER(...) ASSERT_TEST_NOT_SKIP_CHOOSE(ASSERT_TEST_NOT_SKIP_NO_ARG_EXPANDER __VA_ARGS__ ())
+#define assertTestNotSkip_2(name,message)        assertOp_5(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_SKIP,message)
+#define assertTestNotSkip_1(name)                assertOp_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_SKIP)
 /** macro generates optional output and calls skip() followed by a return if false. */
-#define assertTestNotSkip(...) ASSERT_TEST_NOT_SKIP_MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#define assertTestNotSkip(...) ArduinoUnitMacroChoose2(assertTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)

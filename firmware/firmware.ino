@@ -605,3 +605,19 @@ test(iss47)
   assertNotEqual(iss47F,iss47e);
   assertNotEqual(iss47F,iss47f);  
 }
+
+struct AdjustableConfig {
+  int getDoubleClickDelay() const { return 3; }
+};
+
+AdjustableConfig adjustableConfig;
+
+test(compileTestFail) {
+   assertEqual((uint16_t) 3, adjustableConfig.getDoubleClickDelay());
+}
+
+test(compileTestOk) {
+   uint16_t expect = 3;
+   assertEqual(expect, adjustableConfig.getDoubleClickDelay());
+   assertEqual(uint16_t(3), adjustableConfig.getDoubleClickDelay());   
+}

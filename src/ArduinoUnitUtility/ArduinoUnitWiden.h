@@ -16,10 +16,6 @@ template< typename T, int N > struct ArduinoUnitRemoveConstTemplate<const T[N]> 
 
 // these (safely) widen the types in assertions to reduce the number of specializations generated
 template< typename T > struct ArduinoUnitWiden { typedef T type; };
-template< > struct ArduinoUnitWiden < char > { typedef int type; };
-template< > struct ArduinoUnitWiden < unsigned char > { typedef unsigned int type; };
-template< > struct ArduinoUnitWiden < short > { typedef int type; };
-template< > struct ArduinoUnitWiden < unsigned short > { typedef unsigned int type; };
 template< > struct ArduinoUnitWiden < float > { typedef double type; };
 template< > struct ArduinoUnitWiden < __FlashStringHelper * > { typedef ArduinoUnitString type; };
 template< > struct ArduinoUnitWiden < String > { typedef ArduinoUnitString type; };

@@ -23,5 +23,271 @@ template< > struct ArduinoUnitWiden < char * > { typedef ArduinoUnitString type;
 template< > struct ArduinoUnitWiden < char [] > { typedef ArduinoUnitString type; };
 template<int N> struct ArduinoUnitWiden < char [N] > { typedef ArduinoUnitString type; };
 
+//
+// Welcome to the Arduino Unit trailer park...  This is the same idea
+// as Widen, but takes both argument types into account.
+//
+template <typename _A, typename _B> struct ArduinoUnitDoubleWide {
+  typedef _A A;
+  typedef _B B;
+};
+
+// signed types
+
+template < > struct ArduinoUnitDoubleWide < char , char > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < char , short > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < char , int > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < char , long > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < char , long long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < short , char > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < short , short > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < short , int > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < short , long > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < short , long long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < int , char > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < int , short > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < int , int > {
+  typedef int A;
+  typedef int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < int , long > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < int , long long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long , char > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long , short > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long , int > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long , long > {
+  typedef long A;
+  typedef long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long , long long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long long , char > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long long , short > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long long , int > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long long , long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < long long , long long > {
+  typedef long long A;
+  typedef long long B;
+};
+
+
+// unsigned types
+
+template < > struct ArduinoUnitDoubleWide < unsigned char , unsigned char > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned char , unsigned short > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned char , unsigned int > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned char , unsigned long > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned char , unsigned long long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned short , unsigned char > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned short , unsigned short > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned short , unsigned int > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned short , unsigned long > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned short , unsigned long long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned int , unsigned char > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned int , unsigned short > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned int , unsigned int > {
+  typedef unsigned int A;
+  typedef unsigned int B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned int , unsigned long > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned int , unsigned long long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long , unsigned char > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long , unsigned short > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long , unsigned int > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long , unsigned long > {
+  typedef unsigned long A;
+  typedef unsigned long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long , unsigned long long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned char > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned short > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned int > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
+template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned long long > {
+  typedef unsigned long long A;
+  typedef unsigned long long B;
+};
+
 #define ArduinoUnitType(T) ArduinoUnitWiden < ArduinoUnitRemoveConstTemplate < ArduinoUnitRemoveReferenceTemplate < T >::type >::type >::type
 #define ArduinoUnitArgType(X) ArduinoUnitType(__typeof__(X))
+
+#define ArduinoUnitArgTypes(X,Y) ArduinoUnitDoubleWide < ArduinoUnitArgType(X) , ArduinoUnitArgType(Y) >

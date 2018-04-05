@@ -566,7 +566,7 @@ is in another file (or defined after the assertion on it). */
 
 // helper define for the operators below
 #define assertOpMsg(arg1,op,op_name,arg2, message)                               \
-  do {  if (!Test::assertion< ArduinoUnitArgType(arg1) , ArduinoUnitArgType(arg2) > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
+  do {  if (!Test::assertion< ArduinoUnitArgTypes(arg1,arg1)::A , ArduinoUnitArgTypes(arg1,arg2)::B > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
 
 #define assertOp_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
 #define assertOp_4(a1,op,op_name,arg2) assertOpMsg(a1,op,op_name,arg2,&Test::noMessage)

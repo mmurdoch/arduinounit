@@ -621,3 +621,51 @@ test(compileTestOk) {
    assertEqual(expect, adjustableConfig.getDoubleClickDelay());
    assertEqual(uint16_t(3), adjustableConfig.getDoubleClickDelay());   
 }
+
+#if defined(__AVR__)
+test(case_2_intended_to_pass_but_fails_on_avr)
+{
+  verbosity |= TEST_VERBOSITY_ASSERTIONS_PASSED;
+
+  int8_t end = 1;
+  int8_t start = 2;
+  uint16_t limit = 30;
+
+  // Two's complement rollover was not intended to happen, but happens on AVR
+  // with 16-bit integers. This is human-error, and assertLess() does the
+  // correct thing by failing.
+  if (end - start < limit) {
+    Serial.println("The following assertLess() should pass on AVR");
+  } else {
+    Serial.println("The following assertLess() should fail on AVR");
+  }
+
+  assertLess(end - start, limit);
+}
+
+#elif defined(__arm__) || defined(ESP8266) || !defined(ARDUINO)
+
+test(case_2_intended_to_pass_and_should_pass_on_32_bit)
+{
+  verbosity |= TEST_VERBOSITY_ASSERTIONS_PASSED;
+
+  int8_t end = 1;
+  int8_t start = 2;
+  uint16_t limit = 30;
+
+  // Two's complement rollover was not intended and this code was intended to
+  // work on a 32-bit processor. Both arguments should be promoted to a 32-bit
+  // int, and the assertLess() should pass. But something is wrong with the
+  // assertLess() on a 32-bit processor because it actually fails.
+  if (end - start < limit) {
+    Serial.println("The following assertLess() should pass on 32-bit MCUs");
+  } else {
+    Serial.println("The following assertLess() should fail on 32-bit MCUs");
+  }
+
+  assertLess(end - start, limit);
+}
+#endif
+
+
+

@@ -128,3 +128,14 @@ int CppStreamPrint::availableForWrite() {
 }
 
 #endif
+
+MockPrint::MockPrint() {}
+MockPrint::MockPrint(const char *_initial) : String(_initial) {}
+MockPrint::MockPrint(const __FlashStringHelper *_initial) : String(_initial) {}
+MockPrint::MockPrint(const String &_initial) : String(_initial) {}
+MockPrint::~MockPrint() {}
+
+size_t MockPrint::write(uint8_t x) { concat((char) x); return 1; }
+size_t MockPrint::write(const uint8_t *buffer, size_t size) { concat(buffer,size); return size; }
+int MockPrint::availableForWrite() { return INT_MAX; }
+

@@ -289,3 +289,26 @@ void CppIOStream::begin(long baud) { (void) baud; }
 bool CppIOStream::operator!() const { return false; }
 
 #endif
+
+struct MockStreamInput : virtual MockStream {
+  MockStream &output;
+  MockStreamInput(MockStream &_output) : output(_output) { };
+  virtual size_t write(uint8_t x);
+  virtual size_t write(const uint8_t *buffer, size_t size);
+  virtual int availableForWrite();
+
+
+}
+
+struct MockStream : MockPrint, Stream {
+  String input;
+  MockStream(const char *_input) : input(_input) {}
+  MockStream(const __FlashStringHelper *_input) : input(_input) {}
+  MockStream(const String &_input) : input(_input) {}
+  
+  int Mockavailable();
+  int read();
+  int peek();
+  virtual void begin(long baud);
+  virtual bool operator!() const;
+};

@@ -88,3 +88,17 @@ struct CppStreamPrint : Print {
 
 
 #endif
+
+// MockPrint is both a String (arduino String object) and a Print (arduino Print object), so you can print() to it
+struct MockPrint : virtual Print, virtual String {
+  MockPrint();
+  MockPrint(const char *_initial);
+  MockPrint(const __FlashStringHelper *_initial);
+  MockPrint(const String &_initial);
+  virtual size_t write(uint8_t x);
+  virtual size_t write(const uint8_t *buffer, size_t size);
+  virtual int availableForWrite();
+  virtual ~MockPrint();
+};
+
+

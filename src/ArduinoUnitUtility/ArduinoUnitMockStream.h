@@ -69,3 +69,19 @@ struct CppIOStream : Stream {
 
 
 #endif
+
+// MockStream is like MockPrint, but also reads from input (which is a mockstream as well)
+
+struct MockStream : Stream, virtual MockPrint {
+  MockStream &input;
+  MockStream();
+  MockStream(const char *_input);
+  MockStream(const __FlashStringHelper *_input);
+  MockStream(const String &_input);
+  
+  virtual int available();
+  virtual int read();
+  virtual int peek();
+  virtual void begin(long baud);
+  virtual bool operator!() const;
+};

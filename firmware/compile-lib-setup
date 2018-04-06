@@ -24,7 +24,7 @@ do
     esac
 done
 
-if [ ${ARDUINO_TARGET_BOARD} = "" ] ; then
+if [ "${ARDUINO_TARGET_BOARD}" = "" ] ; then
    echo "board must be specified."
    exit 1
 fi

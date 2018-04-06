@@ -1,6 +1,7 @@
 #!/bin/bash
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
-${THIS_DIR}/compile-mock "$@" | egrep -C2 '(warning|error)'
-${THIS_DIR}/compile-uno "$@" | egrep -C2 '(warning|error)'
-${THIS_DIR}/compile-mega "$@" | egrep -C2 '(warning|error)'
-${THIS_DIR}/compile-esp8266 "$@" | egrep -C2 '(warning|error)'
+${THIS_DIR}/compile-mock "$@" |    awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
+${THIS_DIR}/compile-uno "$@" |     awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
+${THIS_DIR}/compile-mega "$@" |    awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
+${THIS_DIR}/compile-esp8266 "$@" | awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
+${THIS_DIR}/compile-esp32 "$@" |   awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'

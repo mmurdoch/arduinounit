@@ -1,0 +1,8 @@
+#!/bin/bash
+
+ARDUINO_TARGET_BOARD="espressif:esp32:esp32:FlashMode=qio,FlashFreq=80,FlashSize=4M,UploadSpeed=921600,DebugLevel=none -vid-pid=0X2A03_0X0042"
+
+THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+. $THIS_DIR/compile-lib-setup
+. $THIS_DIR/compile-lib-esp
+compile

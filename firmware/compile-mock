@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
 . $THIS_DIR/compile-lib-setup

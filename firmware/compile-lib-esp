@@ -7,7 +7,7 @@ ${ARDUINO_DIR}/arduino-builder -compile -logger=machine -hardware ${ARDUINO_DIR}
 
 ARDUINO_TARGET_BIN=${ARDUINO_TARGET_HEX%.hex}.bin
 if [ ! -f ${ARDUINO_TARGET_BIN} ] ; then
-   echo "compile time error"
+   echo "compile time error: esp."
    exit 1
 fi
 }

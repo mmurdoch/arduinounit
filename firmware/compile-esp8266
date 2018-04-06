@@ -4,7 +4,7 @@ ARDUINO_TARGET_BOARD="esp8266:esp8266:generic:CpuFrequency=80,ResetMethod=ck,Cry
 
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
 . $THIS_DIR/compile-lib-setup
-. $THIS_DIR/compile-lib-esp8266
+. $THIS_DIR/compile-lib-esp
 
 compile
 

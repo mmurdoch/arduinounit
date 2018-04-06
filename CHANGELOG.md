@@ -37,6 +37,9 @@
 * Add building outside of arduino environment
 * Significant reduction of code implementation and compiled size (Compare.h is now small)
 * Add minimal mock builds on dev (in vitro) platform
+* Add better mock builds.
+* Use type widening to reduce specializations.
+* Depricate FakeStream for MockStream and MockPrint
 
 
 

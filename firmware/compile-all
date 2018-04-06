@@ -2,6 +2,7 @@
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
 ${THIS_DIR}/compile-mock "$@" |    awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-uno "$@" |     awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
+${THIS_DIR}/compile-nano "$@" |     awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-mega "$@" |    awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-esp8266 "$@" | awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-esp32 "$@" |   awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'

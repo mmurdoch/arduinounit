@@ -40,3 +40,9 @@
 #    define ARDUINO_UNIT_USE_FLASH 0
 #  endif
 #endif
+
+#ifdef F
+#undef F
+#endif
+
+#define F(stringLiteral) ARDUINO_UNIT_STRING(stringLiteral)

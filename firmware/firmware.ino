@@ -28,7 +28,11 @@ void motd()
   Serial.println(F("  max_verbosity <binary number>"));
   Serial.println(F("  run"));
   Serial.println(F("Note:"));
+#if defined(__AVR__)
+  Serial.println(F("  Just 'run' will (correctly) have 2 tests fail and 1 skip."));
+#else
   Serial.println(F("  Just 'run' will (correctly) have 1 test fail and 1 skip."));
+#endif
   Serial.println(F("  Enable 'newline' in the serial monitor to send commands."));
 }
 
@@ -696,3 +700,6 @@ test(iss62_MockStream) {
   assertEqual(MockSerial.output,"read 'hello.' from input.\r\n");
 }
 
+test(iss62_flash) {
+  assertEqual("hello","hello");
+}

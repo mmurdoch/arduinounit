@@ -6,8 +6,6 @@
 
 #include "Flash.h"
 
-#define F(stringLiteral) ARDUINO_UNIT_STRING(stringLiteral)
-
 class __FlashStringHelper;
 
 class StringSumHelper;

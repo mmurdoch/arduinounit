@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ARDUINO_TARGET_BOARD=arduino:avr:mega:cpu=atmega2560
+
+THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+. $THIS_DIR/compile-lib-setup
+. $THIS_DIR/compile-lib-avr
+
+compile

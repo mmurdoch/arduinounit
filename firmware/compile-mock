@@ -1,0 +1,14 @@
+#!/bin/bash
+
+THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+ARDUINO_TARGET_BOARD=mock
+. $THIS_DIR/compile-lib-setup
+ARDUINO_UNIT_DIR="$(dirname "${THIS_DIR}")"
+mkdir -p ${TMP}/ArduinoUnit/src
+(cd ${THIS_DIR}/../src; tar cf - $(find -E . -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp|\.h|\.ino)$')) | tar -C ${TMP}/ArduinoUnit/src -xvf -
+
+ARDUINO_TARGET_EXE=${THIS_DIR}/$(basename ${ARDUINO_TARGET_HEX%.ino.hex})
+
+g++ -isystem ${TMP}/ArduinoUnit/src -std=gnu++11 -o ${ARDUINO_TARGET_EXE} $(find ${TMP}/src -name '*.cpp') $(find ${TMP}/ArduinoUnit/src -name '*.cpp') 2>&1 | sed -e "s|${TMP}/src/|${ARDUINO_TARGET_DIR}/|g" | sed -e "s|${TMP}/ArduinoUnit/src/|${ARDUINO_UNIT_DIR}/src/|g"
+
+

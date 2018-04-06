@@ -1,0 +1,10 @@
+#!/bin/bash
+
+ARDUINO_TARGET_BOARD="esp8266:esp8266:generic:CpuFrequency=80,ResetMethod=ck,CrystalFreq=26,FlashFreq=40,FlashMode=qio,FlashSize=512K0,led=2,LwIPVariant=v2mss536,Debug=Disabled,DebugLevel=None____,FlashErase=none,UploadSpeed=115200 -vid-pid=0X2A03_0X0042"
+
+THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+. $THIS_DIR/compile-lib-setup
+. $THIS_DIR/compile-lib-esp
+
+compile
+

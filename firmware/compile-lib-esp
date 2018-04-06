@@ -1,0 +1,13 @@
+#!/bin/bash
+
+compile() {
+${ARDUINO_DIR}/arduino-builder -dump-prefs -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_PACKAGES} -hardware ${ARDUINO_HARDWARE} -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -tools ${ARDUINO_PACKAGES} -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${ARDUINO_TARGET_BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.esptool.path=${ARDUINO_PACKAGES}/esp8266/tools/esptool/0.4.13 -prefs=runtime.tools.mkspiffs.path=${ARDUINO_PACKAGES}/esp8266/tools/mkspiffs/0.2.0 -prefs=runtime.tools.xtensa-lx106-elf-gcc.path=${ARDUINO_PACKAGES}/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2 -verbose  "${TMP}/src/$(basename ${ARDUINO_TARGET_INO})"  2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
+
+${ARDUINO_DIR}/arduino-builder -compile -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_PACKAGES} -hardware ${ARDUINO_HARDWARE} -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -tools ${ARDUINO_PACKAGES} -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${ARDUINO_TARGET_BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.esptool.path=${ARDUINO_PACKAGES}/esp8266/tools/esptool/0.4.13 -prefs=runtime.tools.mkspiffs.path=${ARDUINO_PACKAGES}/esp8266/tools/mkspiffs/0.2.0 -prefs=runtime.tools.xtensa-lx106-elf-gcc.path=${ARDUINO_PACKAGES}/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2 -verbose  "${TMP}/src/$(basename ${ARDUINO_TARGET_INO})"  2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
+
+ARDUINO_TARGET_BIN=${ARDUINO_TARGET_HEX%.hex}.bin
+if [ ! -f ${ARDUINO_TARGET_BIN} ] ; then
+   echo "compile time error: esp."
+   exit 1
+fi
+}

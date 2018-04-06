@@ -12,7 +12,6 @@
 #define PROGMEM
 #endif
 
-
 char line[80];
 bool configuring = true;
 unsigned long currentTime = 0;

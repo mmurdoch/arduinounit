@@ -1,0 +1,55 @@
+if [ "$(uname)" = "Darwin" ]
+then
+   ARDUINO_DIR=/Applications/Arduino.app/Contents/Java
+   ARDUINO_PACKAGES=$HOME/Library/Arduino15/packages
+   ARDUINO_LIBS=$HOME/Documents/Arduino/libraries
+   ARDUINO_HARDWARE=$HOME/Documents/Arduino/hardware
+   ARDUINO_TARGET_PORT=$(echo /dev/cu.usb*)
+   ARDUINO_TARGET_BAUD=115200
+   ARDUINO_UPLOAD=false
+else
+    echo "unsupported os."
+fi
+
+while [ $# -gt 0 ]
+do
+    case "$1"
+    in
+        --board=*)  ARDUINO_TARGET_BOARD=${1#--board=}; shift;;
+        --port=*)   ARDUINO_TARGET_PORT=${1#--port=}; shift;;
+        --baud=*)   ARDUINO_TARGET_BAUD=${1#--baud=}; shift;;
+        --upload=*) ARDUINO_TARGET_UPLOAD=${1#--upload=}; shift;;        
+        --) shift; break;;
+        *) break;;
+    esac
+done
+
+if [ "${ARDUINO_TARGET_BOARD}" = "" ] ; then
+   echo "board must be specified."
+   exit 1
+fi
+
+ARDUINO_TARGET_INO="$1"
+
+if [ ! -f "${ARDUINO_TARGET_INO}" ] ; then
+  echo "must specify ino file"
+  exit 1
+fi
+
+ARDUINO_TARGET_DIR=$(dirname "$1")
+if [ ! -d "${ARDUINO_TARGET_DIR}" ] ; then
+  echo "missing directory ${ARDUINO_TARGET_DIR}."
+  exit 1
+fi
+
+TMP=$(mktemp -d)
+trap "{ /bin/rm -rf ${TMP}; }" EXIT
+
+mkdir -p ${TMP}/build
+mkdir -p ${TMP}/cache
+mkdir -p ${TMP}/src
+
+(cd ${ARDUINO_TARGET_DIR}; tar cf - $(find -E . -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp|\.h|\.ino)$')) | tar -C ${TMP}/src -xvf -
+
+ARDUINO_TARGET_SRC="${TMP}/src/$(basename ${ARDUINO_TARGET_INO})"
+ARDUINO_TARGET_HEX="${TMP}/build/$(basename ${ARDUINO_TARGET_INO}).hex"

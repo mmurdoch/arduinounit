@@ -27,9 +27,9 @@ template<int N> struct ArduinoUnitWiden < char [N] > { typedef ArduinoUnitString
 // Welcome to the Arduino Unit trailer park...  This is the same idea
 // as Widen, but takes both argument types into account.
 //
-template <typename _A, typename _B> struct ArduinoUnitDoubleWide {
-  typedef _A A;
-  typedef _B B;
+template <typename TA, typename TB> struct ArduinoUnitDoubleWide {
+  typedef TA A;
+  typedef TB B;
 };
 
 // signed types

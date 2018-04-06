@@ -1,7 +1,6 @@
-#!/bin/bash -x
+#!/bin/bash
 
 ARDUINO_TARGET_BOARD=arduino:avr:uno:cpu=atmega328p
-ARDUINO_TARGET_BOARD=arduino:avr:uno
 
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
 . $THIS_DIR/compile-lib-setup

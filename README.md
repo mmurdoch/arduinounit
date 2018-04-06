@@ -133,6 +133,10 @@ Stream # public components only
 ```
 These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment, there are two additional objects, `CppStreamPrint` and `CppIOStream`, which wrap C++ `std::ostream` (and `std::istream` for `CppIOStream`).  This simplifies creating tests in the mocking environments.  Look at the advanced example and test firmware for guidance.
 
+# MockPrint and MockStream
+
+Serial is a kind of Stream (input and output), which is a kind of Print (output only).  Instead of always printing to the console (which makes things hard to test), you can instead read/write to a Stream& reference or write to a Print& reference, and then test them with MockStream and MockPrint.  See the mockstream example.  Basically MockStream has two MockPrint's, one for input and one for output.  A MockPrint is also a String which contains what has been printed to it.
+
 # Verbosity
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:

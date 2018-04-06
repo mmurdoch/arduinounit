@@ -1,0 +1,10 @@
+#!/bin/bash -x
+
+THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+. $THIS_DIR/compile-lib-setup
+(cd ${THIS_DIR}/../src; tar cf - $(find -E . -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp|\.h|\.ino)$')) | tar -C ${TMP}/src -xvf -
+
+ARDUINO_TARGET_EXE=${THIS_DIR}/$(basename ${ARDUINO_TARGET_HEX%.ino.hex})
+
+g++ -isystem ${TMP}/src -std=gnu++11 -o ${ARDUINO_TARGET_EXE} $(find -E ${TMP}/src -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp)$') | tar -C ${TMP}/src -xvf -
+

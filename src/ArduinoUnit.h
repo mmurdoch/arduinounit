@@ -5,8 +5,7 @@
   @file ArduinoUnit.h
 
 */
-#include "ArduinoUnitUtility/ArduinoUnitMockWString.h"
-#include "ArduinoUnitUtility/ArduinoUnitMockPrint.h"
+#include "ArduinoUnitMock.h"
 
 #include "ArduinoUnitUtility/Flash.h"
 #include "ArduinoUnitUtility/Compare.h"

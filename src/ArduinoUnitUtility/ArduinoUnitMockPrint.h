@@ -3,13 +3,14 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include "ArduinoUnitMockPrintable.h"
+#include "ArduinoUnitMockWString.h"
 
 #if defined(ARDUINO)
 #include <Print.h>
+#include <WString.h>
 #else
 #include <iostream>
-#include "ArduinoUnitMockPrintable.h"
-#include "ArduinoUnitMockWString.h"
 
 #ifdef DEC
 #undef DEC
@@ -89,7 +90,6 @@ struct CppStreamPrint : Print {
 
 #endif
 
-// MockPrint is both a String (arduino String object) and a Print (arduino Print object), so you can print() to it
 struct MockPrint : virtual Print, virtual String {
   MockPrint();
   MockPrint(const char *_initial);
@@ -101,4 +101,5 @@ struct MockPrint : virtual Print, virtual String {
   virtual ~MockPrint();
 };
 
-
+#include "ArduinoUnitWiden.h"
+template< > struct ArduinoUnitWiden < MockPrint > { typedef ArduinoUnitString type; };

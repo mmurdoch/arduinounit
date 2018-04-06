@@ -666,5 +666,33 @@ test(case_2_intended_to_pass_and_should_pass_on_32_bit)
 }
 #endif
 
+test(iss62_MockPrint) {
+  MockPrint mp("test");
+  assertEqual(mp,"test");  
+  mp.print('#');
+  mp.println(1);
+  assertEqual(mp,"test#1\r\n");
+}
 
+
+test(iss62_MockStream) {
+  MockStream MockSerial;
+
+  MockSerial.input.print("hello.");
+
+  MockSerial.begin(9600);
+  while (!MockSerial) {}
+
+
+  assertEqual(MockSerial.available(),strlen("hello."));
+  assertEqual(MockSerial.input,"hello.");
+  assertEqual(MockSerial.output,"");
+
+  String s = MockSerial.readString();
+  assertEqual(s,"hello.");
+  MockSerial.print("read '"); MockSerial.print(s); MockSerial.println("' from input.");
+
+  assertEqual(MockSerial.input,"");
+  assertEqual(MockSerial.output,"read 'hello.' from input.\r\n");
+}
 

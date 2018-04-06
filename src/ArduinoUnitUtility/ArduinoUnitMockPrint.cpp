@@ -1,16 +1,13 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
+#include <limits.h>
+#include "ArduinoUnitMockPrint.h"
 #if defined(ARDUINO)
 #include <Print.h>
 #else
 #include <iostream>
 #include <math.h>
-#include <limits.h>
-#include "ArduinoUnitMockPrintable.h"
-#include "ArduinoUnitMockWString.h"
-#include "ArduinoUnitMockPrint.h"
 
 #ifdef DEC
 #undef DEC
@@ -136,6 +133,5 @@ MockPrint::MockPrint(const String &_initial) : String(_initial) {}
 MockPrint::~MockPrint() {}
 
 size_t MockPrint::write(uint8_t x) { concat((char) x); return 1; }
-size_t MockPrint::write(const uint8_t *buffer, size_t size) { concat(buffer,size); return size; }
+size_t MockPrint::write(const uint8_t *buffer, size_t size) { concat((const char *)buffer,size); return size; }
 int MockPrint::availableForWrite() { return INT_MAX; }
-

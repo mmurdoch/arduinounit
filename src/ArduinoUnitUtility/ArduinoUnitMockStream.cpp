@@ -1,7 +1,7 @@
-#if !defined(ARDUINO)
-
 #include "ArduinoUnitMockTime.h"
 #include "ArduinoUnitMockStream.h"
+
+#if !defined(ARDUINO)
 
 Stream::Stream() : timeout(DEFAULT_TIMEOUT) {}
 
@@ -290,25 +290,26 @@ bool CppIOStream::operator!() const { return false; }
 
 #endif
 
-struct MockStreamInput : virtual MockStream {
-  MockStream &output;
-  MockStreamInput(MockStream &_output) : output(_output) { };
-  virtual size_t write(uint8_t x);
-  virtual size_t write(const uint8_t *buffer, size_t size);
-  virtual int availableForWrite();
 
+MockStream::MockStream() {}
+MockStream::MockStream(const char *_input) : input(_input) {}
+MockStream::MockStream(const __FlashStringHelper *_input) : input(_input) {}
+MockStream::MockStream(const String &_input) : input(_input) {}
 
+size_t MockStream::write(uint8_t x) { return output.write(x); }
+size_t MockStream::write(const uint8_t *buffer, size_t size) { return output.write(buffer,size); }
+int MockStream::availableForWrite() { return output.availableForWrite(); }
+int MockStream::available() { return input.length(); }
+int MockStream::read() {
+  int ans = peek();
+  if (input.length() > 0) { input.remove(0,1); }
+  return ans;
 }
 
-struct MockStream : MockPrint, Stream {
-  String input;
-  MockStream(const char *_input) : input(_input) {}
-  MockStream(const __FlashStringHelper *_input) : input(_input) {}
-  MockStream(const String &_input) : input(_input) {}
-  
-  int Mockavailable();
-  int read();
-  int peek();
-  virtual void begin(long baud);
-  virtual bool operator!() const;
-};
+int MockStream::peek() {
+  return input.length() > 0 ? input[0] : -1;
+}
+
+void MockStream::begin(long baud) { (void) baud; }
+bool MockStream::operator!() const { return false; }
+void MockStream::flush() { }

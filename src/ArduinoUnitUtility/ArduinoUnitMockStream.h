@@ -2,14 +2,14 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "ArduinoUnitMockWString.h"
+#include "ArduinoUnitMockPrint.h"
 
 #if defined(ARDUINO)
 #include <Stream.h>
 #else
 #include <string>
 #include <iostream>
-#include "ArduinoUnitMockWString.h"
-#include "ArduinoUnitMockPrint.h"
 
 enum LookaheadMode { SKIP_ALL, SKIP_NONE, SKIP_WHITESPACE  };
 
@@ -72,16 +72,22 @@ struct CppIOStream : Stream {
 
 // MockStream is like MockPrint, but also reads from input (which is a mockstream as well)
 
-struct MockStream : Stream, virtual MockPrint {
-  MockStream &input;
+struct MockStream : Stream {
+  MockPrint input;
+  MockPrint output;
+
   MockStream();
   MockStream(const char *_input);
   MockStream(const __FlashStringHelper *_input);
   MockStream(const String &_input);
   
+  virtual size_t write(uint8_t x);
+  virtual size_t write(const uint8_t *buffer, size_t size);
+  virtual int availableForWrite();
   virtual int available();
   virtual int read();
   virtual int peek();
   virtual void begin(long baud);
   virtual bool operator!() const;
+  virtual void flush();
 };

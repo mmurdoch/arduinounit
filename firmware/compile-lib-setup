@@ -29,7 +29,11 @@ if [ "${ARDUINO_TARGET_BOARD}" = "" ] ; then
    exit 1
 fi
 
-ARDUINO_TARGET_INO="$1"
+if [ $# -gt 0 ]; then
+   ARDUINO_TARGET_INO="$1"
+else
+   ARDUINO_TARGET_INO="$(echo *.ino)"
+fi
 
 if [ ! -f "${ARDUINO_TARGET_INO}" ] ; then
   echo "must specify ino file"

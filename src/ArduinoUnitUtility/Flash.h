@@ -41,8 +41,10 @@
 #  endif
 #endif
 
+class __FlashStringHelper;
 #ifdef F
 #undef F
 #endif
 
-#define F(stringLiteral) ARDUINO_UNIT_STRING(stringLiteral)
+//#define F(stringLiteral) (([]()->const __FlashStringHelper * { return (const __FlashStringHelper *) ARDUINO_UNIT_STRING(stringLiteral); })())
+#define F(stringLiteral) ((const __FlashStringHelper *) ARDUINO_UNIT_STRING(stringLiteral))

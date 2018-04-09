@@ -700,6 +700,13 @@ test(iss62_MockStream) {
   assertEqual(MockSerial.output,"read 'hello.' from input.\r\n");
 }
 
+const __FlashStringHelper *iss64_hello_F = F("hello");
 test(iss62_flash) {
-  assertEqual("hello","hello");
+  const __FlashStringHelper *fs = (([]()->const __FlashStringHelper * { return (const __FlashStringHelper *) ARDUINO_UNIT_STRING("test"); })());
+  Test::out->println(fs);
+        
+//  const __FlashStringHelper *helloF = F("hello");
+//  ArduinoUnitString helloAUS(helloF);
+//  assertEqual("hello",helloAUS);
+//  assertEqual("hello",helloF);  
 }

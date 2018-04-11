@@ -6,42 +6,6 @@ Unit test framework for arduino projects.
 ## Current Version 2.3.7-alpha
 [Download ArduinoUnit 2.3.7-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.7-alpha).
 
-ArduinoUnit 2.0 is a complete rewrite of ArduinoUnit based on the experience 
-of unit testing with the 1.x library over the last few years. It aims to be 
-easier to use for simple use cases whilst at the same time providing better 
-support for more complex unit testing needs (see below for details). As such 
-it is not fully compatible with 1.x unit test sketches, although it is relatively 
-easy to port these to 2.0 (see the 
-[porting guide](https://github.com/mmurdoch/arduinounit/blob/master/porting-guide.md)).
-
-If you don't want to take advantage of the great new features in 2.0 then the 
-latest release of the 1.x code line is still 
-[available for download](https://github.com/mmurdoch/arduinounit/tree/v1.7).
-
-## Why Version 2?
-
-ArduinoUnit 2 follows the spirit of ArduinoUnit 1.x with the following
-less-is-more features:
-
-1. No test suite setup is required.
-1. Custom reporting now uses the standard Arduino `Print` class.
-
-And the following more-is-more features:
-
-1. A wider variety of assertions and assertion argument types.
-1. A wildcard include() and exclude() mechanism for
-   selecting active tests.
-1. A per-test verbosity setting.
-1. Check-once tests (like ArduinoUnit), but also 
-   check-until-skip-pass-or-fail and class structured 
-   (TestOnce and Test) tests.
-1. The output destination and verbosity is quite flexible.
-1. Test names and assert strings are stored in flash (not RAM).
-   - Test names can optionally be stored in either RAM or flash.
-1. assertions about other tests.
-1. optional footnote message [Since 2.3.1]
-1. en vitro builds (unit tests on developer system instead of embedded system) [Since 2.3.3]
-
 ## Getting Started
 
 Install the library from the Arduino IDE.  From the menu, navigate:
@@ -95,10 +59,23 @@ Test bad failed.
 Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
-# Footnote Messages
 
-When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha,
-this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
+The following asserts are supported.  Footnotes are optional messages [see the Footnote section]
+
+| Assertion | Description |
+| --- | --- |
+| `assertEqual(a,b [,footnote])` | `a == b`? |
+| `assertNotEqual(a,b [,footnote])` | `a != b`? |
+| `assertLess(a,b [,footnote])` | `a < b`? |
+| `assertLessOrEqual(a,b [,footnote])` | `a <= b`? |
+| `assertMore(a,b [,footnote])` | `a > b`? |
+| `assertMoreOrEqual(a,b [,footnote])` | `a >= b`? |
+| `assertTrue(p [,footnote])` | `p`? |
+| `assertFalse(p [,footnote])` | `!p`? |
+
+## [Footnotes]
+
+When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha, this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
 ```
 test(cases)
 {
@@ -118,12 +95,79 @@ by chaining things you can print (like `Serial.print()`) between `<<` operators.
 
 The status of the test can be used (bool ok) when printing the message.  Under normal verbosity settings, ok will always be false, but more verbose settings can print assert messages even if they pass.
 
-# En Vitro Testing (Advanced)
+## Selecting tests
+
+In your setup() function, you can select which tests are going to be setup and looped.  The default is that all tests are included.
+
+`Test::exclude(const char *pattern)` removes all the tests that match the given *-pattern.
+
+`Test::include(const char *pattern)` includes all the tests that match the given *-pattern.
+
+Here are some examples:
+
+## Select examples:
+
+A single test `my_test`
+
+```
+void setup()
+{
+  Serial.begin(9600);
+  while(!Serial) {} // Portability for Leonardo/Micro
+  Test::exclude("*");
+  Test::include("my_test");
+}
+```
+
+All tests named dev_-something, but not the ones ending in _skip or _slow, or have the word eeprom in them:
+```
+void setup()
+{
+  Serial.begin(9600);
+  while(!Serial) {} // Portability for Leonardo/Micro
+  Test::exclude("*");
+  Test::include("dev_*");
+  Test::exclude("*_slow");
+  Test::exclude("*_skip");
+  Test::exclude("*eeprom*");
+}
+```
+
+# Output
+
+The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 
+
+```
+Test::out = &Serial;
+```
+
+But you can set to the address of any Print stream, for example, if you want the output to be on the `Serial3` device on the arduino mega, use
+
+```
+Test::out = &Serial3;
+```
+
+in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
+
+## Output (basics)
+
+Normal ArduinoUnit verbosity reports only failed assertions, the status (pass,skip,fail) of completed tests, and a summary.  All this output appears on the Serial stream.
+
+### Seeing more.
+
+It is often useful to see the results of assertions even when they pass. If you want to trace everything in this way, you can turn on all output with `Test::min_verbosity = TEST_VERBOSITY_ALL` in your setup.
+
+### Seeing less more.
+
+The previous choice is great until you are lost in an ocean of messages for tests you do not want to watch at the moment.  If you just want to see more for a particular test, you can use `verbosity = TEST_VERBOSITY_ALL` in a given test to see everything about that test.
+
+## En Vitro Testing (Advanced)
 
 ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
 
 Note ArduinoUnit has very limited mocking features; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.  In particular the only features provided (because of dependencies on these by ArduinoUnit) are:
 ```
+F()
 millis()
 micros()
 String
@@ -184,22 +228,6 @@ TEST_VERBOSITY_ALL                (0x3F)
 TEST_VERBOSITY_NONE               (0x00)
 ```
 
-# Output
-
-The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 
-
-```
-Test::out = &Serial;
-```
-
-But you can set to the address of any Print stream, for example, if you want the output to be on the `Serial3` device on the arduino mega, use
-
-```
-Test::out = &Serial3;
-```
-
-in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
-
 ## Built-in Assertions
 
 The following assertions are supported
@@ -249,9 +277,21 @@ assertions.
 
 All the assert macros expand to a test that creates an optional message, and, if false, calls fail() on the current test and returns.
 
-## Meta Assertions
+## Meta Assertions (Advanced)
 
 You can make assertions on the outcome of tests as well.  The following meta-assertions are supported:
+
+| Meta Assertion | Description |
+| --- | --- |
+| `assertTestDone(t)` | is test t done (skip, pass or fail)?|
+| `assertTestNotDone(t)` | is test t not done?|
+| `assertTestPass(t)` | is test t passed? |
+| `assertTestNotPass(t)` | is test t not passed (fail, skip, or not done)? |
+| `assertTestFail(t)` | is test t failed? |
+| `assertTestNotFail(t)` | is test t not failed (pass, skip, or not done)? |
+| `assertTestSkip(t)` | is test t skipped? |
+| `assertTestNotSkip(t)` | is test t not skipped (pass, fail, or not done)? |
+
 ```
 assertTestDone(test)
 assertTestNotDone(test)
@@ -357,44 +397,6 @@ MyTestOnce myTestOnce2("myTestOnce2");
 ```
 
 Note that `Test::run()` only calls the active unresolved tests.
-
-## Selecting tests
-
-In your setup() function, you can select which tests are going to be setup and looped.  The default is that all tests are included.
-
-`Test::exclude(const char *pattern)` removes all the tests that match the given *-pattern.
-
-`Test::include(const char *pattern)` includes all the tests that match the given *-pattern.
-
-Here are some examples:
-
-## Select examples:
-
-A single test `my_test`
-
-```
-void setup()
-{
-  Serial.begin(9600);
-  while(!Serial) {} // Portability for Leonardo/Micro
-  Test::exclude("*");
-  Test::include("my_test");
-}
-```
-
-All tests named dev_-something, but not the ones ending in _skip or _slow, or have the word eeprom in them:
-```
-void setup()
-{
-  Serial.begin(9600);
-  while(!Serial) {} // Portability for Leonardo/Micro
-  Test::exclude("*");
-  Test::include("dev_*");
-  Test::exclude("*_slow");
-  Test::exclude("*_skip");
-  Test::exclude("*eeprom*");
-}
-```
 
 ## FAQ
 

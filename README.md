@@ -60,7 +60,7 @@ Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
 
-The following asserts are supported.  Footnotes are optional messages [see the Footnote section]
+The following asserts are supported.  Footnotes are optional.
 
 | Assertion | Description |
 | --- | --- |
@@ -73,7 +73,7 @@ The following asserts are supported.  Footnotes are optional messages [see the F
 | `assertTrue(p [,footnote])` | `p`? |
 | `assertFalse(p [,footnote])` | `!p`? |
 
-## [Footnotes]
+## [,footnote]
 
 When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha, this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
 ```

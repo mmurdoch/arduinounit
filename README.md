@@ -177,7 +177,62 @@ These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment
 
 # MockPrint and MockStream
 
-Serial is a kind of Stream (input and output), which is a kind of Print (output only).  Instead of always printing to the console (which makes things hard to test), you can instead read/write to a Stream& reference or write to a Print& reference, and then test them with MockStream and MockPrint.  See the mockstream example.  Basically MockStream has two MockPrint's, one for input and one for output.  A MockPrint is also a String which contains what has been printed to it.
+`MockPrint` is provided by ArduinoUnit to mimic a real output device, like Serial, but is also a String which happens to contain the information printed to it.  This can be used to test output formatting, as in:
+```
+void format(Print &out, int value) {
+  out.print("decimal ");
+  out.print(value);
+  out.print(" is hex ");
+  out.println(value,HEX);
+}
+
+test(format) {
+  MockPrint mp;
+  format(mp,32); // test as mock
+  assertEquals(mp,"decimal 32 is hex 20\r\n");
+}
+
+void setup() {
+  Serial.begin();
+  while (!Serial) {}
+  format(Serial,100); // format to serial
+}
+
+void loop() {
+
+}
+```
+
+`MockStream` is provided by ArduinoUnit to mimic a real input/output device, like Serial.  It contains two `MockPrint` parts, `input` contains the input that will be read from the MockStream, and `output` which contains the output that was written.  This can be used to test input and output, as in:
+```
+void square(Stream &io) {
+  io.print("value? ");
+  int x = io.nextInt();
+  out.print(value);  
+  out.print("*");
+  out.print(value);
+  out.print("=");
+  out.println(x*x);
+}
+
+test(square) {
+  MockStream ms;
+  ms.input.print(10);
+  square(ms);
+  assertEquals(ms.output,"value? 10*10=100\r\n");
+}
+
+void setup() {
+  Serial.begin();
+  while (!Serial) {}
+  square(Serial); // format to serial
+}
+
+void loop() {
+
+}
+```
+The `mockstream` example shows a convenient way to switch between real and mock streams for testing.
 
 # Verbosity (Advanced)
 

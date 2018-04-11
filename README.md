@@ -70,8 +70,8 @@ The following asserts are supported.  Footnotes are optional.
 | `assertLessOrEqual(a,b [,footnote])` | `a <= b`? |
 | `assertMore(a,b [,footnote])` | `a > b`? |
 | `assertMoreOrEqual(a,b [,footnote])` | `a >= b`? |
-| `assertTrue(p [,footnote])` | `p`? |
-| `assertFalse(p [,footnote])` | `!p`? |
+| `assertTrue(p [,footnote])` | `assertEqual(p,true)` |
+| `assertFalse(p [,footnote])` | `assertEqual(p,false)`? |
 
 ## [,footnote]
 
@@ -149,13 +149,13 @@ Test::out = &Serial3;
 
 in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
 
-## Output (basics)
+## Verbosity (basics)
 
-Normal ArduinoUnit verbosity reports only failed assertions, the status (pass,skip,fail) of completed tests, and a summary.  All this output appears on the Serial stream.
+Normal ArduinoUnit verbosity reports only failed assertions, the status (pass,skip,fail) of completed tests, and a summary.
 
 ### Seeing more.
 
-It is often useful to see the results of assertions even when they pass. If you want to trace everything in this way, you can turn on all output with `Test::min_verbosity = TEST_VERBOSITY_ALL` in your setup.
+It is often useful to see the results of assertions [and footnotes] even when they pass. If you want to trace everything in this way, you can turn on all output with `Test::min_verbosity = TEST_VERBOSITY_ALL` in your setup.
 
 ### Seeing less more.
 
@@ -181,7 +181,7 @@ These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment
 
 Serial is a kind of Stream (input and output), which is a kind of Print (output only).  Instead of always printing to the console (which makes things hard to test), you can instead read/write to a Stream& reference or write to a Print& reference, and then test them with MockStream and MockPrint.  See the mockstream example.  Basically MockStream has two MockPrint's, one for input and one for output.  A MockPrint is also a String which contains what has been printed to it.
 
-# Verbosity
+# Verbosity (Advanced)
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:
 
@@ -228,7 +228,7 @@ TEST_VERBOSITY_ALL                (0x3F)
 TEST_VERBOSITY_NONE               (0x00)
 ```
 
-## Built-in Assertions
+## Built-in Assertions (details)
 
 The following assertions are supported
 
@@ -240,7 +240,7 @@ assertNotEqual(arg1,arg2)
 assertMoreOrEqual(arg1,arg2)
 assertMore(arg1,arg2)
 ```
-Anything that can be compared via a '<' comparison beween them can be used.
+Anything that can be compared via a '<' comparison between them can be used.
 
 All the string-like types (String, char *, char[] and flash string literals) can be used interchangeably in assertions, i.e.:
 ```
@@ -248,7 +248,8 @@ test(strings) {
    const char *cOk="ok";
    char aOk[3]; 
    String sOk(cOk);
-   const __FlashStringHelper *fOk = F("ok");
+   // two underbars (_) for a flash string literal...
+   const __FlashStringHelper *fOk = F("ok"); 
 
    strcpy(aOk,cOk);
 
@@ -257,13 +258,18 @@ test(strings) {
    assertEqual(sOk,fOk,F("String vs flash"));
    assertEqual(fOk,cOk,F("flash vs char*"));   
 }
-```   
+```
+
+### __FlashStringHelper ?
+Note that using a flash string literal directly (except the footnote) in an assert is not supported.  You must declare and use them separately as above.  The main reason for this is the F() macro expands to a large useless expression, which is then represented in flash as part of the assert message.  The alternate version keeps the assert message small and readable.
 
 There are addtionally some boolean assertions:
 ```
 assertTrue(arg)
 assertFalse(arg)
 ```
+These are shorthands for `assertEqual(arg,true)` and `assertEqual(arg,false)`.
+
 See the section below for assertions on tests.
 
 The output from these assertions is to print a string represenation of the
@@ -292,16 +298,6 @@ You can make assertions on the outcome of tests as well.  The following meta-ass
 | `assertTestSkip(t)` | is test t skipped? |
 | `assertTestNotSkip(t)` | is test t not skipped (pass, fail, or not done)? |
 
-```
-assertTestDone(test)
-assertTestNotDone(test)
-assertTestPass(test)
-assertTestNotPass(test)
-assertTestFail(test)
-assertTestNotFail(test)
-assertTestSkip(test)
-assertTestNotSkip(test)
-```
 These can be used in conjunction with the boolean check-only macros
 ```
 checkTestDone(test)

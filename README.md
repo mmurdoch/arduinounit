@@ -147,7 +147,7 @@ Test::out = &Serial3;
 
 in your `setup()`.  Note the library does not set the baud rate - you have to do that in your `setup()`.
 
-## Verbosity (basics)
+## Verbosity
 
 Normal ArduinoUnit verbosity reports only failed assertions, the status (pass,skip,fail) of completed tests, and a summary.
 
@@ -159,23 +159,7 @@ It is often useful to see the results of assertions [and footnotes] even when th
 
 The previous choice is great until you are lost in an ocean of messages for tests you do not want to watch at the moment.  Instead of globally setting `min_verbosity/max_verbosity` in your `setup()`, you can instead use `verbosity = TEST_VERBOSITY_ALL` in a given test to see everything about that test.
 
-## En Vitro Testing (Advanced)
-
-ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
-
-Note ArduinoUnit has very limited mocking features; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.  In particular the only features provided (because of dependencies on these by ArduinoUnit) are:
-```
-F()
-millis()
-micros()
-String
-Print
-Printable
-Stream # public components only
-```
-These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment, there are two additional objects, `CppStreamPrint` and `CppIOStream`, which wrap C++ `std::ostream` (and `std::istream` for `CppIOStream`).  This simplifies creating tests in the mocking environments.  Look at the advanced example and test firmware for guidance.
-
-# MockPrint and MockStream
+## MockPrint and MockStream (intermediate)
 
 `MockPrint` is provided by ArduinoUnit to mimic a real output device, like Serial, but is also a String which happens to contain the information printed to it.  This can be used to test output formatting, as in:
 ```
@@ -234,7 +218,23 @@ void loop() {
 ```
 The `mockstream` example shows a convenient way to switch between real and mock streams for testing.
 
-# Verbosity (Advanced)
+## En Vitro Testing (advanced)
+
+ArduinoUnit will compile in a standard C++ environment (LLVM or GCC) with -std=gnu++11.  The advanced example has a makefile and main.cpp to support this.
+
+Note ArduinoUnit has very limited mocking features; you will have to include the mocking features you need to simulate the embedded environment.  The main.cpp file in the advanced example illustrates minimal mocking.  In particular the only features provided (because of dependencies on these by ArduinoUnit) are:
+```
+F()
+millis()
+micros()
+String
+Print
+Printable
+Stream # public components only
+```
+These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment, there are two additional objects, `CppStreamPrint` and `CppIOStream`, which wrap C++ `std::ostream` (and `std::istream` for `CppIOStream`).  This simplifies creating tests in the mocking environments.  Look at the advanced example and test firmware for guidance.
+
+# Verbosity (advanced)
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:
 
@@ -390,7 +390,7 @@ testing(too_slow)
 Since the ordering tests cannot be controlled, only use test-asserts
 in a testing() environment.
 
-## `Test` and `TestOnce`
+## `Test` and `TestOnce` (advanced)
 You can create your own modular tests by deriving from these classes.
 
 ```

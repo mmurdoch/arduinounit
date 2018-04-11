@@ -207,7 +207,7 @@ void loop() {
 ```
 void square(Stream &io) {
   io.print("value? ");
-  int x = io.nextInt();
+  int x = io.parseInt();
   out.print(value);  
   out.print("*");
   out.print(value);

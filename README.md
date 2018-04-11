@@ -67,8 +67,8 @@ The following asserts are supported.  Footnotes are optional.
 | `assertLessOrEqual(a,b [,footnote])` | `a <= b`? |
 | `assertMore(a,b [,footnote])` | `a > b`? |
 | `assertMoreOrEqual(a,b [,footnote])` | `a >= b`? |
-| `assertTrue(p [,footnote])` | `assertEqual(p,true)` |
-| `assertFalse(p [,footnote])` | `assertEqual(p,false)`? |
+| `assertTrue(p [,footnote])` | same as `assertEqual(p,true)` |
+| `assertFalse(p [,footnote])` | same as `assertEqual(p,false)` |
 
 ## [,footnote]
 

@@ -1,7 +1,7 @@
 ArduinoUnit
 ===========
 
-Unit test framework for arduino projects.
+Unit testing framework for arduino projects. Supports Arduino, ESP8266 and ESP32 as well as "en vitro" development system (vs embedded target) testing.
 
 ## Current Version 2.3.7-alpha
 [Download ArduinoUnit 2.3.7-alpha](https://github.com/mmurdoch/arduinounit/releases/tag/v2.3.7-alpha).

@@ -637,6 +637,7 @@ test(case_2_intended_to_pass_but_fails_on_avr)
   // Two's complement rollover was not intended to happen, but happens on AVR
   // with 16-bit integers. This is human-error, and assertLess() does the
   // correct thing by failing.
+  
   if (end - start < limit) {
     Serial.println("The following assertLess() should pass on AVR");
   } else {
@@ -698,15 +699,4 @@ test(iss62_MockStream) {
 
   assertEqual(MockSerial.input,"");
   assertEqual(MockSerial.output,"read 'hello.' from input.\r\n");
-}
-
-const __FlashStringHelper *iss64_hello_F = F("hello");
-test(iss62_flash) {
-  const __FlashStringHelper *fs = (([]()->const __FlashStringHelper * { return (const __FlashStringHelper *) ARDUINO_UNIT_STRING("test"); })());
-  Test::out->println(fs);
-        
-//  const __FlashStringHelper *helloF = F("hello");
-//  ArduinoUnitString helloAUS(helloF);
-//  assertEqual("hello",helloAUS);
-//  assertEqual("hello",helloF);  
 }

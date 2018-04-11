@@ -217,16 +217,17 @@ Anything that can be compared via a '<' comparison beween them can be used.
 All the string-like types (String, char *, char[] and flash string literals) can be used interchangeably in assertions, i.e.:
 ```
 test(strings) {
-   const char *cok="ok";
-   char aok[3];
-   String sok(cok);
+   const char *cOk="ok";
+   char aOk[3]; 
+   String sOk(cOk);
+   const __FlashStringHelper *fOk = F("ok");
 
-   strcpy(aok,cok);
-   
-   assertEqual(cok,aok);
-   assertEqual(aok,sok);
-   assertEqual(sok,F("ok"));
-   // etc.
+   strcpy(aOk,cOk);
+
+   assertEqual(cOk,aOk,F("char* vs char[]"));
+   assertEqual(aOk,sOk,F("char[] vs String"));
+   assertEqual(sOk,fOk,F("String vs flash"));
+   assertEqual(fOk,cOk,F("flash vs char*"));   
 }
 ```   
 

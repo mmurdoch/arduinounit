@@ -700,3 +700,19 @@ test(iss62_MockStream) {
   assertEqual(MockSerial.input,"");
   assertEqual(MockSerial.output,"read 'hello.' from input.\r\n");
 }
+
+test(strings) {
+   verbosity |= TEST_VERBOSITY_ASSERTIONS_ALL;
+   const char *cOk="ok";
+   char aOk[3]; 
+   String sOk(cOk);
+   const __FlashStringHelper *fOk = F("ok");
+
+   strcpy(aOk,cOk);
+
+   assertEqual(cOk,aOk,F("char* vs char[]"));
+   assertEqual(aOk,sOk,F("char[] vs String"));
+   assertEqual(sOk,fOk,F("String vs flash"));
+   assertEqual(fOk,cOk,F("flash vs char*"));   
+}
+

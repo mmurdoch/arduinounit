@@ -57,7 +57,7 @@ Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
 
-The following asserts are supported.  Footnotes are optional.
+The following asserts are supported [with an optional footnote]
 
 | Assertion | Description |
 | --- | --- |
@@ -70,9 +70,10 @@ The following asserts are supported.  Footnotes are optional.
 | `assertTrue(p [,footnote])` | same as `assertEqual(p,true)` |
 | `assertFalse(p [,footnote])` | same as `assertEqual(p,false)` |
 
+
 ## [,footnote]
 
-When things go wrong, it is sometimes useful to print additional information.  As of 2.3.2-alpha, this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
+When things go wrong, it can be useful to print additional information.  As of 2.3.2-alpha, this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
 ```
 test(cases)
 {
@@ -156,7 +157,7 @@ It is often useful to see the results of assertions [and footnotes] even when th
 
 ### Seeing less more.
 
-The previous choice is great until you are lost in an ocean of messages for tests you do not want to watch at the moment.  If you just want to see more for a particular test, you can use `verbosity = TEST_VERBOSITY_ALL` in a given test to see everything about that test.
+The previous choice is great until you are lost in an ocean of messages for tests you do not want to watch at the moment.  Instead of globally setting `min_verbosity/max_verbosity` in your `setup()`, you can instead use `verbosity = TEST_VERBOSITY_ALL` in a given test to see everything about that test.
 
 ## En Vitro Testing (Advanced)
 

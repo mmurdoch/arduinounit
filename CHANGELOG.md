@@ -40,6 +40,5 @@
 * Add better mock builds.
 * Use type widening to reduce specializations.
 * Depricate FakeStream for MockStream and MockPrint
-
-
-
+* Resolve a<b equivalence regresion (issue 77)
+* Resolve builds for ESP8266/ESP32

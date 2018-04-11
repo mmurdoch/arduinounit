@@ -334,7 +334,7 @@ testing(too_slow)
 Since the ordering tests cannot be controlled, only use test-asserts
 in a testing() environment.
 
-# `Test` and `TestOnce`
+## `Test` and `TestOnce`
 You can create your own modular tests by deriving from these classes.
 
 ```

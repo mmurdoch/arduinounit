@@ -436,5 +436,5 @@ A. Here is a troubleshooting guideline:
  * Make sure verbosity is adequate.  You can generate all possible output by
    * Assuring that TEST_MAX_VERBOSITY in ArduinoUnit.h is TEST_VERBOSITY_ALL (the default).
    * Assuring that Test::max_verbosity is TEST_VERBOSITY_ALL (the default).
-   * Setting Test::min_verbosity = TEST_VERBOSITY_ALL (the default is TEST_VERSOBITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED, generating output only for failed assertions, completions of tests, and an overall summary).
+   * Setting Test::min_verbosity = TEST_VERBOSITY_ALL (the default is TEST_VERBOSITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED, generating output only for failed assertions, completions of tests, and an overall summary).
    * With these settings, the per-test verbosity has no effect.

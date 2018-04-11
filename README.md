@@ -199,7 +199,7 @@ void setup() {
 }
 
 void loop() {
-
+  Test::run();
 }
 ```
 
@@ -229,7 +229,7 @@ void setup() {
 }
 
 void loop() {
-
+  Test::run();
 }
 ```
 The `mockstream` example shows a convenient way to switch between real and mock streams for testing.

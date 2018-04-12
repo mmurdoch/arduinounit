@@ -716,3 +716,34 @@ test(strings) {
    assertEqual(fOk,cOk,F("flash vs char*"));   
 }
 
+void pr65(const char *state) {
+     if (strcmp(state,"pass") == 0) Test::current->pass();
+     if (strcmp(state,"fail") == 0) Test::current->fail();
+}
+
+test(pr65message) {
+   verbosity |= TEST_VERBOSITY_ASSERTIONS_PASSED;
+   assertCurrentTestNotDone();
+   assertCurrentTestNotDone("not done");   
+}
+
+test(pr65fail) {
+   pr65("other");
+   assertCurrentTestNotDone();
+   assertTrue(checkCurrentTestNotDone());
+   pr65("fail");
+   assertTrue(checkCurrentTestFail());
+   assertCurrentTestFail();
+   pass(); // revert to pass
+}
+
+test(pr65pass) {
+   pr65("other");
+   assertCurrentTestNotDone();
+   assertTrue(checkCurrentTestNotDone());   
+   pr65("pass");
+   assertTrue(checkCurrentTestPass());
+   assertCurrentTestPass();
+}
+
+

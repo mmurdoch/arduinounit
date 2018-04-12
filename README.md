@@ -342,14 +342,14 @@ You can make assertions on the outcome of tests as well.  The following meta-ass
 
 | Meta Assertion | Description |
 | --- | --- |
-| `assertTestDone(t)` | is test t done (skip, pass or fail)?|
-| `assertTestNotDone(t)` | is test t not done?|
-| `assertTestPass(t)` | is test t passed? |
-| `assertTestNotPass(t)` | is test t not passed (fail, skip, or not done)? |
-| `assertTestFail(t)` | is test t failed? |
-| `assertTestNotFail(t)` | is test t not failed (pass, skip, or not done)? |
-| `assertTestSkip(t)` | is test t skipped? |
-| `assertTestNotSkip(t)` | is test t not skipped (pass, fail, or not done)? |
+| `assertTestDone(test [,footnote])` or `assertCurrentTestDone([footnote])`| test done (skip, pass or fail)?|
+| `assertTestNotDone(test [,footnote])` or `assertCurrentTestNotDone([footnote])` | test not done?|
+| `assertTestPass(test [,footnote])` or `assertCurrentTestPass([footnote])` | test passed? |
+| `assertTestNotPass(test [,footnote])` or `assertCurrentTestNotPass([footnote])` | test not passed (fail, skip, or not done)? |
+| `assertTestFail(test [,footnote])` or `assertCurrentTestFail([footnote])` | test failed? |
+| `assertTestNotFail(test [,footnote])` or `assertCurrentTestNotFail([footnote])` | test not failed (pass, skip, or not done)? |
+| `assertTestSkip(test [,footnote])` or `assertCurrentTestSkip([footnote])` | test skipped? |
+| `assertTestNotSkip(test [,footnote])` or `assertCurrentTestNotSkip([footnote])` | test not skipped (pass, fail, or not done)? |
 
 These can be used in conjunction with the boolean check-only macros
 ```
@@ -433,8 +433,7 @@ public:
   void once() {
   // same as MyTest::loop(), but will only be called once from loop()
   // if included in the active tests and was not resolved in setup().
-  }
-  
+  }  
 }
 
 // create instances of the custom test 

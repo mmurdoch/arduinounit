@@ -678,3 +678,66 @@ is in another file (or defined after the assertion on it). */
 #define assertTestNotSkip_1(name)                assertOp_4(test_##name##_instance.state,compareNotEqual,"!=",Test::DONE_SKIP)
 /** macro generates optional output and calls skip() followed by a return if false. */
 #define assertTestNotSkip(...) ArduinoUnitMacroChoose2(assertTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define checkCurrentTestDone() (Test::current->state >= Test::DONE_SKIP)
+
+/** check condition only */
+#define checkCurrentTestNotDone() (Test::current->state < Test::DONE_SKIP)
+
+/** check condition only */
+#define checkCurrentTestPass() (Test::current->state == Test::DONE_PASS)
+
+/** check condition only */
+#define checkCurrentTestNotPass() (Test::current->state != Test::DONE_PASS)
+
+/** check condition only */
+#define checkCurrentTestFail() (Test::current->state == Test::DONE_FAIL)
+
+/** check condition only */
+#define checkCurrentTestNotFail() (Test::current->state != Test::DONE_FAIL)
+
+/** check condition only */
+#define checkCurrentTestSkip() (Test::current->state == Test::DONE_SKIP)
+
+/** check condition only */
+#define checkCurrentTestNotSkip() (Test::current->state != Test::DONE_SKIP)
+
+#define assertCurrentTestDone_1(message)        assertOp_5(Test::current->state,compareMoreOrEqual,">=",Test::DONE_SKIP,message)
+#define assertCurrentTestDone_0()                assertOp_4(Test::current->state,compareMoreOrEqual,">=",Test::DONE_SKIP)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertCurrentTestDone(...) ArduinoUnitMacroChoose1(assertCurrentTestDone_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestNotDone_1(message)        assertOp_5(Test::current->state,compareLess,"<",Test::DONE_SKIP,message)
+#define assertCurrentTestNotDone_0()                assertOp_4(Test::current->state,compareLess,"<",Test::DONE_SKIP)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertCurrentTestNotDone(...) ArduinoUnitMacroChoose1(assertCurrentTestNotDone_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestPass_1(message)        assertOp_5(Test::current->state,compareEqual,"==",Test::DONE_PASS,message)
+#define assertCurrentTestPass_0()                assertOp_4(Test::current->state,compareEqual,"==",Test::DONE_PASS)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertCurrentTestPass(...) ArduinoUnitMacroChoose1(assertCurrentTestPass_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestNotPass_1(message)        assertOp_5(Test::current->state,compareNotEqual,"!=",Test::DONE_PASS,message)
+#define assertCurrentTestNotPass_0()                assertOp_4(Test::current->state,compareNotEqual,"!=",Test::DONE_PASS)
+/** macro generates optional output and calls pass() followed by a return if false. */
+#define assertCurrentTestNotPass(...) ArduinoUnitMacroChoose1(assertCurrentTestNotPass_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestFail_1(message)        assertOp_5(Test::current->state,compareEqual,"==",Test::DONE_FAIL,message)
+#define assertCurrentTestFail_0()                assertOp_4(Test::current->state,compareEqual,"==",Test::DONE_FAIL)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertCurrentTestFail(...) ArduinoUnitMacroChoose1(assertCurrentTestFail_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestNotFail_1(message)        assertOp_5(Test::current->state,compareNotEqual,"!=",Test::DONE_FAIL,message)
+#define assertCurrentTestNotFail_0()                assertOp_4(Test::current->state,compareNotEqual,"!=",Test::DONE_FAIL)
+/** macro generates optional output and calls fail() followed by a return if false. */
+#define assertCurrentTestNotFail(...) ArduinoUnitMacroChoose1(assertCurrentTestNotFail_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestSkip_1(message)        assertOp_5(Test::current->state,compareEqual,"==",Test::DONE_SKIP,message)
+#define assertCurrentTestSkip_0()                assertOp_4(Test::current->state,compareEqual,"==",Test::DONE_SKIP)
+/** macro generates optional output and calls skip() followed by a return if false. */
+#define assertCurrentTestSkip(...) ArduinoUnitMacroChoose1(assertCurrentTestSkip_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCurrentTestNotSkip_1(message)        assertOp_5(Test::current->state,compareNotEqual,"!=",Test::DONE_SKIP,message)
+#define assertCurrentTestNotSkip_0()                assertOp_4(Test::current->state,compareNotEqual,"!=",Test::DONE_SKIP)
+/** macro generates optional output and calls skip() followed by a return if false. */
+#define assertCurrentTestNotSkip(...) ArduinoUnitMacroChoose1(assertCurrentTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)

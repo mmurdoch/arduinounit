@@ -42,3 +42,5 @@
 * Depricate FakeStream for MockStream and MockPrint
 * Resolve a<b equivalence regresion (issue 77)
 * Resolve builds for ESP8266/ESP32
+* Prefer decltype over __typeof__
+

@@ -288,6 +288,11 @@ template < > struct ArduinoUnitDoubleWide < unsigned long long , unsigned long l
 };
 
 #define ArduinoUnitType(T) ArduinoUnitWiden < ArduinoUnitRemoveConstTemplate < ArduinoUnitRemoveReferenceTemplate < T >::type >::type >::type
-#define ArduinoUnitArgType(X) ArduinoUnitType(__typeof__(X))
+
+#if __cplusplus < 201103L
+#  define ArduinoUnitArgType(X) ArduinoUnitType(__typeof__(X))
+#else
+#  define ArduinoUnitArgType(X) ArduinoUnitType(decltype(X))
+#endif
 
 #define ArduinoUnitArgTypes(X,Y) ArduinoUnitDoubleWide < ArduinoUnitArgType(X) , ArduinoUnitArgType(Y) >

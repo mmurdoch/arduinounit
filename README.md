@@ -342,26 +342,38 @@ You can make assertions on the outcome of tests as well.  The following meta-ass
 
 | Meta Assertion | Description |
 | --- | --- |
-| `assertTestDone(test [,footnote])` or `assertCurrentTestDone([footnote])`| test done (skip, pass or fail)?|
-| `assertTestNotDone(test [,footnote])` or `assertCurrentTestNotDone([footnote])` | test not done?|
-| `assertTestPass(test [,footnote])` or `assertCurrentTestPass([footnote])` | test passed? |
-| `assertTestNotPass(test [,footnote])` or `assertCurrentTestNotPass([footnote])` | test not passed (fail, skip, or not done)? |
-| `assertTestFail(test [,footnote])` or `assertCurrentTestFail([footnote])` | test failed? |
-| `assertTestNotFail(test [,footnote])` or `assertCurrentTestNotFail([footnote])` | test not failed (pass, skip, or not done)? |
-| `assertTestSkip(test [,footnote])` or `assertCurrentTestSkip([footnote])` | test skipped? |
-| `assertTestNotSkip(test [,footnote])` or `assertCurrentTestNotSkip([footnote])` | test not skipped (pass, fail, or not done)? |
+| `assertTestDone(test [,footnote])` | test done (skip, pass or fail)?|
+| `assertTestNotDone(test [,footnote])` | test not done?|
+| `assertTestPass(test [,footnote])` | test passed? |
+| `assertTestNotPass(test [,footnote])` | test not passed (fail, skip, or not done)? |
+| `assertTestFail(test [,footnote])` | test failed? |
+| `assertTestNotFail(test [,footnote])` | test not failed (pass, skip, or not done)? |
+| `assertTestSkip(test [,footnote])` | test skipped? |
+| `assertTestNotSkip(test [,footnote])` | test not skipped (pass, fail, or not done)? |
+
+| Meta Assertion | Description |
+| --- | --- |
+| `assertCurrentTestDone([footnote])`| current test done (skip, pass or fail)?|
+| `assertCurrentTestNotDone([footnote])` | current test not done?|
+| `assertCurrentTestPass([footnote])` | current test passed? |
+| `assertCurrentTestNotPass([footnote])` | current test not passed (fail, skip, or not done)? |
+| `assertCurrentTestFail([footnote])` | current test failed? |
+| `assertCurrentTestNotFail([footnote])` | current test not failed (pass, skip, or not done)? |
+| `assertCurrentTestSkip([footnote])` | current test skipped? |
+| `assertCurrentTestNotSkip([footnote])` | current test not skipped (pass, fail, or not done)? |
 
 These can be used in conjunction with the boolean check-only macros
 ```
-checkTestDone(test)
-checkTestNotDone(test)
-checkTestPass(test)
-checkTestNotPass(test)
-checkTestFail(test)
-checkTestNotFail(test)
-checkTestSkip(test)
-checkTestNotSkip(test)
+checkTestDone(test) / checkCurrentTestDone()
+checkTestNotDone(test) / checkCurrentTestNotDone()
+checkTestPass(test) / checkCurrentTestPass()
+checkTestNotPass(test) / checkCurrentTestNotPass()
+checkTestFail(test) / checkCurrentTestFail()
+checkTestNotFail(test) / checkCurrentTestNotFail()
+checkTestSkip(test) / checkCurrentTestSkip()
+checkTestNotSkip(test) / checkCurrentTestNotSkip()
 ```
+
 These behave like the other asserts, but they work only in the context
 of other tests.  The most likely place you would have such a test would
 be in a testing meta-test as so:

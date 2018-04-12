@@ -1,0 +1,266 @@
+===info ||| Progress {0} ||| [0.00]
+===info ||| Progress {0} ||| [33.33]
+===info ||| Using board '{0}' from platform in folder: {1} ||| [mega %2FApplications%2FArduino.app%2FContents%2FJava%2Fhardware%2Farduino%2Favr]
+===info ||| Using core '{0}' from platform in folder: {1} ||| [arduino %2FApplications%2FArduino.app%2FContents%2FJava%2Fhardware%2Farduino%2Favr]
+===info ||| Progress {0} ||| [66.67]
+_id=mega
+archive_file_path={build.path}/{archive_file}
+bootloader.extended_fuses=0xFD
+bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+bootloader.high_fuses=0xD8
+bootloader.lock_bits=0x0F
+bootloader.low_fuses=0xFF
+bootloader.tool=avrdude
+bootloader.unlock_bits=0x3F
+build.arch=AVR
+build.board=AVR_MEGA2560
+build.core=arduino
+build.core.path=/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino
+build.extra_flags=
+build.f_cpu=16000000L
+build.fqbn=arduino:avr:mega:cpu=atmega2560
+build.mcu=atmega2560
+build.path=/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build
+build.project_name=va_args.ino
+build.source.path=/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/src
+build.system.path=/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/system
+build.usb_flags=-DUSB_VID={build.vid} -DUSB_PID={build.pid} '-DUSB_MANUFACTURER={build.usb_manufacturer}' '-DUSB_PRODUCT={build.usb_product}'
+build.usb_manufacturer="Unknown"
+build.variant=mega
+build.variant.path=/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega
+build.warn_data_percentage=75
+compiler.S.extra_flags=
+compiler.S.flags=-c -g -x assembler-with-cpp -flto -MMD
+compiler.ar.cmd=avr-gcc-ar
+compiler.ar.extra_flags=
+compiler.ar.flags=rcs
+compiler.c.cmd=avr-gcc
+compiler.c.elf.cmd=avr-gcc
+compiler.c.elf.extra_flags=
+compiler.c.elf.flags={compiler.warning_flags} -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections
+compiler.c.extra_flags=
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects
+compiler.cpp.cmd=avr-g++
+compiler.cpp.extra_flags=
+compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto
+compiler.elf2hex.cmd=avr-objcopy
+compiler.elf2hex.extra_flags=
+compiler.elf2hex.flags=-O ihex -R .eeprom
+compiler.ldflags=
+compiler.objcopy.cmd=avr-objcopy
+compiler.objcopy.eep.extra_flags=
+compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
+compiler.path={runtime.tools.avr-gcc.path}/bin/
+compiler.size.cmd=avr-size
+compiler.warning_flags=-w
+compiler.warning_flags.all=-Wall -Wextra
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.none=-w
+extra.time.dst=3600
+extra.time.local=1523547991
+extra.time.utc=1523569591
+extra.time.zone=-25200
+ide_version=10802
+menu.cpu.atmega1280=ATmega1280
+menu.cpu.atmega1280.bootloader.extended_fuses=0xF5
+menu.cpu.atmega1280.bootloader.file=atmega/ATmegaBOOT_168_atmega1280.hex
+menu.cpu.atmega1280.bootloader.high_fuses=0xDA
+menu.cpu.atmega1280.build.board=AVR_MEGA
+menu.cpu.atmega1280.build.mcu=atmega1280
+menu.cpu.atmega1280.upload.maximum_size=126976
+menu.cpu.atmega1280.upload.protocol=arduino
+menu.cpu.atmega1280.upload.speed=57600
+menu.cpu.atmega2560=ATmega2560 (Mega 2560)
+menu.cpu.atmega2560.bootloader.extended_fuses=0xFD
+menu.cpu.atmega2560.bootloader.file=stk500v2/stk500boot_v2_mega2560.hex
+menu.cpu.atmega2560.bootloader.high_fuses=0xD8
+menu.cpu.atmega2560.build.board=AVR_MEGA2560
+menu.cpu.atmega2560.build.mcu=atmega2560
+menu.cpu.atmega2560.upload.maximum_size=253952
+menu.cpu.atmega2560.upload.protocol=wiring
+menu.cpu.atmega2560.upload.speed=115200
+name=Arduino/Genuino Mega or Mega 2560
+pid.0=0x0010
+pid.1=0x0042
+pid.2=0x0010
+pid.3=0x0042
+pid.4=0x0210
+pid.5=0x0242
+preproc.includes.flags=-w -x c++ -M -MG -MP
+preproc.macros.flags=-w -x c++ -E -CC
+recipe.S.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.S.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.c.elf.flags} -mmcu={build.mcu} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" {object_files} "{build.path}/{archive_file}" "-L{build.path}" -lm
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{object_file}"
+recipe.objcopy.eep.pattern="{compiler.path}{compiler.objcopy.cmd}" {compiler.objcopy.eep.flags} {compiler.objcopy.eep.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.eep"
+recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.hex"
+recipe.output.save_file={build.project_name}.{build.variant}.hex
+recipe.output.tmp_file={build.project_name}.hex
+recipe.preproc.includes="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.includes.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}"
+recipe.preproc.macros="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} {preproc.macros.flags} -mmcu={build.mcu} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {includes} "{source_file}" -o "{preprocessed_file_path}"
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
+recipe.size.regex=^(?:\.text|\.data|\.bootloader)\s+([0-9]+).*
+recipe.size.regex.data=^(?:\.data|\.bss|\.noinit)\s+([0-9]+).*
+recipe.size.regex.eeprom=^(?:\.eeprom)\s+([0-9]+).*
+runtime.hardware.path=/Applications/Arduino.app/Contents/Java/hardware/arduino
+runtime.ide.version=10802
+runtime.os=macosx
+runtime.platform.path=/Applications/Arduino.app/Contents/Java/hardware/arduino/avr
+runtime.tools.arduinoOTA-1.1.1.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.arduinoOTA.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.avr-gcc-4.9.2-atmel3.5.4-arduino2.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.avr-gcc.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.avrdude-6.3.0-arduino9.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.avrdude.path=/Applications/Arduino.app/Contents/Java/hardware/tools/avr
+runtime.tools.ctags-5.8-arduino11.path=/Applications/Arduino.app/Contents/Java/tools-builder/ctags/5.8-arduino11
+runtime.tools.ctags.path=/Applications/Arduino.app/Contents/Java/tools-builder/ctags/5.8-arduino11
+runtime.tools.esptool-0.4.13.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/esptool/0.4.13
+runtime.tools.esptool.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/esptool/0.4.13
+runtime.tools.mkspiffs-0.2.0.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/mkspiffs/0.2.0
+runtime.tools.mkspiffs.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/mkspiffs/0.2.0
+runtime.tools.xtensa-lx106-elf-gcc-1.20.0-26-gb404fb9-2.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2
+runtime.tools.xtensa-lx106-elf-gcc.path=/Users/wmacevoy/Library/Arduino15/packages/esp8266/tools/xtensa-lx106-elf-gcc/1.20.0-26-gb404fb9-2
+software=ARDUINO
+tools.avrdude.bootloader.params.quiet=-q -q
+tools.avrdude.bootloader.params.verbose=-v
+tools.avrdude.bootloader.pattern="{cmd.path}" "-C{config.path}" {bootloader.verbose} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:w:{runtime.platform.path}/bootloaders/{bootloader.file}:i" -Ulock:w:{bootloader.lock_bits}:m
+tools.avrdude.cmd.path={path}/bin/avrdude
+tools.avrdude.config.path={path}/etc/avrdude.conf
+tools.avrdude.erase.params.quiet=-q -q
+tools.avrdude.erase.params.verbose=-v
+tools.avrdude.erase.pattern="{cmd.path}" "-C{config.path}" {erase.verbose} -p{build.mcu} -c{protocol} {program.extra_params} -e -Ulock:w:{bootloader.unlock_bits}:m -Uefuse:w:{bootloader.extended_fuses}:m -Uhfuse:w:{bootloader.high_fuses}:m -Ulfuse:w:{bootloader.low_fuses}:m
+tools.avrdude.network_cmd={runtime.tools.arduinoOTA.path}/bin/arduinoOTA
+tools.avrdude.path={runtime.tools.avrdude.path}
+tools.avrdude.program.params.noverify=-V
+tools.avrdude.program.params.quiet=-q -q
+tools.avrdude.program.params.verbose=-v
+tools.avrdude.program.pattern="{cmd.path}" "-C{config.path}" {program.verbose} {program.verify} -p{build.mcu} -c{protocol} {program.extra_params} "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.program.verify=
+tools.avrdude.upload.network_pattern="{network_cmd}" -address {serial.port} -port {upload.network.port} -sketch "{build.path}/{build.project_name}.hex" -upload {upload.network.endpoint_upload} -sync {upload.network.endpoint_sync} -reset {upload.network.endpoint_reset} -sync_exp {upload.network.sync_return}
+tools.avrdude.upload.params.noverify=-V
+tools.avrdude.upload.params.quiet=-q -q
+tools.avrdude.upload.params.verbose=-v
+tools.avrdude.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbose} {upload.verify} -p{build.mcu} -c{upload.protocol} -P{serial.port} -b{upload.speed} -D "-Uflash:w:{build.path}/{build.project_name}.hex:i"
+tools.avrdude.upload.verify=
+tools.avrdude_remote.upload.pattern=/usr/bin/run-avrdude /tmp/sketch.hex {upload.verbose} -p{build.mcu}
+tools.ctags.cmd.path={path}/ctags
+tools.ctags.path={runtime.tools.ctags.path}
+tools.ctags.pattern="{cmd.path}" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "{source_file}"
+upload.maximum_data_size=8192
+upload.maximum_size=253952
+upload.protocol=wiring
+upload.speed=115200
+upload.tool=avrdude
+version=1.6.18
+vid.0=0x2341
+vid.1=0x2341
+vid.2=0x2A03
+vid.3=0x2A03
+vid.4=0x2341
+vid.5=0x2341
+===info ||| Progress {0} ||| [100.00]
+===info ||| Progress {0} ||| [0.00]
+===info ||| Progress {0} ||| [2.94]
+===info ||| Progress {0} ||| [5.88]
+===info ||| Using board '{0}' from platform in folder: {1} ||| [mega %2FApplications%2FArduino.app%2FContents%2FJava%2Fhardware%2Farduino%2Favr]
+===info ||| Using core '{0}' from platform in folder: {1} ||| [arduino %2FApplications%2FArduino.app%2FContents%2FJava%2Fhardware%2Farduino%2Favr]
+===info ||| Progress {0} ||| [8.82]
+===info ||| Progress {0} ||| [11.76]
+===info ||| Progress {0} ||| [14.71]
+===info ||| Progress {0} ||| [17.65]
+===info ||| Progress {0} ||| [20.59]
+===info ||| Detecting libraries used... ||| []
+===info ||| Progress {0} ||| [23.53]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics  -flto -w -x c++ -E -CC -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "./va_args.ino.cpp" -o "/dev/null"
+===info ||| Progress {0} ||| [26.47]
+===info ||| Progress {0} ||| [29.41]
+===info ||| Generating function prototypes... ||| []
+===info ||| Progress {0} ||| [32.35]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -w -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics  -flto -w -x c++ -E -CC -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "./va_args.ino.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/preproc/ctags_target_for_gcc_minus_e.cpp"
+"/Applications/Arduino.app/Contents/Java/tools-builder/ctags/5.8-arduino11/ctags" -u --language-force=c++ -f - --c++-kinds=svpf --fields=KSTtzns --line-directives "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/preproc/ctags_target_for_gcc_minus_e.cpp"
+===info ||| Progress {0} ||| [35.29]
+===info ||| Compiling sketch... ||| []
+===info ||| Progress {0} ||| [38.24]
+===info ||| Progress {0} ||| [41.18]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "./va_args.ino.cpp" -o "./va_args.ino.cpp.o"
+===info ||| Progress {0} ||| [44.12]
+===info ||| Progress {0} ||| [47.06]
+===info ||| Compiling libraries... ||| []
+===info ||| Progress {0} ||| [50.00]
+===info ||| Progress {0} ||| [52.94]
+===info ||| Progress {0} ||| [55.88]
+===info ||| Progress {0} ||| [58.82]
+===info ||| Progress {0} ||| [61.76]
+===info ||| Compiling core... ||| []
+===info ||| Progress {0} ||| [64.71]
+===info ||| Progress {0} ||| [67.65]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -x assembler-with-cpp -flto -MMD -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring_pulse.S" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_pulse.S.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/WInterrupts.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WInterrupts.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/hooks.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/hooks.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring_analog.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_analog.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring_digital.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_digital.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring_pulse.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_pulse.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -c -g -Os -Wall -Wextra -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/wiring_shift.c" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_shift.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/CDC.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/CDC.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/HardwareSerial.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/HardwareSerial0.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial0.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/HardwareSerial1.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial1.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/HardwareSerial2.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial2.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/HardwareSerial3.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial3.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/IPAddress.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/IPAddress.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/PluggableUSB.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/PluggableUSB.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/Print.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Print.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/Stream.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Stream.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/Tone.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Tone.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/USBCore.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/USBCore.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/WMath.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WMath.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/WString.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WString.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/abi.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/abi.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/main.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/main.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-g++" -c -g -Os -Wall -Wextra -std=gnu++11 -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -MMD -flto -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=10802 -DARDUINO_AVR_MEGA2560 -DARDUINO_ARCH_AVR   "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino" "-I/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/variants/mega" "/Applications/Arduino.app/Contents/Java/hardware/arduino/avr/cores/arduino/new.cpp" -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/new.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_pulse.S.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WInterrupts.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/hooks.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_analog.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_digital.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_pulse.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/wiring_shift.c.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/CDC.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial0.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial1.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial2.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/HardwareSerial3.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/IPAddress.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/PluggableUSB.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Print.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Stream.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/Tone.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/USBCore.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WMath.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/WString.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/abi.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/main.cpp.o"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc-ar" rcs  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/new.cpp.o"
+===debug ||| Archiving built core (caching) in: /var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/cache/core/core_arduino_avr_mega_cpu_atmega2560_51f02b7210b938436b779d1c032618e1.a ||| []
+===info ||| Progress {0} ||| [70.59]
+===info ||| Progress {0} ||| [73.53]
+===info ||| Linking everything together... ||| []
+===info ||| Progress {0} ||| [76.47]
+===info ||| Progress {0} ||| [79.41]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-gcc" -Wall -Wextra -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections,--relax -mmcu=atmega2560  -o "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/va_args.ino.elf" "./va_args.ino.cpp.o" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/core/core.a" "-L/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build" -lm
+===info ||| Progress {0} ||| [82.35]
+===info ||| Progress {0} ||| [85.29]
+===info ||| Progress {0} ||| [88.24]
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objcopy" -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/va_args.ino.elf" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/va_args.ino.eep"
+"/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objcopy" -O ihex -R .eeprom  "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/va_args.ino.elf" "/var/folders/bm/5c2gpt0n3jxdd7tjb2mlq4hxfhnh9y/T/tmp.tvrjPPM0/build/va_args.ino.hex"
+===info ||| Progress {0} ||| [91.18]
+===info ||| Progress {0} ||| [94.12]
+===info ||| Progress {0} ||| [97.06]
+===info ||| Progress {0} ||| [100.00]
+===info ||| Sketch uses {0} bytes ({2}%%) of program storage space. Maximum is {1} bytes. ||| [2106 253952 0]
+===info ||| Global variables use {0} bytes ({2}%%) of dynamic memory, leaving {3} bytes for local variables. Maximum is {1} bytes. ||| [198 8192 2 7994]

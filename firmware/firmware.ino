@@ -721,29 +721,34 @@ void pr65(const char *state) {
      if (strcmp(state,"fail") == 0) Test::current->fail();
 }
 
+#if !defined(ESP8266)
+#define PR65_ESP8266_HACK(X) X ()
+#else
+#define PR65_ESP8266_HACK(X) X ## _0 ()
+#endif
+
 test(pr65message) {
    verbosity |= TEST_VERBOSITY_ASSERTIONS_PASSED;
-   assertCurrentTestNotDone();
+   PR65_ESP8266_HACK(assertCurrentTestNotDone);
    assertCurrentTestNotDone("not done");   
 }
 
 test(pr65fail) {
    pr65("other");
-   assertCurrentTestNotDone();
+   PR65_ESP8266_HACK(assertCurrentTestNotDone);
    assertTrue(checkCurrentTestNotDone());
    pr65("fail");
    assertTrue(checkCurrentTestFail());
-   assertCurrentTestFail();
+   PR65_ESP8266_HACK(assertCurrentTestFail);
    pass(); // revert to pass
 }
 
 test(pr65pass) {
    pr65("other");
-   assertCurrentTestNotDone();
+   PR65_ESP8266_HACK(assertCurrentTestNotDone);
    assertTrue(checkCurrentTestNotDone());   
    pr65("pass");
-   assertTrue(checkCurrentTestPass());
-   assertCurrentTestPass();
+   PR65_ESP8266_HACK(assertCurrentTestPass);
 }
 
 

@@ -30,12 +30,12 @@
 #define ArduinoUnitMacroRecompose4(args) ArduinoUnitMacroArgs4 args
 #define ArduinoUnitMacroRecompose5(args) ArduinoUnitMacroArgs5 args
 
-#define ArduinoUnitMacroChoose0(f,...) ArduinoUnitMacroRecompose0((null,##__VA_ARGS__,f ## 0,))
-#define ArduinoUnitMacroChoose1(f,...) ArduinoUnitMacroRecompose1((null,##__VA_ARGS__,f ## 1, f ## 0,))
-#define ArduinoUnitMacroChoose2(f,...) ArduinoUnitMacroRecompose2((null,##__VA_ARGS__,f ## 2,f ## 1, f ## 0,))
-#define ArduinoUnitMacroChoose3(f,...) ArduinoUnitMacroRecompose3((null,##__VA_ARGS__,f ## 3, f ## 2,f ## 1, f ## 0,))
-#define ArduinoUnitMacroChoose4(f,...) ArduinoUnitMacroRecompose4((null,##__VA_ARGS__,f ## 4, f ## 3, f ## 2,f ## 1, f ## 0,)
-#define ArduinoUnitMacroChoose5(f,...) ArduinoUnitMacroRecompose5((null,##__VA_ARGS__,f ## 5, f ## 4, f ## 3, f ## 2,f ## 1, f ## 0,))
+#define ArduinoUnitMacroChoose0(f,...) ArduinoUnitMacroRecompose0((null,##__VA_ARGS__,f##0))
+#define ArduinoUnitMacroChoose1(f,...) ArduinoUnitMacroRecompose1((null,##__VA_ARGS__,f##1,f##0))
+#define ArduinoUnitMacroChoose2(f,...) ArduinoUnitMacroRecompose2((null,##__VA_ARGS__,f##2,f##1,f##0))
+#define ArduinoUnitMacroChoose3(f,...) ArduinoUnitMacroRecompose3((null,##__VA_ARGS__,f##3,f##2,f##1,f##0))
+#define ArduinoUnitMacroChoose4(f,...) ArduinoUnitMacroRecompose4((null,##__VA_ARGS__,f##4,f##3,f##2,f##1,f##0)
+#define ArduinoUnitMacroChoose5(f,...) ArduinoUnitMacroRecompose5((null,##__VA_ARGS__,f##5,f##4,f##3,f##2,f##1,f##0))
 
 /** \brief This is defined to manage the API transition to 2.X */
 #define ARDUINO_UNIT_MAJOR_VERSION 2

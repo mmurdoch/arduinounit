@@ -456,6 +456,10 @@ MyTestOnce myTestOnce2("myTestOnce2");
 
 Note that `Test::run()` only calls the active unresolved tests.
 
+## Known Bugs
+
+* The `assertCurrentTestXXXX([footnote])` macros do not compile on ESP8266 boards with no footnote.  Use an empty footnote `assertCurrentTestXXXX("")`, or use `assertCurrentTestXXXX_0()` for no footnote.
+
 ## FAQ
 
 Q. The line number of the asserts do not match the source file.

@@ -14,6 +14,7 @@ const uint8_t Test::DONE_FAIL = 4;
 
 
 Test* Test::root = 0;
+Test* Test::done = 0;
 Test* Test::current = 0;
 
 uint16_t Test::count = 0;
@@ -146,7 +147,13 @@ void Test::run()
     }
 
     if (current->state != LOOPING) {
+      // Remove from root list
       (*p)=((*p)->next);
+
+      // Add to done list
+      current->next = done;
+      done = current;
+
       current->resolve();
     } else {
       p=&((*p)->next);
@@ -170,6 +177,8 @@ void Test::abort()
     Test::out->print(__LINE__);
     Test::out->println(ARDUINO_UNIT_STRING("."));
     root=root->next;
+    current->next = done;
+    done = current;
     current->resolve();
   }
   current=0;

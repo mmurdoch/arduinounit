@@ -293,6 +293,9 @@ class Test
  private:
   // linked list structure for active tests
   static Test* root;
+  // linked list structure for done tests. This includes skipped tests,
+  // though they are only moved after Test::run() finds them.
+  static Test* done;
   Test *next;
 
   // static statistics for tests

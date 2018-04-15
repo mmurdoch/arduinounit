@@ -19,6 +19,9 @@ template< typename T > struct ArduinoUnitWiden { typedef T type; };
 template< > struct ArduinoUnitWiden < float > { typedef double type; };
 template< > struct ArduinoUnitWiden < __FlashStringHelper * > { typedef ArduinoUnitString type; };
 template< > struct ArduinoUnitWiden < String > { typedef ArduinoUnitString type; };
+#if ! defined(ARDUINO)
+template< > struct ArduinoUnitWiden < std::string > { typedef ArduinoUnitString type; };
+#endif
 template< > struct ArduinoUnitWiden < char * > { typedef ArduinoUnitString type; };
 template< > struct ArduinoUnitWiden < char [] > { typedef ArduinoUnitString type; };
 template<int N> struct ArduinoUnitWiden < char [N] > { typedef ArduinoUnitString type; };

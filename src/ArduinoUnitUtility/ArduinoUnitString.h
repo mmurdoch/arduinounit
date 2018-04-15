@@ -28,6 +28,9 @@ class ArduinoUnitString : public Printable
   ArduinoUnitString(const char *_data);
   ArduinoUnitString(const __FlashStringHelper *_data);
   ArduinoUnitString(const String &_data);
+#if !defined(ARDUINO)
+  ArduinoUnitString(const std::string &_data);
+#endif
   void readTo(void *destination, uint16_t offset, uint8_t length) const;
   uint16_t length() const;
   int8_t compareTo(const ArduinoUnitString &to) const;

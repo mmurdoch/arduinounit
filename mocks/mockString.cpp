@@ -113,9 +113,14 @@ void testStringNums() {
   assert(strcmp(s2.c_str(),"42.10")==0);  
 }
 
+void testCppStrings() {
+  ASSERT_SEQ(std::string("test"),String("test"));
+}
+
 int main() {
   testStringCons();
-  testStringNums();  
+  testStringNums();
+  testCppStrings();
   printf("ok\n");
 
   return 0;

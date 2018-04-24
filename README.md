@@ -1,7 +1,7 @@
 ArduinoUnit
 ===========
 
-Unit testing framework for arduino projects. Supports Arduino, ESP8266 and ESP32 as well as "en vitro" development system (vs embedded target) testing.
+ArduinoUnit is a testing framework for Arduino projects. It supports Arduino, ESP8266 and ESP32 as well as "en vitro" development system (vs embedded target) testing.
 
 ## Getting Started
 
@@ -139,7 +139,7 @@ The `Test::out` value is the *shared* value for all tests describing where outpu
 Test::out = &Serial;
 ```
 
-But you can set to the address of any Print stream, for example, if you want the output to be on the `Serial3` device on the arduino mega, use
+But you can set to the address of any Print stream. For example, if you want the output to be on the `Serial3` device on the arduino mega, use
 
 ```
 Test::out = &Serial3;
@@ -173,7 +173,7 @@ void format(Print &out, int value) {
 test(format) {
   MockPrint mp;
   format(mp,32); // test as mock
-  assertEquals(mp,"decimal 32 is hex 20\r\n");
+  assertEqual(mp,"decimal 32 is hex 20\r\n");
 }
 
 void setup() {
@@ -203,7 +203,7 @@ test(square) {
   MockStream ms;
   ms.input.print(10);
   square(ms);
-  assertEquals(ms.output,"value? 10*10=100\r\n");
+  assertEqual(ms.output,"value? 10*10=100\r\n");
 }
 
 void setup() {
@@ -234,7 +234,7 @@ Stream # public components only
 ```
 These are available via `#include "ArduinoUnitMock.h"`.  In the mock environment, there are two additional objects, `CppStreamPrint` and `CppIOStream`, which wrap C++ `std::ostream` (and `std::istream` for `CppIOStream`).  This simplifies creating tests in the mocking environments.  Look at the advanced example and test firmware for guidance.
 
-# Verbosity (advanced)
+## Verbosity (advanced)
 
 Just how much information is generated on each test is fairly flexible, and designed to address these rules:
 

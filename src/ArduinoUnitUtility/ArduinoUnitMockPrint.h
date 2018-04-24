@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <iostream>
+#include <sstream>
 #include "ArduinoUnitMockPrintable.h"
 #include "ArduinoUnitMockWString.h"
 
@@ -75,6 +77,17 @@ class Print
  public: size_t println(double x, int decimalPoints = 2);
  public: size_t println(const Printable& x);
  public: size_t println();
+ public: template <typename T> size_t print(const T &x) {
+    std::ostringstream oss;
+    oss << x;
+    const std::string &s=oss.str();
+    print(s.c_str());
+    return s.length();
+  }
+
+ public: template <typename T> size_t println(const T &x) {
+    return print(x)+println();
+  }
 
  public: virtual void flush();
 };

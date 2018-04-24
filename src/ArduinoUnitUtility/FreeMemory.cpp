@@ -63,4 +63,10 @@ int freeMemory() {
     }
     return free_memory;
 }
+
+#else
+#include <limits.h>
+int freeMemory() {
+  return INT_MAX/4;
+}
 #endif

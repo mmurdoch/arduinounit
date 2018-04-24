@@ -88,3 +88,8 @@ template  <  > struct Compare<ArduinoUnitString,ArduinoUnitString>
     return a.compareTo(b) >= 0;
   } // moreOrEqual
 };
+
+#if !defined(ARDUINO)
+std::ostream& operator<<(std::ostream & out, const ArduinoUnitString &s);
+#endif
+

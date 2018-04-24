@@ -231,11 +231,11 @@ void NextPacket() {
 By passing a stream reference to IO operations, you can test if specific input and output steps work using the MockStream to simulate a serial port.  It is nice to set the default to the actual destination, so you don't have to type it everywhere:
 
 ```c++
-int InInt(const char *name, Stream &io=&Serial) {
+int InInt(const char *name, Stream &io=Serial) {
     io.print("integer ");
     io.print(name);
     io.print("? ");
-    return io.nextInt();
+    return io.parseInt();
 }
 
 test(InInt) {
@@ -300,9 +300,9 @@ Code that insists on doing things one way is hard to test.  For example:
 
 
 double F;
-
+const int TempPin = 0;
 void ReadTempF() {
-    double K = analogRead(TEMP_PIN)*1024;
+    double K = analogRead(TempPin)*1024;
     double C = K-273;
     F=(9/5)*C-32;
 }
@@ -317,7 +317,7 @@ Consider however:
 #include <math.h>
 
 double TempRaw() { // rule
-    return analogRead(TEMP_PIN);
+    return analogRead(TempPin);
 }
 
 double TempRaw2K(double raw) { // serve
@@ -334,14 +334,15 @@ double TempC2F(double C) { // serve
 
 double TempRaw2F(double raw) { // serve
     double K = TempRaw2K(raw);
-    double C = TempK2C(C);
-    double TempC2F(C);
+    double C = TempK2C(K);
+    return TempC2F(C);
 }
 
 float F;
+
 void ReadTemp() { // rule
     float raw = TempRaw();
-    F = TempRaw2F(C);
+    F = TempRaw2F(raw);
 }
 
 // everyone's idea of equal for floats/doubles is a little different...
@@ -353,15 +354,18 @@ const double deps = sqrt(DBL_EPSILON);
     assertLess(derr,deps,(#a "=") << dlhs << " ~ " << (#b "=") << drhs); \
 }
 
+const int MinTempRaw = 100;
+const int MaxTempRaw = 900;
+
 testing(TempRaw) {
     double raw = TempRaw();
-    assertLessOrEqual(MinRawTemp,raw);
-    assertLessOrEqual(raw, MaxRawTemp);
+    assertLessOrEqual(MinTempRaw,raw);
+    assertLessOrEqual(raw, MaxTempRaw);
 }
 
 test(TempRaw2K) {
-    assertClose(TempRaw2K(MinRawTemp),0.0);
-    assertClose(TempRaw2K(MaxRawTemp),1000.0);
+    assertClose(TempRaw2K(MinTempRaw),0.0);
+    assertClose(TempRaw2K(MaxTempRaw),1000.0);
 }
 
 test(TempK2C) {

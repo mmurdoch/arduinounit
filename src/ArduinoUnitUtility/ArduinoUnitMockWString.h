@@ -3,7 +3,7 @@
 #if defined(ARDUINO)
 #include "WString.h"
 #else
-
+#include <iostream>
 #include "Flash.h"
 
 class __FlashStringHelper;
@@ -149,5 +149,7 @@ struct StringSumHelper : String {
  public: StringSumHelper(float x) : String(x) {}
  public: StringSumHelper(double x) : String(x) {}
 };
+
+std::ostream& operator<<(std::ostream & out, const String &s);
 
 #endif

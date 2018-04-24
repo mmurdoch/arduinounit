@@ -2,6 +2,7 @@
 
 #if ! defined(ARDUINO)
 
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -543,6 +544,11 @@ void String::move(String &rhs) {
 
 String::~String() {
   if (buffer != 0) free(buffer);
+}
+
+std::ostream& operator<<(std::ostream& out, const String &s) {
+  out << s.c_str();
+  return out;
 }
 
 #endif

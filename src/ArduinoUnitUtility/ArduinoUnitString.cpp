@@ -129,3 +129,10 @@ bool ArduinoUnitString::matches(const char *pattern) const {
   k=np+1;
   return (state0[k/8]&(1<<(k%8))) != 0;
 }
+
+#if !defined(ARDUINO)
+std::ostream& operator<<(std::ostream & out, const ArduinoUnitString &s) {
+  out << s.data;
+  return out;
+}
+#endif

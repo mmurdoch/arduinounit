@@ -1,4 +1,20 @@
-# ArduinoUnit Mini Tutorial
+# ArduinoUnit Guidebook: The Zen of Testing
+
+## Who
+
+If you are already familiar with testing, I suggest you skip to __Making A Reliable Thing__ , which addresses specific details about using ArduinoUnit and some suggested patterns of using it to solve common problems in embedded system design.
+
+If you are a total beginner, welcome!  There are some entry requirements, however. I do expect that you have worked with Arduino's at least a little, and have solved some problem with it (perhaps as a school assignment, or just because you like this kind of stuff).
+
+If you don't know about `setup()` and `loop()` and `pinMode()`, then get your green belt first.  Seek out some tutorials on using Arduino and Arduino-like systems elsewhere. Wax on. Wax off.
+
+If you have stared at a little Arduino board you are nurturing to life and wondered
+
+    What is going on in there, why isn't the servo moving?
+
+then you are our kind of people.
+
+## Why
 
 Building reliable embedded software is a rewarding experience.  Some important challenges are:
 
@@ -17,8 +33,6 @@ ArduinoUnit does not instantly change any of these.  But
 * ArduinoUnit was originally designed to run "en vivo" on the actual embedded hardware, where any system specific components can be tested and used.  This means your tests can include any specific idiosyncrasies about your embedded design.
 * Testing saves time and money (and stress).  It is really the only possibility for delivering reliable solutions to complex problems.
 * ArduinoUnit is MIT licensed, so it is free for both open and closed-source applications with no viral clauses to make any lawyers you know nervous.
-
-## Why
 
 Writing software can be hard.  Why make it harder by adding tests to the problem:
 
@@ -50,7 +64,7 @@ A little math is useful here.  If you have N independent components, each with r
 
 Turns out, if you wanted a Q=99% reliability of a system with N=10 independent components, each component has to be P=Q^(1/N) = (0.99)^(0.1) = 0.999 = 99.9% reliable.
 
-    Solving bigger problems reliably requires more reliable components
+    Solving bigger problems reliably requires more reliable components.
 
 Equate "Thing" and "Unit" in your mind.  We solve complicated problems by breaking them up into parts, and then putting those parts together to make bigger parts.  Each part is a "unit" that should be tested to make sure it works; so you can reliably use it as a part in a larger unit.
 
@@ -62,7 +76,66 @@ Ideally, a unit test will test the suitability of a component for any situation 
 
 ArduinoUnit is a non-denominational testing framework: you can use it to make highly independent tests of each component, but you can also build tests that are application specific. Building reliable software requires both.  After all, your entire embedded system will likely be a "unit" in someone else's design.
 
-## Making a reliable thing
+## How to Make a Reliable Thing
+
+### Step 0: ArduinoUnit basics
+
+Add the library (Sketch->Include Library->Manage Libraries...), find the "basic" example and upload it.  Open your serial monitor (9600 baud and you should see some words about tests).  Look at the code a bit...
+
+* ArduinoUnit uses `Serial` by default for reporting.  Don't forget to set it up [`Serial.begin(baud)`], or point it elsewhere [`Test::out = &Serial3` and `Serial3.begin(baud)`] in your `setup()`.  Remember to match the baud rate when looking at the serial monitor.
+* `test(thingFor) {...}` creates a test named `thingFor` that will be executed once.
+* `testing(thingFor) {...}` creates a test named `thingFor` that will be executed repeatedly.
+* `thingFor` can be replaced with any combination of letters, numbers, and underscores (_) but __no spaces__ and must be __unique__ among test/ing().  Good names might be `batteryLevel` and `messageSentOnTime`.
+* All active test & testing blocks are executed in alphabetical order.  If you want to control test order you can use test names like `000_BatteryLevel` and `010_MessageSentOnTime`.
+* If all the tests complete, a summary is printed.
+
+In a test block `{ ... }` you can put code.  Any code really, but some particularly useful code is
+
+* `verbosity = TEST_VERBOSITY_ALL` to see everything, pass or fail.
+* `pass()` or `fail()` mark this test as passed or failed.
+* `assertCompare(a,b [,foot << note])` or `assertTestStatus(testName [,foot << note])`
+
+  * `Compare` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
+  * `Status` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
+  * `testName` is some test/testing name.
+  * The `<<` in the optional `foot << note` separates things you can print.
+
+* For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  Floating point arithmetic is almost never exact.
+
+* `checkTestStatus(testName)` Just true/false depending on the current status of `testName`.
+
+The asserts are replaced with code like
+
+    if (not assertion)) { fail(); return; }
+
+But also print out a status message (by default only if the assertion fails). For example:
+
+    assertEqual(a[i],b[j],"i="<<i<<",j="<<j);
+
+will generate a message like:
+
+    Assertion failed: (a[i]=3) == (b[j]=4), file sketch.ino, line 17 [i=0,j=2].
+
+With a few tests and asserts in place, you can control them in your `setup()` and `loop()`.
+
+Simply:
+
+```c++
+#include <ArduinoUnit.h>
+
+test(numbers) { assertNotEqual(1,2); }
+
+void setup() {
+    Serial.begin(9600);
+    while (!Serial) {} // Leonardo Serial Mantra
+}
+
+void loop() {
+    Test::run();
+}
+```
+
+Tests that are completed are removed from the list (this is not a dynamic memory thing, trust me), so only the active tests are executed.  This means you can have a lot of tests that complete quickly and they represent no run-time overhead once they are resolved.
 
 ### Step 1: The Idiot Light
 
@@ -71,68 +144,82 @@ Pejoratives aside, this idea is really useful and we are all idiots most of the 
 ```c++
 #include <ArduinoUnit.h>
 
-test(WaterSensorConnected) { /* ... */ }
+test(flash) { /* .. */ }
+testing(battery) { /* ..  */ }
+testing(heaterRelay) { /* ..  */ }
+testing(heaterTempSense) { /* .. */ }
+testing(chillerTempSense) { /* .. */ }
+testing(hotBinTemp) { /* .. */ }
+testing(coldBinTemp) { /* .. */ }
 
-testing(WaterSensorSane) { /* ... */ }
+const int idiotLightPin = 13;
 
-void TestSetup() {
-    /* First Test::run() calls setup() of each test.  These usually do nothing, but may be customized for advanced tests */
-    Test::run();
+void idiotLightOn() {
+  digitalWrite(idiotLightPin,HIGH);
 }
 
-void TestLoop() {
-    Test::run();
+void idiotLightOff() {
+  digitalWrite(idiotLightPin,LOW);
 }
+
+void idiotLightFlip() {
+  digitalWrite(idiotLightPin,
+               ! digitalRead(idiotLightPin));
+}
+
+void idiotLightSetup() {
+    pinMode(idiotLightPin, OUTPUT);
+    digitalWrite(idiotLightPin, LOW);
+}
+
+void idiotLightLoop() {
+  static uint32_t next = 0;
+  if (Test::getCurrentFailed() > 0
+      && (next == 0 || int32_t(millis()-next) >= 0)) {
+    next=millis()+1000;
+    idiotLightFlip();
+  }
+}
+
+void testSetup() {
+  idiotLightOn();
+
+  // first run sets up tests (usually nothing)
+  Test::run();
+
+  idiotLightOn();
+}
+
+void testLoop() {
+  Test::run();
+}
+
 
 void SerialSetup() {
-    Serial.begin(9600);
+  Serial.baud(115200L);
+  while (!Serial) {} // Leonardo/Due Mantra
 
-    /* Leonardo needs this, and it does no harm... */
-    while (!Serial) {}
-}
-
-const int IdiotLightPin = 13;
-
-void IdiotSetup() {
-    pinMode(IdiotLightPin, OUTPUT);
-    digitalWrite(IdiotLightPin, LOW);
-}
-
-/* on->off->on ... */
-void IdiotFlip() {
-    digitalWrite(IdiotLightPin,
-        ! digitalRead(IdiotLightPin));
-}
-
-/* flash 1/sec if tests fail */
-void IdiotLoop() {
-    static uint32_t nextFlip = 0;
-    if (Test::getCurrentFailed() > 0
-        && int32_t(millis()-nextFlip) >= 0) {
-        nextFlip=millis()+1000;
-        IdiotFlip();
-    }
-}
-
-void setup() {
-    SerialSetup();
-    TestSetup();
-    IdiotSetup();
-    /* ... */
+  idiotSetup();
+  
+  // ...
+  
+  testSetup();
 }
 
 void loop() {
-    TestLoop();
-    IdiotLoop();
-    /* ... */
+  idiotLoop();
+  
+  // ...
+  
+  testLoop();
 }
 ```
 
 If all your sensors are disconnected but you want to test other things.  You can exclude sensor tests (hopefully temporarily) with
 
 ```c++
-void TestSetup() {
-    Test::exclude("*Sensor*");
+void testSetup() {
+    Test::exclude("*Sense");
     Test::run();
 }
 ```
@@ -140,9 +227,9 @@ void TestSetup() {
 If you __only__ wanted to test sensors, then:
 
 ```c++
-void TestSetup() {
+void testSetup() {
     Test::exclude("*");
-    Test::include("*Sensor*");
+    Test::include("*Sense");
     Test::run();
 }
 ```
@@ -152,78 +239,125 @@ void TestSetup() {
 If your thing can't run without certain things, you should make sure those certain things are ok or just stop. Add the following:
 
 ```c++
-test(FlashChecksum) { /* .. */ }
-test(RelayCycle) { /* .. */ }
-
-/* tests are run alphabetically, so this is the last test (little z is after big Z, so make them small) */
-test(zzzz_post) {
-  assertTestPass(FlashChecksum);
-  assertTestPass(RelayCycle);
+// alphabetically last test
+// (declaration order does not matter)
+test(zzzz_powerOnSelfTest) {
+  assertTestPass(flashOk);
+  assertTestPass(pumpConnected);
+  assertTestPass(waterSensorConnected);
 }
 
-void PowerOnSelfTest() {
-    while (!checkTestDone(zzzz_post)) {
-        Test::run();
+void powerOnSelfTest() {
+  uint8_t saveVerbosity = Test::min_verbosity;
+
+  // get reports on pass/fail & skipped tests...
+  Test::min_verbosity =
+    TEST_VERBOSITY_TESTS_ALL | TEST_VERBOSITY_ASSERTIONS_FAILED;
+
+  // run tests until the post test is complete
+  while (!checkTestDone(zzzz_powerOnSelfTest)) {
+    Test::run();
+  }
+
+  // halt if post fails
+  if (checkTestFail(zzzz_powerOnSelfTest)) {
+    while (true) {
+      idiotLightFlip();
+      delay(1000);
     }
-    if (!checkTestPass(zzzz_post)) {
-        while (true) {
-            IdiotFlip();
-            delay(250);
-        }
-    }
+  }
+
+  // restore original min_verbosity
+  Test::min_verbosity = saveVerbosity;
 }
 ```
 
-Then call `PowerOnSelfTest()` as the last step of your setup.
+Then call `powerOnSelfTest()` as the last step of your test setup:
+
+```c++
+void testSetup() {
+  idiotLightOn();
+
+  // include/exclude ...
+
+  powerOnSelfTest();
+
+  idiotLightOff();
+}
+```
 
 ### Step 3: Sanity
 
 The world can be a wild and wooly place. Your system should revert to some safe state if it can't make sense of it. This uses another library, SoftReset, to reboot the Arduino in the hopes it gets better.
 
+Add the "SoftReset" library to your IDE and include it in your project:
+
 ```c++
-/* addtional library to reset the arduino */
+#include <ArduinoUnit.h>
 #include <SoftReset.h>
+```
 
-/* repeated until pass or fail */
-testing(BatteryCritical) {
-    assertMore(BatteryVoltage(),3.0);
+Add a repeating sanity test:
+
+```c++
+testing(sanity) {
+  assertTestNotFail(batteryOk);
+  assertTestNotFail(pumpOk);
+  assertTestNotFail(waterSensorOk);
 }
 
-/* repeated until pass or fail */
-testing(NetworkLost) {
-    assertLess(int32_t(millis()-NetworkLastPacketTime()), 10000);
-}
-
-testing(Sanity) {
-    assertTestNotFail(BatteryCritical);
-    assertTestNotFail(NetworkLost);
-}
-
-void SanityLoop() {
-    if (checkTestFail(Sanity)) {
-        for (int i=5; i>0; --i) {
-            IdiotFlip();
-            delay(100*i);
-        }
-        soft_restart();
+void sanityCheck() {
+  if (checkTestFail(Sanity)) {
+    for (int i=5; i>0; --i) {
+      idiotLightFlip();
+      delay(100*i);
     }
+    soft_restart();
+  }
 }
 ```
 
-Add `SanityLoop()` to your loop to stay sane or die trying.
+Add `sanityCheck()` to your testLoop():
+
+```c++
+void testLoop() {
+  Test::run();
+  sanityCheck();
+}
+```
+
+At this point, you might be testing too often [every `loop()`].  You can add some timing to test only so often:
+
+```c++
+
+// run repeated tests & sanity check every interval ms
+void testLoop() {
+  const uint16_t interval = 250;
+  static uint32_t next = interval;
+
+  if (int32_t(micros()-next) < 0) {
+    return;
+  }
+
+  next += interval;
+  Test::run();
+  sanityCheck();
+}
+```
+
 
 ### Step 4: IO
 
 There is a chicken-and-egg problem with I/O.  If you have input and output errors, how can you tell there are problems?  You can hijack assert footnotes to give a hint by flickering the idiot light:
 
 ```c++
-const char *IO(bool ok) {
-    if (!ok) IdiotFlip();
+const char *io(bool ok) {
+    if (!ok) idiotLightFlip();
     return "io";
 }
 
-void NextPacket() {
-    assertEqual(CrcPacket(), CrcCompute(),IO(ok));
+void packetReceive() {
+    assertEqual(packetMessageCrc(), packetComputeCrc(),io(ok));
     ProcessPacket();
 }
 ```
@@ -231,25 +365,25 @@ void NextPacket() {
 By passing a stream reference to IO operations, you can test if specific input and output steps work using the MockStream to simulate a serial port.  It is nice to set the default to the actual destination, so you don't have to type it everywhere:
 
 ```c++
-int InInt(const char *name, Stream &io=Serial) {
+int inInt(const char *name, Stream &io=Serial) {
     io.print("integer ");
     io.print(name);
     io.print("? ");
     return io.parseInt();
 }
 
-test(InInt) {
+test(inInt) {
     MockStream ms;
     int xsend = 132;
     ms.input.println(xsend);
-    int xrecv = InInt("x",ms);
+    int xrecv = inInt("x",ms);
     assertEqual(xsend,xrecv);
     assertEqual(ms.output,"integer x? ");
 }
 
-void UseInInt() {
-    int a = InInt("a");
-    int b = InInt("b");
+void useInInt() {
+    int a = inInt("a");
+    int b = inInt("b");
     /* ... */
 }
 
@@ -260,11 +394,11 @@ void UseInInt() {
 It is important to know if something takes too long.  The following accounts for your system running long enough to suffer from the 32-bit microsecond counter rolling back through zero.
 
 ```c++
-void TimeCritical() {
-    const int32_t TooLongMicros = 10000;
+void timeCritical() {
+    const int32_t maxMicros = 10000;
     uint32_t start = micros();
     /* ... */
-    assertLess(int32_t(micros()-start),TooLongMicros);
+    assertLess(int32_t(micros()-start),maxMicros);
 }
 ```
 
@@ -273,10 +407,34 @@ void TimeCritical() {
 Recursion (functions that directly or indirectly use themselves to solve a reduced version of a problem) and dynamic memory (malloc or new operator, or dynamic structures like String that use malloc/new) create systems that just run out of room.
 
 ```c++
-void SpaceCritical() {
-    const int16_t SpaceRequired = 350;
-    assertMore(freeMemory(), SpaceRequired);
+void spaceCritical() {
+    const int16_t minBytes = 350;
+    assertMore(freeMemory(), minBytes);
     /* ... */
+}
+```
+
+Note that there is no gaurantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so:
+
+```c++
+bool critical = false;
+
+test(sanity) {
+  assertFalse(critical);
+  /* ... */
+}
+
+const char *critical(bool ok) {
+  if (ok) { return "ok"; }
+
+  critical = true;
+  return "critical";
+}
+
+void dynamic(int bytes) {
+   uint8_t *buf = (uint8_t*) malloc(bytes);
+   assertNotEqual(buf,0,"memory " << critical(ok));
+   /* ... */
 }
 ```
 
@@ -297,90 +455,80 @@ More importantly, writing tests changes how you write code.  Tests __observe__ c
 Code that insists on doing things one way is hard to test.  For example:
 
 ```c++
-
-
 double F;
-const int TempPin = 0;
-void ReadTempF() {
-    double K = analogRead(TempPin)*1024;
+const int tempPin = 0;
+void readTempF() {
+    double K = analogRead(tempPin)*1024;
     double C = K-273;
     F=(9/5)*C-32;
 }
 ```
 
-`ReadTempF` is very insistent; marching from the activation of the analog-to-digital converter, to a specific sequence of transformations resulting in what we hope is the Fahrenheit temperature. It is incorrect (most code is initially), but there is little to do discover what part(s) are wrong.
+`readTempF` is very insistent; marching from the activation of the analog-to-digital converter, to a specific sequence of transformations resulting in what we hope is the Fahrenheit temperature. It is incorrect (most code is initially), but there is little to do discover what part(s) are wrong.
 
 Consider however:
 
 ```c++
-#include <float.h>
-#include <math.h>
-
-double TempRaw() { // rule
-    return analogRead(TempPin);
+double tempRaw() { // rule
+    return analogRead(tempPin);
 }
 
-double TempRaw2K(double raw) { // serve
+double tempRaw2K(double raw) { // serve
     return raw*1024;
 }
 
-double TempK2C(double K) { // serve
+double tempK2C(double K) { // serve
     return K - 273;
 }
 
-double TempC2F(double C) { // serve
+double tempC2F(double C) { // serve
     return (9/5)*C-32;
 }
 
-double TempRaw2F(double raw) { // serve
-    double K = TempRaw2K(raw);
-    double C = TempK2C(K);
-    return TempC2F(C);
+double tempRaw2F(double raw) { // serve
+    double K = tempRaw2K(raw);
+    double C = tempK2C(K);
+    return tempC2F(C);
 }
 
 float F;
 
-void ReadTemp() { // rule
+void readTempF() { // rule
     float raw = TempRaw();
-    F = TempRaw2F(raw);
+    F = tempRaw2F(raw);
 }
 
-// everyone's idea of equal for floats/doubles is a little different...
-const double deps = sqrt(DBL_EPSILON);
-#define assertClose(a,b) { \
-    double dlhs = (a); \
-    double drhs =(b); \
-    double derr = fabs(dlhs-drhs); \
-    assertLess(derr,deps,(#a "=") << dlhs << " ~ " << (#b "=") << drhs); \
+const int minTempRaw = 100;
+const int maxTempRaw = 900;
+
+testing(tempRaw) {
+    double raw = tempRaw();
+    assertLessOrEqual(minTempRaw,raw);
+    assertLessOrEqual(raw, maxTempRaw);
 }
 
-const int MinTempRaw = 100;
-const int MaxTempRaw = 900;
-
-testing(TempRaw) {
-    double raw = TempRaw();
-    assertLessOrEqual(MinTempRaw,raw);
-    assertLessOrEqual(raw, MaxTempRaw);
+test(tempRaw2K) {
+    const float tolerance = 0.01;
+    assertNear(tempRaw2K(minTempRaw),0.0,tolerance);
+    assertNear(tempRaw2K(maxTempRaw),1000.0,tolerance);
 }
 
-test(TempRaw2K) {
-    assertClose(TempRaw2K(MinTempRaw),0.0);
-    assertClose(TempRaw2K(MaxTempRaw),1000.0);
+test(tempK2C) {
+    const float tolerance = 0.01;
+    const float absZeroC = -273.15;
+    assertNear(tempK2C(0.0),absZeroC,tolerance);
 }
 
-test(TempK2C) {
-    assertClose(TempK2C(0.0),-273.15);
-    assertClose(TempK2C(273.15),0.0);
-
-}
-
-test(TempC2F) {
-    assertClose(TempC2F(0.0),32.0);
-    assertClose(TempC2F(100.0),212.0);
+test(tempC2F) {
+    const float tolerance = 0.01;
+    const float freezeF = 32.0;
+    const float boilF = 212.0;
+    assertNear(tempC2F(0.0),freezeF,tolerance);
+    assertNear(tempC2F(100.0),boilF,tolerance);
 }
 ```
 
-Ok, so the first and last parts `TempRaw` and  `ReadTemp` are still "rule", since they need to access specific things (the analog sensor and the global temperature F).  But all the parts are separated and the parts that can serve many purposes can be well tested.  Once the components are tested, it is easier to rely on them for the overall solution.  A good compiler will turn them both into the same code as well.
+Ok, so the first and last parts `tempRaw` and  `readTempF` are still "rule", since they need to access specific things (the analog sensor and the global temperature F).  But all the parts are separated and the parts that can serve many purposes can be well tested.  Once the components are tested, it is easier to rely on them for the overall solution.  A good compiler will turn them both into the same code as well.
 
 ### Slow and Steady Wins the Race
 

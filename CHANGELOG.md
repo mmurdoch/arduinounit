@@ -44,4 +44,4 @@
 * Resolve builds for ESP8266/ESP32
 * Prefer `decltype` over `__typeof__`
 * Added a tutorial
-
+* assertNear(a,b,max[,message]) for float/double

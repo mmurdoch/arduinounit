@@ -3,8 +3,10 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#if !defined(ARDUINO)
 #include <iostream>
 #include <sstream>
+#endif
 #include "ArduinoUnitMockPrintable.h"
 #include "ArduinoUnitMockWString.h"
 

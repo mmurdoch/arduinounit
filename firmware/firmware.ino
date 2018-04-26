@@ -751,4 +751,64 @@ test(pr65pass) {
    PR65_ESP8266_HACK(assertCurrentTestPass);
 }
 
+template<typename F> void call(F f) { f(); }
 
+test(near) {
+  verbosity = TEST_VERBOSITY_ALL;
+  double a=1.0;
+  double b=1.1;
+
+  assertNear(a,b,0.2,"message");
+  assertNear(a,b,0.2);
+}
+
+int vf_0() { return 0; }
+int vf_1(int a1) { (void)a1; return 1; }
+int vf_2(int a1, int a2) { (void)a1; (void) a2; return 2; }
+int vf_3(int a1, int a2, int a3) { (void)a1; (void) a2; (void) a3; return 3; }
+int vf_4(int a1, int a2, int a3, int a4) { (void)a1; (void) a2; (void) a3; (void) a4; return 4; }
+int vf_5(int a1, int a2, int a3, int a4, int a5) { (void)a1; (void) a2; (void) a3; (void) a4; (void) a5; return 5; }
+
+#define vm1(...) ArduinoUnitMacroChoose1(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+#define vm2(...) ArduinoUnitMacroChoose2(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+#define vm3(...) ArduinoUnitMacroChoose3(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+#define vm4(...) ArduinoUnitMacroChoose4(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+#define vm5(...) ArduinoUnitMacroChoose5(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+
+test(varargmacros) {
+
+#if !defined(ESP8266)
+  assertEqual(vm1(),0);
+#endif
+  assertEqual(vm1(1),1);  
+
+#if !defined(ESP8266)
+  assertEqual(vm2(),0);
+#endif
+  assertEqual(vm2(1),1);
+  assertEqual(vm2(1,2),2);
+
+#if !defined(ESP8266)
+  assertEqual(vm3(),0);
+#endif
+  assertEqual(vm3(1),1);
+  assertEqual(vm3(1,2),2);
+  assertEqual(vm3(1,2,3),3);
+
+#if !defined(ESP8266)
+  assertEqual(vm4(),0);
+#endif
+  assertEqual(vm4(1),1);
+  assertEqual(vm4(1,2),2);
+  assertEqual(vm4(1,2,3),3);
+  assertEqual(vm4(1,2,3,4),4);
+
+#if !defined(ESP8266)
+  assertEqual(vm5(),0);
+#endif
+  assertEqual(vm5(1),1);
+  assertEqual(vm5(1,2),2);
+  assertEqual(vm5(1,2,3),3);
+  assertEqual(vm5(1,2,3,4),4);
+  assertEqual(vm5(1,2,3,4,5),5);
+}

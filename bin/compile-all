@@ -1,5 +1,6 @@
 #!/bin/bash
 THIS_DIR="$(cd "$(dirname "$0")"; pwd)"
+( cd "${THIS_DIR}"; cd ..; make install; )
 ${THIS_DIR}/compile-mock "$@" |    awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-uno "$@" |     awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'
 ${THIS_DIR}/compile-nano "$@" |     awk '/(^|[: \t])(warning|error)(^|[: \t\.\?!])/'

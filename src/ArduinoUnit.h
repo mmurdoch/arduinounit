@@ -5,6 +5,7 @@
   @file ArduinoUnit.h
 
 */
+#include <math.h>
 #include "ArduinoUnitMock.h"
 
 #include "ArduinoUnitUtility/Flash.h"
@@ -34,7 +35,7 @@
 #define ArduinoUnitMacroChoose1(f,...) ArduinoUnitMacroRecompose1((null,##__VA_ARGS__,f##1,f##0))
 #define ArduinoUnitMacroChoose2(f,...) ArduinoUnitMacroRecompose2((null,##__VA_ARGS__,f##2,f##1,f##0))
 #define ArduinoUnitMacroChoose3(f,...) ArduinoUnitMacroRecompose3((null,##__VA_ARGS__,f##3,f##2,f##1,f##0))
-#define ArduinoUnitMacroChoose4(f,...) ArduinoUnitMacroRecompose4((null,##__VA_ARGS__,f##4,f##3,f##2,f##1,f##0)
+#define ArduinoUnitMacroChoose4(f,...) ArduinoUnitMacroRecompose4((null,##__VA_ARGS__,f##4,f##3,f##2,f##1,f##0))
 #define ArduinoUnitMacroChoose5(f,...) ArduinoUnitMacroRecompose5((null,##__VA_ARGS__,f##5,f##4,f##3,f##2,f##1,f##0))
 
 /** \brief This is defined to manage the API transition to 2.X */
@@ -742,26 +743,9 @@ is in another file (or defined after the assertion on it). */
 /** macro generates optional output and calls skip() followed by a return if false. */
 #define assertCurrentTestNotSkip(...) ArduinoUnitMacroChoose1(assertCurrentTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define assertCloseMsg(a,b,max,message) \
-do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
-
-#define assertClose_4(a,b,max,message) assertCloseMsg(a,b,max,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
-#define assertClose_3(a,b,max,message) assertCloseMsg(a,b,max,&Test::noMessage)
-#define assertClose(...) ArduinoUnitMacroChoose4(assertClose_, ## __VA_ARGS__)(__VA_ARGS__)
-
-  
-do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
-
-#define assertClose_3(a,b,max) \
-do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
-
-
-    do {  if (fabs(ArduinoUnitAEval-ArduinoUnitBEval) > ArduinoUnitMaxEval) {
-
-    FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
-
-    double derr = fabs(dlhs-drhs);                              \
-    assertLess(derr,max,                                        \
-               ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << dlhs << " ~ " << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << drhs); \
-}
+#define assertNear_4(a,b,max,message) \
+  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(") ") << message << ARDUINO_UNIT_STRING("]"); })) return; } while (0)
+#define assertNear_3(a,b,max) \
+  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(")]"); })) return; } while (0)
+#define assertNear(...) ArduinoUnitMacroChoose4(assertNear_, ## __VA_ARGS__)(__VA_ARGS__)
 

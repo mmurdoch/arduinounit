@@ -62,6 +62,7 @@ The following asserts are supported [with an optional footnote]
 | Assertion | Description |
 | --- | --- |
 | `assertEqual(a,b [,footnote])` | `a == b`? |
+| `assertNear(a,b,maxerr, [,footnote])` | `abs(b-a)<=maxerr`? |
 | `assertNotEqual(a,b [,footnote])` | `a != b`? |
 | `assertLess(a,b [,footnote])` | `a < b`? |
 | `assertLessOrEqual(a,b [,footnote])` | `a <= b`? |

@@ -565,7 +565,7 @@ is in another file (or defined after the assertion on it). */
 
 // helper define for the operators below
 #define assertOpMsg(arg1,op,op_name,arg2, message)                               \
-  do {  if (!Test::assertion< ArduinoUnitArgTypes(arg1,arg1)::A , ArduinoUnitArgTypes(arg1,arg2)::B > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
+  do {  if (!Test::assertion< ArduinoUnitArgTypes(arg1,arg2)::A , ArduinoUnitArgTypes(arg1,arg2)::B > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
 
 #define assertOp_5(a1,op,op_name,arg2,message) assertOpMsg(a1,op,op_name,arg2,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
 #define assertOp_4(a1,op,op_name,arg2) assertOpMsg(a1,op,op_name,arg2,&Test::noMessage)
@@ -741,3 +741,27 @@ is in another file (or defined after the assertion on it). */
 #define assertCurrentTestNotSkip_0()                assertOp_4(Test::current->state,compareNotEqual,"!=",Test::DONE_SKIP)
 /** macro generates optional output and calls skip() followed by a return if false. */
 #define assertCurrentTestNotSkip(...) ArduinoUnitMacroChoose1(assertCurrentTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertCloseMsg(a,b,max,message) \
+do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
+
+#define assertClose_4(a,b,max,message) assertCloseMsg(a,b,max,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [") << message << ARDUINO_UNIT_STRING("]"); })
+#define assertClose_3(a,b,max,message) assertCloseMsg(a,b,max,&Test::noMessage)
+#define assertClose(...) ArduinoUnitMacroChoose4(assertClose_, ## __VA_ARGS__)(__VA_ARGS__)
+
+  
+do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
+
+#define assertClose_3(a,b,max) \
+do {  if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING(#a),(a),ARDUINO_UNIT_STRING("~=~"),[&](double ArduinoUnitA, double ArduinoUnitB)->{ return fabs(ArduinoUnitA-ArduinoUnitB)<(max); },ARDUINO_UNIT_STRING(#b),(b),message)) return; } while (0)
+
+
+    do {  if (fabs(ArduinoUnitAEval-ArduinoUnitBEval) > ArduinoUnitMaxEval) {
+
+    FILE__),__LINE__,ARDUINO_UNIT_STRING(#arg1),(arg1),ARDUINO_UNIT_STRING(op_name),op,ARDUINO_UNIT_STRING(#arg2),(arg2),message)) return; } while (0)
+
+    double derr = fabs(dlhs-drhs);                              \
+    assertLess(derr,max,                                        \
+               ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << dlhs << " ~ " << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << drhs); \
+}
+

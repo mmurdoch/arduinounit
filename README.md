@@ -57,22 +57,26 @@ Test ok passed.
 Test summary: 1 passed, 1 failed, and 0 skipped, out of 2 test(s).
 ```
 
-The following asserts are supported [with an optional footnote]
+The following asserts are supported [with an optional footnote and return value]
 
 | Assertion | Description |
 | --- | --- |
-| `assertEqual(a,b [,footnote])` | `a == b`? |
-| `assertNear(a,b,maxerr, [,footnote])` | `abs(b-a)<=maxerr`? |
-| `assertNotEqual(a,b [,footnote])` | `a != b`? |
-| `assertLess(a,b [,footnote])` | `a < b`? |
-| `assertLessOrEqual(a,b [,footnote])` | `a <= b`? |
-| `assertMore(a,b [,footnote])` | `a > b`? |
-| `assertMoreOrEqual(a,b [,footnote])` | `a >= b`? |
-| `assertTrue(p [,footnote])` | same as `assertEqual(p,true)` |
-| `assertFalse(p [,footnote])` | same as `assertEqual(p,false)` |
+| `assertEqual(a,b [,footnote [,retval]])` | `a == b`? |
+| `assertNear(a,b,maxerr, [,footnote[,retval]])` | `abs(b-a)<=maxerr`? |
+| `assertNotEqual(a,b [,footnote[,retval]])` | `a != b`? |
+| `assertLess(a,b [,footnote[,retval]])` | `a < b`? |
+| `assertLessOrEqual(a,b [,footnote[,retval]])` | `a <= b`? |
+| `assertMore(a,b [,footnote[,retval]])` | `a > b`? |
+| `assertMoreOrEqual(a,b [,footnote[,retval]])` | `a >= b`? |
+| `assertTrue(p [,footnote[,retval]])` | same as `assertEqual(p,true)` |
+| `assertFalse(p [,footnote[,retval]])` | same as `assertEqual(p,false)` |
 
 
-## [,footnote]
+## [,footnote[,retval]]
+
+Assertions are replaced with essentially (retval is the optional last value of an assert):
+
+    if (not assertion) { fail(); return [retval]; }
 
 When things go wrong, it can be useful to print additional information.  As of 2.3.2-alpha, this is possible with any assertXXX() method by adding an additional third parameter [footnote] to the assert.  For example,
 ```
@@ -343,25 +347,25 @@ You can make assertions on the outcome of tests as well.  The following meta-ass
 
 | Meta Assertion | Description |
 | --- | --- |
-| `assertTestDone(test [,footnote])` | test done (skip, pass or fail)?|
-| `assertTestNotDone(test [,footnote])` | test not done?|
-| `assertTestPass(test [,footnote])` | test passed? |
-| `assertTestNotPass(test [,footnote])` | test not passed (fail, skip, or not done)? |
-| `assertTestFail(test [,footnote])` | test failed? |
-| `assertTestNotFail(test [,footnote])` | test not failed (pass, skip, or not done)? |
-| `assertTestSkip(test [,footnote])` | test skipped? |
-| `assertTestNotSkip(test [,footnote])` | test not skipped (pass, fail, or not done)? |
+| `assertTestDone(test [,footnote[,retval]])` | test done (skip, pass or fail)?|
+| `assertTestNotDone(test [,footnote[,retval]])` | test not done?|
+| `assertTestPass(test [,footnote[,retval]])` | test passed? |
+| `assertTestNotPass(test [,footnote[,retval]])` | test not passed (fail, skip, or not done)? |
+| `assertTestFail(test [,footnote[,retval]])` | test failed? |
+| `assertTestNotFail(test [,footnote[,retval]])` | test not failed (pass, skip, or not done)? |
+| `assertTestSkip(test [,footnote[,retval]])` | test skipped? |
+| `assertTestNotSkip(test [,footnote[,retval]])` | test not skipped (pass, fail, or not done)? |
 
 | Meta Assertion | Description |
 | --- | --- |
-| `assertCurrentTestDone([footnote])`| current test done (skip, pass or fail)?|
-| `assertCurrentTestNotDone([footnote])` | current test not done?|
-| `assertCurrentTestPass([footnote])` | current test passed? |
-| `assertCurrentTestNotPass([footnote])` | current test not passed (fail, skip, or not done)? |
-| `assertCurrentTestFail([footnote])` | current test failed? |
-| `assertCurrentTestNotFail([footnote])` | current test not failed (pass, skip, or not done)? |
-| `assertCurrentTestSkip([footnote])` | current test skipped? |
-| `assertCurrentTestNotSkip([footnote])` | current test not skipped (pass, fail, or not done)? |
+| `assertCurrentTestDone([footnote[,retval]])`| current test done (skip, pass or fail)?|
+| `assertCurrentTestNotDone([footnote[,retval]])` | current test not done?|
+| `assertCurrentTestPass([footnote[,retval]])` | current test passed? |
+| `assertCurrentTestNotPass([footnote[,retval]])` | current test not passed (fail, skip, or not done)? |
+| `assertCurrentTestFail([footnote[,retval]])` | current test failed? |
+| `assertCurrentTestNotFail([footnote[,retval]])` | current test not failed (pass, skip, or not done)? |
+| `assertCurrentTestSkip([footnote[,retval]])` | current test skipped? |
+| `assertCurrentTestNotSkip([footnote[,retval]])` | current test not skipped (pass, fail, or not done)? |
 
 These can be used in conjunction with the boolean check-only macros
 ```
@@ -459,7 +463,7 @@ Note that `Test::run()` only calls the active unresolved tests.
 
 ## Known Bugs
 
-* The `assertCurrentTestXXXX([footnote])` macros do not compile on ESP8266 boards with no footnote.  Use an empty footnote `assertCurrentTestXXXX("")`, or use `assertCurrentTestXXXX_0()` for no footnote.
+* The `assertCurrentTestXXXX([,footnote [,retval])` macros do not compile on ESP8266 boards with no footnote.  Use an empty footnote `assertCurrentTestXXXX("")`, or use `assertCurrentTestXXXX_0()` for no footnote.  You do not have to specify a return value.
 
 ## FAQ
 

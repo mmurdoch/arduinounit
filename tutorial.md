@@ -2,7 +2,7 @@
 
 ## Who
 
-If you are already familiar with testing, I suggest you skip to __Making A Reliable Thing__ , which addresses specific details about using ArduinoUnit and some suggested patterns of using it to solve common problems in embedded system design.
+If you are already familiar with testing, I suggest you skip to __Making A Reliable Thing__, which addresses specific details about using ArduinoUnit and some suggested patterns of using it to solve common problems in embedded system design.
 
 If you are a total beginner, welcome!  There are some entry requirements, however. I do expect that you have worked with Arduino's at least a little, and have solved some problem with it (perhaps as a school assignment, or just because you like this kind of stuff).
 
@@ -29,7 +29,7 @@ Building reliable embedded software is a rewarding experience.  Some important c
 ArduinoUnit does not instantly change any of these.  But
 
 * ArduinoUnit is designed to be small so it can work in tiny systems.
-* Tests can illuminate what does and does not work. ArduinoUnit does this with as little as a serial port.  ArduinoUnit can also run "en vitro" on the development environment, where it is easier to discover what is wrong.
+* Tests can show what does and does not work. ArduinoUnit does this with as little as a serial port.  ArduinoUnit can also run "en vitro" on the development environment, where it is easier to discover what is wrong.
 * ArduinoUnit was originally designed to run "en vivo" on the actual embedded hardware, where any system specific components can be tested and used.  This means your tests can include any specific idiosyncrasies about your embedded design.
 * Testing saves time and money (and stress).  It is really the only possibility for delivering reliable solutions to complex problems.
 * ArduinoUnit is MIT licensed, so it is free for both open and closed-source applications with no viral clauses to make any lawyers you know nervous.
@@ -82,20 +82,35 @@ ArduinoUnit is a non-denominational testing framework: you can use it to make hi
 
 Add the library (Sketch->Include Library->Manage Libraries...), find the "basic" example and upload it.  Open your serial monitor (9600 baud and you should see some words about tests).  Look at the code a bit...
 
+#### Serial Port
+
 * ArduinoUnit uses `Serial` by default for reporting.  Don't forget to set it up [`Serial.begin(baud)`], or point it elsewhere [`Test::out = &Serial3` and `Serial3.begin(baud)`] in your `setup()`.  Remember to match the baud rate when looking at the serial monitor.
+
+#### `test/ing()`
+
 * `test(thingFor) {...}` creates a test named `thingFor` that will be executed once.
 * `testing(thingFor) {...}` creates a test named `thingFor` that will be executed repeatedly.
 * `thingFor` can be replaced with any combination of letters, numbers, and underscores (_) but __no spaces__ and must be __unique__ among test/ing().  Good names might be `batteryLevel` and `messageSentOnTime`.
 * All active test & testing blocks are executed in alphabetical order.  If you want to control test order you can use test names like `000_BatteryLevel` and `010_MessageSentOnTime`.
+* By default, if a test finishes, it is a `pass()`.  Usually, tests have assertions (discussed next) which (if they fail) have it finish early with a `fail()` status.
+* Continuous `testing()` tests are called again and again [usually from your `loop()`].  Forever that is your thing.  You can end them by calling `pass()` or `fail()` directly or having an assertion fail.
 * If all the tests complete, a summary is printed.
 
 In a test block `{ ... }` you can put code.  Any code really, but some particularly useful code is
 
-* `verbosity = TEST_VERBOSITY_ALL` to see everything, pass or fail.
-* `pass()` or `fail()` mark this test as passed or failed.
-* `assertCompare(a,b [,foot << note])` or `assertTestStatus(testName [,foot << note])`
+#### Verbosity
 
-  * `Compare` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
+* `verbosity = TEST_VERBOSITY_ALL` to see everything, pass or fail.
+
+#### `pass()` or `fail()`
+
+* `pass()` or `fail()` mark this test as passed or failed.  The current test will continue to the end (which may change it's mind), but it will be resolved. This means a `testing()` environment will not loop again.
+
+#### `assertRelation(between [,foot << note])`
+
+* `assertRelation(a,b [,foot << note])` or `assertTestStatus(testName [,foot << note])`
+
+  * `Relation` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
   * `Status` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
   * `testName` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
@@ -106,7 +121,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 The asserts are replaced with code like
 
-    if (not assertion)) { fail(); return; }
+    if (not assertion) { fail(); return; }
 
 But also print out a status message (by default only if the assertion fails). For example:
 
@@ -139,8 +154,9 @@ Tests that are completed are removed from the list (this is not a dynamic memory
 
 ### Step 1: The Idiot Light
 
-Pejoratives aside, this idea is really useful and we are all idiots most of the time (there are infinitely more things we don't know than we know).  It is important to have a thumbs up/thumbs down status so we can at least decide to look more closely.
+Pejoratives aside, this idea is really useful and we are all idiots most of the time (there are infinitely more things we don't know than we know).  It is important to have a thumbs up/thumbs down status so we can at least decide to look more closely.  If you or your manager puckers when they see your code, replace `idiot` with `status`.  We know what you mean: "Toilet" vs. "Bathroom", it's all the same business.
 
+So lets imagine we are building a controller for a food cart.  I'm not going to bother with the implementation, just the tests.  By default if a test completes it is a `pass()`.  You can put a fail or some simple assertions to see how the output changes.
 ```c++
 #include <ArduinoUnit.h>
 

@@ -768,12 +768,14 @@ int vf_2(int a1, int a2) { (void)a1; (void) a2; return 2; }
 int vf_3(int a1, int a2, int a3) { (void)a1; (void) a2; (void) a3; return 3; }
 int vf_4(int a1, int a2, int a3, int a4) { (void)a1; (void) a2; (void) a3; (void) a4; return 4; }
 int vf_5(int a1, int a2, int a3, int a4, int a5) { (void)a1; (void) a2; (void) a3; (void) a4; (void) a5; return 5; }
+int vf_6(int a1, int a2, int a3, int a4, int a5, int a6) { (void)a1; (void) a2; (void) a3; (void) a4; (void) a5; (void) a6; return 6; }
 
 #define vm1(...) ArduinoUnitMacroChoose1(vf_, ## __VA_ARGS__)(__VA_ARGS__)
 #define vm2(...) ArduinoUnitMacroChoose2(vf_, ## __VA_ARGS__)(__VA_ARGS__)
 #define vm3(...) ArduinoUnitMacroChoose3(vf_, ## __VA_ARGS__)(__VA_ARGS__)
 #define vm4(...) ArduinoUnitMacroChoose4(vf_, ## __VA_ARGS__)(__VA_ARGS__)
 #define vm5(...) ArduinoUnitMacroChoose5(vf_, ## __VA_ARGS__)(__VA_ARGS__)
+#define vm6(...) ArduinoUnitMacroChoose6(vf_, ## __VA_ARGS__)(__VA_ARGS__)
 
 test(varargmacros) {
 
@@ -811,4 +813,31 @@ test(varargmacros) {
   assertEqual(vm5(1,2,3),3);
   assertEqual(vm5(1,2,3,4),4);
   assertEqual(vm5(1,2,3,4,5),5);
+
+#if !defined(ESP8266)
+  assertEqual(vm6(),0);
+#endif
+  assertEqual(vm6(1),1);
+  assertEqual(vm6(1,2),2);
+  assertEqual(vm6(1,2,3),3);
+  assertEqual(vm6(1,2,3,4),4);
+  assertEqual(vm6(1,2,3,4,5),5);
+  assertEqual(vm6(1,2,3,4,5,6),6);
+}
+
+int testHelper(int c) {
+    assertEqual(1,(c == 1) ? 2 : 1,"c=" << c,1);
+    assertNotEqual(1,(c ==2 ) ? 1 : 2,"c=" << c,2);
+    assertLess(1,(c == 3) ? 1 : 2,"c=" << c,3);
+    assertLessOrEqual(1,(c == 4) ? 0 : 1,"c=" << c,4);
+    assertMore(2,(c == 5) ? 2 : 1,"c=" << c,5);
+    assertMoreOrEqual(2,(c == 6) ? 3 : 2,"c=" << c,6);
+    return 0;
+}
+
+test(assertReturnVal) {
+  for (int c=0; c <= 6; ++c) {
+    assertEqual(testHelper(c),c);
+  }
+  pass();
 }

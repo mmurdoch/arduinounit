@@ -34,9 +34,9 @@ void Test::noMessage(bool ok) { (void) ok; }
 
 void Test::resolve() 
 {
-  bool pass = current->state==DONE_PASS;
-  bool fail = current->state==DONE_FAIL;
-  bool skip = current->state==DONE_SKIP;
+  bool pass = state==DONE_PASS;
+  bool fail = state==DONE_FAIL;
+  bool skip = state==DONE_SKIP;
   bool done = (pass || fail || skip);
   
   if (done) {
@@ -121,9 +121,9 @@ void Test::insert()
   ++Test::count;
 }
 
-void Test::pass() { state = DONE_PASS; }
-void Test::fail() { state = DONE_FAIL; }
-void Test::skip() { state = DONE_SKIP; }
+void Test::pass() { if (current != 0) current->state = DONE_PASS; }
+void Test::fail() { if (current != 0) current->state = DONE_FAIL; }
+void Test::skip() { if (current != 0) current->state = DONE_SKIP; }
 
 void Test::setup() {};
 
@@ -156,6 +156,7 @@ void Test::run()
     yield();
 #endif
   }
+  current = 0;
 }
 
 Test::~Test()

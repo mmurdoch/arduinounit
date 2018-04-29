@@ -45,3 +45,4 @@
 * Prefer `decltype` over `__typeof__`
 * Added a tutorial
 * assertNear(a,b,max[,message]) for float/double
+* assertRelation(args [,message [,retval]])

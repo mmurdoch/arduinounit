@@ -2,7 +2,7 @@
 
 // Pseudo-replacement for reset
 // #include <SoftReset.h>
-// To make this 
+// To make this not depend on other lib
 void soft_restart() {
   Serial.println("press reset.");
   while (true) { } // 
@@ -79,7 +79,10 @@ void powerOnSelfTest() {
   Test::min_verbosity = saveVerbosity;
 }
 
+bool criticalError = false;
+
 testing(sanity) {
+  assertFalse(criticalError);
   assertTestNotFail(battery);
   assertTestNotFail(heaterRelay);
   assertTestNotFail(heaterTempSense);
@@ -173,4 +176,21 @@ double CtoK(double C) {
   const double absZeroK = 0;
   assertMoreOrEqual(K,absZeroK,F("below absolute zero"),absZeroK);
   return K;
+}
+
+void critical() {
+     criticalError = true;
+}
+
+void io() {
+     idiotLightFlip();
+}
+
+int intReturnExample() {
+  assertEqual(1,1,"weird",(critical(),io(),0));
+  return 1;
+}
+
+void voidReturnExample() {
+  assertEqual(1,1,"still weird",(critical(),io()));
 }

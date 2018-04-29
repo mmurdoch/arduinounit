@@ -762,6 +762,15 @@ test(near) {
   assertNear(a,b,0.2);
 }
 
+test(relativelyNear) {
+  verbosity = TEST_VERBOSITY_ALL;
+  double a=1.0e6;
+  double b=1.1e6;
+
+  assertRelativelyNear(a,b,0.2,"message");
+  assertRelativelyNear(a,b,0.2);
+}
+
 int vf_0() { return 0; }
 int vf_1(int a1) { (void)a1; return 1; }
 int vf_2(int a1, int a2) { (void)a1; (void) a2; return 2; }
@@ -840,4 +849,21 @@ test(assertReturnVal) {
     assertEqual(testHelper(c),c);
   }
   pass();
+}
+
+void critical() {
+     /* .. */
+}
+
+void io() {
+     /* .. */
+}
+
+int intReturnExample() {
+  assertEqual(1,1,"weird",(critical(),io(),0));
+  return 1;
+}
+
+void voidReturnExample() {
+  assertEqual(1,1,"still weird",(critical(),io()));
 }

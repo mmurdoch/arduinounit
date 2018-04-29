@@ -800,12 +800,30 @@ is in another file (or defined after the assertion on it). */
 /** macro generates optional output and calls skip() followed by a return if false. */
 #define assertCurrentTestNotSkip(...) ArduinoUnitMacroChoose2(assertCurrentTestNotSkip_, ## __VA_ARGS__)(__VA_ARGS__)
 
-#define assertNear_5(a,b,max,message,retval)                                  \
-  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(") ") << message << ARDUINO_UNIT_STRING("]"); })) return retval; } while (0)
+#define assertNearMsg(a,b,max,message,retval)                                  \
+  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(")") << message << ARDUINO_UNIT_STRING("]"); })) return retval; } while (0)
+
+#define assertNear_5(a,b,max,message,retval)                            \
+  assertNearMsg(a,b,max,ARDUINO_UNIT_STRING(" ") << message,retval)
 
 #define assertNear_4(a,b,max,message)                                   \
-  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(") ") << message << ARDUINO_UNIT_STRING("]"); })) return; } while (0)
+  assertNearMsg(a,b,max,ARDUINO_UNIT_STRING(" ") << message,)
 
 #define assertNear_3(a,b,max)                                           \
-  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("abserr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(")]"); })) return; } while (0)
+  assertNearMsg(a,b,max,ARDUINO_UNIT_STRING(""),)
+
 #define assertNear(...) ArduinoUnitMacroChoose5(assertNear_, ## __VA_ARGS__)(__VA_ARGS__)
+
+#define assertRelativelyNearMsg(a,b,max,message,retval)                                  \
+  do {  double ArduinoUnitA=(a), ArduinoUnitB=(b), ArduinoUnitMax=(max), ArduinoUnitErr=fabs(ArduinoUnitA-ArduinoUnitB)/(0.5*(fabs(ArduinoUnitA)+fabs(ArduinoUnitB))); if (!Test::assertion< double, double > (ARDUINO_UNIT_STRING(__FILE__),__LINE__,ARDUINO_UNIT_STRING("relerr"),ArduinoUnitErr,ARDUINO_UNIT_STRING("<="),compareLessOrEqual,ARDUINO_UNIT_STRING(#max),ArduinoUnitMax,[&](bool ok)->void { (void)ok; Test::Printer() << ARDUINO_UNIT_STRING(" [(") << ARDUINO_UNIT_STRING(#a) << ARDUINO_UNIT_STRING("=") << ArduinoUnitA << ARDUINO_UNIT_STRING(") ~ (") << ARDUINO_UNIT_STRING(#b) << ARDUINO_UNIT_STRING("=") << ArduinoUnitB << ARDUINO_UNIT_STRING(")") << message << ARDUINO_UNIT_STRING("]"); })) return retval; } while (0)
+
+#define assertRelativelyNear_5(a,b,max,message,retval)                            \
+  assertRelativelyNearMsg(a,b,max,ARDUINO_UNIT_STRING(" ") << message,retval)
+
+#define assertRelativelyNear_4(a,b,max,message)                                   \
+  assertRelativelyNearMsg(a,b,max,ARDUINO_UNIT_STRING(" ") << message,)
+
+#define assertRelativelyNear_3(a,b,max)                                           \
+  assertRelativelyNearMsg(a,b,max,ARDUINO_UNIT_STRING(""),)
+
+#define assertRelativelyNear(...) ArduinoUnitMacroChoose5(assertRelativelyNear_, ## __VA_ARGS__)(__VA_ARGS__)

@@ -115,7 +115,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
   * `testName` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
 
-* For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  Floating point arithmetic is almost never exact.
+* For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
 * `checkTestStatus(testName)` Just true/false depending on the current status of `testName`.
 
@@ -161,6 +161,7 @@ So lets imagine we are building a controller for a food cart.  I'm not going to 
 #include <ArduinoUnit.h>
 
 test(flash) { /* .. */ }
+test(lcd) { /* .. */ }
 testing(battery) { /* ..  */ }
 testing(heaterRelay) { /* ..  */ }
 testing(heaterTempSense) { /* .. */ }
@@ -212,7 +213,7 @@ void testLoop() {
 
 
 void SerialSetup() {
-  Serial.baud(115200L);
+  Serial.begin(115200L);
   while (!Serial) {} // Leonardo/Due Mantra
 
   idiotSetup();
@@ -258,9 +259,8 @@ If your thing can't run without certain things, you should make sure those certa
 // alphabetically last test
 // (declaration order does not matter)
 test(zzzz_powerOnSelfTest) {
-  assertTestPass(flashOk);
-  assertTestPass(pumpConnected);
-  assertTestPass(waterSensorConnected);
+  assertTestPass(flash);
+  assertTestPass(lcd);  
 }
 
 void powerOnSelfTest() {
@@ -317,9 +317,10 @@ Add a repeating sanity test:
 
 ```c++
 testing(sanity) {
-  assertTestNotFail(batteryOk);
-  assertTestNotFail(pumpOk);
-  assertTestNotFail(waterSensorOk);
+  assertTestNotFail(battery);
+  assertTestNotFail(heaterRelay);
+  assertTestNotFail(heaterTempSense);
+  assertTestNotFail(chillerTempSense);  
 }
 
 void sanityCheck() {
@@ -374,7 +375,7 @@ const char *io(bool ok) {
 
 void packetReceive() {
     assertEqual(packetMessageCrc(), packetComputeCrc(),io(ok));
-    ProcessPacket();
+    packetProcess();
 }
 ```
 
@@ -430,7 +431,7 @@ void spaceCritical() {
 }
 ```
 
-Note that there is no gaurantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so:
+Note that there is no gaurantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so add to your sanity checks:
 
 ```c++
 bool critical = false;

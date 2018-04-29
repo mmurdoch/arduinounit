@@ -46,3 +46,5 @@
 * Added a guidebook
 * assertNear(a,b,max[,message]) for float/double
 * assertRelation(args [,message [,retval]])
+* assertRelativelyNear(a,b,max[,message]) for float/double
+

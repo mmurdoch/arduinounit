@@ -412,6 +412,10 @@ void useInInt() {
 }
 
 ```
+Be careful!  MockStream uses dynamic memory to hold the input and output (they have the features of `Print` and `String` if you want to look them up).  Your device probably has very little memory, so:
+
+* Don't create a lot of input or output in your test(s).
+* Declare MockStreams inside tests/functions (not globals) so they can clean themselves up.
 
 ### Step 5: Time
 

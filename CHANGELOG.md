@@ -43,6 +43,6 @@
 * Resolve a<b equivalence regresion (issue 77)
 * Resolve builds for ESP8266/ESP32
 * Prefer `decltype` over `__typeof__`
-* Added a tutorial
+* Added a guidebook
 * assertNear(a,b,max[,message]) for float/double
 * assertRelation(args [,message [,retval]])

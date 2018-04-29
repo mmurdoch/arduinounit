@@ -106,22 +106,23 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 * `pass()` or `fail()` mark this test as passed or failed.  The current test will continue to the end (which may change it's mind), but it will be resolved. This means a `testing()` environment will not loop again.
 
-#### `assertRelation(between [,foot << note])`
+#### `assertRelation(between [,foot << note [,retva]])`
 
-* `assertRelation(a,b [,foot << note])` or `assertTestStatus(testName [,foot << note])`
+* `assertRelation(a,b)` or `assertTestStatus(testName)`
 
   * `Relation` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
   * `Status` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
   * `testName` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
+  * The optional retval is what is returned if the assertion fails (usually just nothing).
 
 * For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
 * `checkTestStatus(testName)` Just true/false depending on the current status of `testName`.
 
-The asserts are replaced with code like
+The asserts are replaced with code like:
 
-    if (not assertion) { fail(); return; }
+    if (not assertion) { fail(); return retval; }
 
 But also print out a status message (by default only if the assertion fails). For example:
 
@@ -204,7 +205,7 @@ void testSetup() {
   // first run sets up tests (usually nothing)
   Test::run();
 
-  idiotLightOn();
+  idiotLightOff();
 }
 
 void testLoop() {
@@ -212,7 +213,7 @@ void testLoop() {
 }
 
 
-void SerialSetup() {
+void setup() {
   Serial.begin(115200L);
   while (!Serial) {} // Leonardo/Due Mantra
 
@@ -324,7 +325,7 @@ testing(sanity) {
 }
 
 void sanityCheck() {
-  if (checkTestFail(Sanity)) {
+  if (checkTestFail(sanity)) {
     for (int i=5; i>0; --i) {
       idiotLightFlip();
       delay(100*i);
@@ -365,19 +366,25 @@ void testLoop() {
 
 ### Step 4: IO
 
-There is a chicken-and-egg problem with I/O.  If you have input and output errors, how can you tell there are problems?  You can hijack assert footnotes to give a hint by flickering the idiot light:
+There is a chicken-and-egg problem with I/O.  If you have input and output errors, how can you tell there are problems?  You can hijack the return value to flip the idiot light on fail:
 
 ```c++
-const char *io(bool ok) {
-    if (!ok) idiotLightFlip();
-    return "io";
-}
-
 void packetReceive() {
-    assertEqual(packetMessageCrc(), packetComputeCrc(),io(ok));
+    assertEqual(packetMessageCrc(), packetComputeCrc(),"io",idiotLightFlip());
     packetProcess();
 }
 ```
+
+If this is a function that does not return a void (nothing), there's a seaky notation you can use `(a,b,c)` as an expression evaluates `a`, then `b`, then is the value of `c`, so:
+
+```c++
+int packetReceive() {
+    assertEqual(packetMessageCrc(), packetComputeCrc(),"io",(idiotLightFlip(),-1));
+    return packetProcess();
+}
+```
+
+flips the idiot light and returns -1 for `packetRecieve` if the checksum fails.
 
 By passing a stream reference to IO operations, you can test if specific input and output steps work using the MockStream to simulate a serial port.  It is nice to set the default to the actual destination, so you don't have to type it everywhere:
 
@@ -434,23 +441,20 @@ void spaceCritical() {
 Note that there is no gaurantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so add to your sanity checks:
 
 ```c++
-bool critical = false;
+bool criticalError = false;
 
 test(sanity) {
-  assertFalse(critical);
+  assertFalse(criticalError);
   /* ... */
 }
 
-const char *critical(bool ok) {
-  if (ok) { return "ok"; }
-
-  critical = true;
-  return "critical";
+void critical() {
+     criticalError=true;
 }
 
 void dynamic(int bytes) {
    uint8_t *buf = (uint8_t*) malloc(bytes);
-   assertNotEqual(buf,0,"memory " << critical(ok));
+   assertNotEqual(buf,0,"memory",critical());
    /* ... */
 }
 ```

@@ -93,7 +93,7 @@ Add the library (Sketch->Include Library->Manage Libraries...), find the "basic"
 * `thingFor` can be replaced with any combination of letters, numbers, and underscores (_) but __no spaces__ and must be __unique__ among test/ing().  Good names might be `batteryLevel` and `messageSentOnTime`.
 * All active test & testing blocks are executed in alphabetical order.  If you want to control test order you can use test names like `000_BatteryLevel` and `010_MessageSentOnTime`.
 * By default, if a test finishes, it is a `pass()`.  Usually, tests have assertions (discussed next) which (if they fail) have it finish early with a `fail()` status.
-* Continuous `testing()` tests are called again and again [usually from your `loop()`].  Forever that is your thing.  You can end them by calling `pass()` or `fail()` directly or having an assertion fail.
+* Continuous `testing()` tests are called again and again [usually from your `loop()`].  Forever if that is your thing.  You can end them by calling `pass()` or `fail()` directly or having an assertion fail.
 * If all the tests complete, a summary is printed.
 
 In a test block `{ ... }` you can put code.  Any code really, but some particularly useful code is
@@ -190,6 +190,9 @@ void idiotLightSetup() {
     digitalWrite(idiotLightPin, LOW);
 }
 
+//
+// blink idiot light 1/sec if any tests fail
+//
 void idiotLightLoop() {
   static uint32_t next = 0;
   if (Test::getCurrentFailed() > 0
@@ -217,7 +220,7 @@ void setup() {
   Serial.begin(115200L);
   while (!Serial) {} // Leonardo/Due Mantra
 
-  idiotSetup();
+  idiotLightSetup();
   
   // ...
   

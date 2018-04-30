@@ -22,7 +22,7 @@ Building reliable embedded software is a rewarding experience.  Some important c
 
 * Systems are dark.  Larger systems can log everything.  Embedded devices often can just keep up with what they need to do, and spending resources logging events can break what they do.  Stepping through with a debugger may be impossible, or just hard because of all the real-time events the device interacts with.
 
-* Hardware is specific.  A real time clock that drives an interrupt on an 8-bit micro-controller which is controlling a coil that drives a metronome who's position is measured by an analog hall-effect sensor has many points of failure that is not easy to identify as "software".  But are part of the system and can cause the system to fail none the less.
+* Hardware is specific.  A real time clock that drives an interrupt on an 8-bit micro-controller which is controlling a coil that drives a metronome who's position is measured by an analog hall-effect sensor has many points of failure that is not easy to identify as "software".  But are part of the system and can cause the system to fail none the less. [If you think there is a difference between hardware and software, explain why all the transistors your "software" runs on is different philosophically from a hall effect sensor.  (Answer: you may have been trained to ignore one of them)]
 
 * Time and money are short.  Projects are almost universally wanted quickly and cheaply.
 
@@ -378,7 +378,11 @@ void packetReceive() {
 }
 ```
 
-If this is a function that does not return a void (nothing), there's a seaky notation you can use `(a,b,c)` as an expression evaluates `a`, then `b`, then is the value of `c`, so:
+If `packetRecieve` returns somethiing (not just `void`), there's a sneaky notation you can use:
+
+   `(a,b,c)` evaluates `a`, then `b`, then is the value of `c`
+
+So:
 
 ```c++
 int packetReceive() {
@@ -415,9 +419,11 @@ void useInInt() {
 }
 
 ```
+
 Be careful!  MockStream uses dynamic memory to hold the input and output (they have the features of `Print` and `String` if you want to look them up).  Your device probably has very little memory, so:
 
-* Don't create a lot of input or output in your test(s).
+* Don't create a lot of input or output in your test(s).  Each test should create and check
+  relatively small (compared to the amount of free static RAM you have) amounts of data.
 * Declare MockStreams inside tests/functions (not globals) so they can clean themselves up.
 
 ### Step 5: Time
@@ -476,7 +482,7 @@ Measuring something often changes it, and tests are a kind of observation of sof
 
 But.
 
-More importantly, writing tests changes how you write code.  Tests __observe__ code, and good tests are so valuable that you will want to adjust your habits so you code is easier to observe (hopefully operating correctly) with tests.
+More importantly, writing tests changes how you write code.  Tests __observe__ code, and good tests are so valuable that you will want to adjust your habits so your code is easier to observe (hopefully operating correctly) with tests.
 
 ### Serve, don't rule
 
@@ -571,3 +577,4 @@ Planning every detail ahead of time is a waste of effort. So is just charging in
 ### Your Momma Writes Better Tests Than You
 
 You cannot see past your own design. Have other people suggest what needs to be tested. Have other people test it. Take their advice; your mother is usually right.
+

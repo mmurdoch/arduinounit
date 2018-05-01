@@ -47,4 +47,4 @@
 * assertNear(a,b,max[,message]) for float/double
 * assertRelation(args [,message [,retval]])
 * assertRelativelyNear(a,b,max[,message]) for float/double
-
+* Test::abort() to complete all unresolved tests

@@ -3,7 +3,7 @@
 
 test(simple1)
 {
-  assertTrue(true);
+  assertTrue(true,"message");
 }
 
 test(simple2)
@@ -71,6 +71,10 @@ public:
 MyTest myTest1("myTest1");
 MyTest myTest2("myTest2");
 MyTest myTest3("myTest3");
+
+testing(long) {
+  if (millis() > 5000) pass();
+}
 
 void setup()
 {

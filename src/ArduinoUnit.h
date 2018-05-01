@@ -535,6 +535,9 @@ void loop() {
 #endif
     return ok;
   }
+
+ /** abort all testing - all unresolved tests are resolved as failed */
+ public: static void abort();
 };
 
 /** Class for creating a once-only test.  Test::run() on such a test

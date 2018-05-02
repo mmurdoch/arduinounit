@@ -108,16 +108,16 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 #### Assertions
 
-* `assert__Relation__(a,b [,foot << note])` or `assertTest__Status__(testName [,foot << note])`
+* `assert[Relation]`(a,b [,foot << note])` or `assertTest[Status](testName [,foot << note])`
 
-  * `<u>Relation</u>` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
-  * `<u>Status</u>` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
+  * `[Relation]` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
+  * `[Status]` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
   * `testName` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
 
 * For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
-* `checkTest<u>Status</u>(testName)` Just true/false depending on the current status of `testName`.
+* `checkTest[Status](thingFor)` Just true/false depending on the current status of `test/ing(thingFor)`.
 
 The asserts are replaced with code like
 

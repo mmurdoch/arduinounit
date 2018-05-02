@@ -108,12 +108,13 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 #### Assertions
 
-* `assert[Relation]`(a,b [,foot << note])` or `assertTest[Status](testName [,foot << note])`
+* `assert[Relation]`(a,b [,foot << note, [,retval]])` or `assertTest[Status](thingFor [,foot << note [,retval]])`
 
   * `[Relation]` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
   * `[Status]` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
-  * `testName` is some test/testing name.
+  * `thingFor` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
+  * The optional `retval` is to control the return value (normally nothing) when failing an assertion.
 
 * For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
@@ -121,7 +122,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 The asserts are replaced with code like
 
-    if (not assertion) { fail(); return; }
+    if (not assertion) { fail(); return retval; }
 
 But also print out a status message (by default only if the assertion fails). For example:
 

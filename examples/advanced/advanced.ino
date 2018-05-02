@@ -73,12 +73,12 @@ MyTest myTest2("myTest2");
 MyTest myTest3("myTest3");
 
 testing(long) {
-  if (millis() > 5000) pass();
+  if (millis() > 2000) pass();
 }
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200L);
   while(!Serial) {} // Portability for Leonardo/Micro
 
   Test::min_verbosity |= TEST_VERBOSITY_ASSERTIONS_ALL;

@@ -108,7 +108,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 #### Assertions
 
-* `assert[Relation]`(a,b[,foot<<note[,retval]])` or `assertTest[Status](thingFor[,foot<<note[,retval]])`
+* `assert[Relation](a,b[,foot<<note[,retval]])` or `assertTest[Status](thingFor[,foot<<note[,retval]])`
 
   * `[Relation]` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
   * `[Status]` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.

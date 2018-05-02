@@ -106,7 +106,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 * `pass()` or `fail()` mark this test as passed or failed.  The current test will continue to the end (which may change it's mind), but it will be resolved. This means a `testing()` environment will not loop again.
 
-#### `assert<u>Relation</u>(...)`
+#### Assertions
 
 * `assert<u>Relation</u>(a,b [,foot << note])` or `assertTest<u>Status</u>(testName [,foot << note])`
 

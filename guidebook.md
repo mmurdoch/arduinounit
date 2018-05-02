@@ -108,7 +108,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 #### Assertions
 
-* `assert<u>Relation</u>(a,b [,foot << note])` or `assertTest<u>Status</u>(testName [,foot << note])`
+* `assert__Relation__(a,b [,foot << note])` or `assertTest__Status__(testName [,foot << note])`
 
   * `<u>Relation</u>` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
   * `<u>Status</u>` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.

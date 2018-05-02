@@ -106,18 +106,18 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 * `pass()` or `fail()` mark this test as passed or failed.  The current test will continue to the end (which may change it's mind), but it will be resolved. This means a `testing()` environment will not loop again.
 
-#### `assertRelation(between [,foot << note])`
+#### `assert<u>Relation</u>(...)`
 
-* `assertRelation(a,b [,foot << note])` or `assertTestStatus(testName [,foot << note])`
+* `assert<u>Relation</u>(a,b [,foot << note])` or `assertTest<u>Status</u>(testName [,foot << note])`
 
-  * `Relation` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
-  * `Status` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
+  * `<u>Relation</u>` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
+  * `<u>Status</u>` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
   * `testName` is some test/testing name.
   * The `<<` in the optional `foot << note` separates things you can print.
 
 * For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
-* `checkTestStatus(testName)` Just true/false depending on the current status of `testName`.
+* `checkTest<u>Status</u>(testName)` Just true/false depending on the current status of `testName`.
 
 The asserts are replaced with code like
 

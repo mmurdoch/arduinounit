@@ -1,0 +1,47 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+if [ "$(type -t os)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
+fi
+
+if [ "$(type -t versions)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+fi
+
+arduino_exe() {
+    if [ "$ARDUINO_EXE" != "" ]
+    then
+        echo "$ARDUINO_EXE"
+        return
+    fi
+    
+    OS="$(os "$@")"
+    DIR="$(dir "$@")"
+    VERSIONS="$(versions "$@")"
+
+    for VERSION in $VERSIONS
+    do
+        if [ "$OS" = "macosx" ]
+        then
+            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/MacOS/Arduino"
+        elif [ "$OS" = "windows" ]
+        then
+            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}/arduino.exe"
+        else
+            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}/arduino"
+        fi
+        echo "$ARDUINO_EXE"
+    done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    arduino_exe "$@"
+fi

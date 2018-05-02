@@ -1,0 +1,173 @@
+#!/bin/bash -x
+
+if [ "$(type -t os)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
+fi
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+if [ "$(type -t versions)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+fi
+
+cache_ide() {
+    OS="$(os "$@")"
+    DIR="$(dir "$@")"
+    VERSIONS="$(versions "$@")"
+    
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --extension=*) EXTENSION=${1#--extension=}; shift;;
+            --tries=*)     TRIES=${1#--tries=}; shift;;
+            --reload=*)    RELOAD=${1#--reload=}; shift;;
+            --timeout=*)   TIMEOUT=${1#--timeout=}; shift;;
+            --*=*)         shift;;
+            --)            shift; break;;
+            *)             break;;
+        esac
+    done
+
+    CACHE="${DIR}/cache"
+    if [ ! -d "$CACHE" ]
+    then
+        mkdir -p "$CACHE"
+    fi
+
+    PORTABLE="${DIR}/portable"
+    if [ ! -d "$PORTABLE" ]
+    then
+        mkdir -p "$PORTABLE"
+    fi
+
+    if [ "$EXTENSION" = "" ]
+    then
+        if [ "$OS" = "macosx" -o "$OS" = "windows" ]
+        then
+            EXTENSION="zip"
+        elif [ "${OS#linux}" != "$OS" ]
+        then
+            EXTENSION="tar.xz"
+        else
+            echo "Unsupported architecture."
+            exit 1
+        fi
+    fi
+
+    if [ "$TRIES" = "" ]
+    then
+        TRIES=3
+    fi
+    
+    if [ "$RELOAD" = "" ]
+    then
+        RELOAD=false
+    fi
+    
+    if [ "$TIMEOUT" = "" ]
+    then
+        TIMEOUT=10
+    fi
+    
+    for VERSION in $VERSIONS
+    do
+        ARCHIVE="arduino-${VERSION}-${OS}.${EXTENSION}"
+        CHECKSUM="arduino-${VERSION}.sha512sum.txt"
+        
+        OK=false
+        for TRY in $(seq $TRIES)
+        do
+            if [ -r "${CACHE}/${CHECKSUM}" ]
+            then
+                if grep -q "${ARCHIVE}" "${CACHE}/${CHECKSUM}"
+                then
+                    OK=true
+                    break
+                fi
+            fi
+            curl --connect-timeout "$TIMEOUT" -o "${CACHE}/${CHECKSUM}" "https://downloads.arduino.cc/${CHECKSUM}"
+        done
+        if [ "$OK" != "true" ]
+        then
+            echo "Could not download checksum ${CHECKSUM}"
+            /bin/rm -rf "${CACHE}/${CHECKSUM}"
+            continue
+        fi
+        
+        grep "${ARCHIVE}" "${CACHE}/${CHECKSUM}" > "${CACHE}/${ARCHIVE}.sha512sum.txt"
+        
+        OK=false
+        for TRY in $(seq $TRIES)
+        do
+            if [ -r "${CACHE}/${ARCHIVE}" ]
+            then
+                if cd "$CACHE" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt" > /dev/null
+                then
+                    OK=true
+                    break
+                fi
+            fi
+            /bin/rm -rf "${CACHE}/${ARCHIVE}"
+            curl --connect-timeout "$TIMEOUT" -o "${CACHE}/${ARCHIVE}" "https://downloads.arduino.cc/${ARCHIVE}"
+        done
+        
+        if [ "$OK" != "true" ]
+        then
+            echo "Could not download archive ${ARCHIVE}"
+            /bin/rm -rf "${CACHE}/${ARCHIVE}"
+            /bin/rm -rf "${CACHE}/${VERSION}-${OS}"
+            continue
+        fi
+        
+        if [ "${RELOAD}" = "true" ]
+        then
+            /bin/rm -rf "${CACHE}/${VERSION}-${OS}"
+        fi
+        
+        if [ "${EXTENSION}" = "zip" ]
+        then
+            if [ ! -d "${CACHE}/${VERSION}-${OS}" ]
+            then
+                (cd "${CACHE}" && mkdir -p "${VERSION}-${OS}" && unzip -d "${VERSION}-${OS}" -a -o "${ARCHIVE}" > /dev/null)
+                if [ "${OS}" = "macosx" ]
+                then
+                    (cd "${CACHE}/${VERSION}-${OS}/Arduino.app/Contents/Java"; ln -s ../../../../../portable portable)
+                else
+                    (cd "${CACHE}/${VERSION}-${OS}/arduino-${VERSION}"; ln -s ../../../portable portable)                    
+                fi
+            fi
+        else
+            if [ ! -d "${CACHE}/${VERSION}-${OS}" ]
+            then        
+                (cd "${CACHE}" && mkdir -p "${VERSION}-${OS}" && tar -C "${VERSION}-${OS}" -xf "${ARCHIVE}")
+                (cd "${CACHE}/${VERSION}-${OS}/arduino-${VERSION}"; ln -s ../../../portable portable)
+            fi
+        fi
+    done
+    
+    OK=true
+    for VERSION in $VERSIONS
+    do
+        if [ ! -d "${CACHE}/${VERSION}-${OS}" ]
+        then
+            OK=false
+            break
+        fi
+    done
+
+    if [ "$OK" = "false" ]
+    then
+        exit 1
+    fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    cache_ide "$@"
+fi

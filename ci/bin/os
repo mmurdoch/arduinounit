@@ -1,0 +1,74 @@
+#!/bin/bash
+
+os() {
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --os=*) OS=${1#--os=}; shift;;
+            --*=*)  shift;;
+            --)     shift; break;;
+            *)      break;;
+        esac
+    done
+
+    if [ "$OS" != "" ]
+    then
+        echo "$OS"
+        return
+    fi
+    
+    if [ "$(uname)" = "Darwin" ]
+    then
+        echo "macosx"
+        return
+    fi
+
+    # Windows Subsystem for Linux
+    if [ -f "/proc/version" ]
+    then
+        if grep -q Windows /proc/version
+        then
+            echo "windows"
+            return
+        fi
+    fi
+
+    # cygwin
+    if uname -s | grep -q -i "cygwin"
+    then
+        echo "windows"
+        return
+    fi
+
+    # mingw
+    if uname -s | grep -q -i "mingw"
+    then
+        echo "windows"
+        return
+    fi
+
+    if [ "$(uname)" = "Linux" ]
+    then
+        if uname -m | grep -q arm
+        then
+            echo "linuxarm"
+            return
+        elif lscpu | grep "CPU op-modes(s)" | grep -q "64-bit"
+        then
+            echo "linux64"
+            return
+        else
+            echo "linux32"
+            return
+        fi
+    fi
+
+    echo "Unsupported operating system."
+    exit 1
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    os "$@"
+fi

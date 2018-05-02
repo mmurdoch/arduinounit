@@ -1,0 +1,30 @@
+#!/bin/bash
+
+dir() {
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --dir=*) DIR=${1#--dir=}; shift;;
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+
+    if [ "$DIR" = "" ]
+    then
+        DIR="$HOME/.arduino"
+    fi
+
+    if [ ! -d "${DIR}" ]
+    then
+        mkdir -p "${DIR}"
+    fi
+    echo "${DIR}"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    dir "$@"
+fi

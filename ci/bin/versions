@@ -1,0 +1,31 @@
+#!/bin/bash
+
+versions() {
+    if [ "$VERSIONS" != "" ]
+    then
+        echo $VERSIONS
+        return
+    fi
+
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --version=*) VERSIONS="$VERSIONS ${1#--version=}"; shift;;
+            --*=*)       shift;;
+            --)          shift; break;;
+            *)           break;;
+        esac
+    done
+
+    if [ "$VERSIONS" = "" ]
+    then
+        VERSIONS="1.8.5"
+    fi
+    echo $VERSIONS
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    versions "$@"
+fi

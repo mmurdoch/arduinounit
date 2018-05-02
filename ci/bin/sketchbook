@@ -1,0 +1,24 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+sketchbook() {
+    if [ "$SKETCHBOOK" == "" ]
+    then
+        SKETCHBOOK="$(dir "$@")/portable/sketchbook"
+    fi
+    
+    if [ ! -d "$SKETCHBOOK" ]
+    then
+        mkdir -p "$SKETCHBOOK"
+    fi
+    echo "$SKETCHBOOK"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    sketchbook "$@"
+fi

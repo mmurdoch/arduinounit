@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+preferences() {
+    if [ "$PREFERENCES" == "" ]
+    then
+        PREFERENCES="$(dir "$@")/portable/preferences.txt"
+    fi
+    echo "$PREFERENCES"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    preferences "$@"
+fi

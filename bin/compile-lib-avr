@@ -8,6 +8,9 @@ compile() {
         echo "compile time error: avr."
         exit 1
     fi
+
+    cp "${ARDUINO_TARGET_HEX}" "${ARDUINO_TARGET_INO%.ino}.hex"
+    
     if [ "${ARDUINO_TARGET_UPLOAD}" = "true" -a -e "${ARDUINO_TARGET_PORT}" ] ; then
         if ! ${ARDUINO_DIR}/hardware/tools/avr/bin/avrdude -C${ARDUINO_DIR}/hardware/tools/avr/etc/avrdude.conf -v -p${ARDUINO_TARGET_BOARD##*cpu=} -cwiring -P"${ARDUINO_TARGET_PORT}" -b${ARDUINO_TARGET_BAUD} -D -Uflash:w:"${ARDUINO_TARGET_HEX}":i
         then

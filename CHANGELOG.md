@@ -48,3 +48,4 @@
 * assertRelation(args [,message [,retval]])
 * assertRelativelyNear(a,b,max[,message]) for float/double
 * Test::abort() to complete all unresolved tests
+* Provide "en vitro" simple example & build scripts

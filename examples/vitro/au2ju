@@ -1,0 +1,541 @@
+#!/usr/bin/env python
+
+import os
+import re
+import sys
+import glob
+import threading
+import xml.etree.cElementTree as xet
+
+class Test:
+      _re = re.compile('.*Test (.*) (skipped|passed|failed)\.')      
+
+      def __init__(self, result, assertions,stdout,stderr):
+            if result != None:
+                  self.name = result.group(1)
+                  self.state = result.group(2)
+                  self.stdout = stdout
+                  self.stderr = stderr
+            else:
+                  self.name = "unknown"
+                  self.state = "unknown"
+                  self.stdout = stdout
+                  self.stderr = stderr
+                  
+            if assertions != None:
+                  self.assertions = assertions
+            else:
+                  self.assertions=[]
+
+      def __str__(self):
+            return "test(name='"+str(self.name)+"',state='"+str(self.state)+"',assertions="+str(self.assertions) + ",stdout=" + str(self.stdout) + ",stderr=" + str(self.stdout)+")"
+
+      def __repr__(self):
+            return self.__str__()
+
+
+class Assert:
+      _re = re.compile('.*Assertion (passed|failed): (.*)\.')
+      _details = re.compile('(.*), file (.*), line ([0-9]+) *(\[(.*)\])?')
+
+      def __init__(self,result):
+            if result == None:
+                  self.state = None
+                  self.message = None
+                  self.footnote = None
+                  self.file = None
+                  self.line = None
+            else:
+                  self.state = result.group(1)
+                  details = Assert._details.match(result.group(2))
+                  if details != None:
+                        self.message = details.group(1)
+                        self.file = details.group(2)
+                        self.line = int(details.group(3))
+                        if details.group(5) != None:
+                              self.footnote = details.group(5)
+                        else:
+                              self.footnote = None
+                  else:
+                        self.message = result.group(2)
+                        self.file = None
+                        self.line = None
+                        self.footnote = None
+                        
+      def __str__(self):
+            return "assert(state='"+str(self.state)+"',message='"+str(self.message)+"',file='"+str(self.file)+"',line="+str(self.line)+",footnote='" + self.footnote + "')"
+
+      def __repr__(self):
+            return self.__str__()
+
+class Summary:
+      _re = re.compile('.*Test summary: (.*) passed, (.*) failed, and (.*) skipped, out of (.*) test\(s\)\.')
+
+      def __init__(self,result):
+            if result != None:
+                  self.passed = int(result.group(1))
+                  self.failed = int(result.group(2))
+                  self.skipped = int(result.group(3))
+                  self.count = int(result.group(4))
+            else:
+                  self.passed = 0
+                  self.failed = 0
+                  self.skipped = 0
+                  self.count = 0
+
+      def __str__(self):
+            return 'summary(passed=' + str(self.passed) + ',failed='+str(self.failed)+',skipped='+str(self.skipped)+',count='+str(self.count)+')'
+
+      def __repr__(self):
+            return self.__str__()
+      
+
+class TestSet:
+      def __init__(self,result,tests,assertions,stdout,stderr):
+            self.summary = Summary(result)
+            if tests != None:
+                  self.tests = tests
+            else:
+                  self.tests = []
+            if len(assertions) > 0:
+                  self.tests.append(Test(None,assertions,stdout,stderr))
+
+      def __str__(self):
+            return 'testset(tests='+str(self.tests)+',summary='+str(self.summary)+')'
+      def __repr__(self):
+            return self.__str__()
+
+class Processor:
+      def __init__(self,parser,stream,isStderr):
+            self.parser = parser
+            self.stream = stream
+            self.isStderr=isStderr
+                  
+      def run(self):
+            for line in self.stream:
+                  line=line.rstrip()
+                  self.parser.parseLine(line,self.isStderr)
+                  
+class Parser:
+      def __init__(self):
+            self.reTest = re.compile('.*Test (.*) (skipped|passed|failed)\.')
+            self.testSets = []
+            self.tests = []
+            self.assertions = []
+            self.stdout = []
+            self.stderr = []            
+
+      def end(self):
+            if len(self.tests) != 0 or len(self.assertions) != 0:
+                  self.testSets.append(TestSet(None,self.tests,self.assertions,self.stdout,self.stderr))
+            self.tests=[]
+            self.assertions=[]
+            self.stdout = []
+            self.stderr = []            
+            
+      def parseLine(self,line,stderr=False):
+            if line == None:
+                  self.end()
+                  return
+            if (stderr == False):
+                  self.stdout.append(line)
+            else:
+                  self.stderr.append(line)                  
+
+            result=Assert._re.match(line)
+            if result:
+                  self.assertions.append(Assert(result))
+            result=Test._re.match(line)
+            if result:
+                  self.tests.append(Test(result,self.assertions,self.stdout,self.stderr))
+                  self.assertions=[]
+                  self.stdout=[]
+                  self.stderr=[]                  
+            result=Summary._re.match(line)
+            if result:
+                  self.testSets.append(TestSet(result,self.tests,self.assertions,self.stdout,self.stderr))
+                  self.tests=[]
+                  self.assertions=[]
+                  self.stdout = []
+                  self.stderr = []            
+
+      def process(self,inFromStdout=sys.stdin,inFromStderr=None):
+            self.testSet = []
+            self.assertions = []
+            self.tests = []
+            self.stdin = []
+            self.stderr = []
+            
+            workers = [Processor(self,inFromStdout,False)]
+            if inFromStderr != None:
+                  worders.append(Processor(self,inFromStderr,True))
+            threads = [threading.Thread(target=workers[i].run) for i in range(len(workers))]
+            for thread in threads:
+                  thread.start()
+            for thread in threads:
+                  thread.join()
+            self.end()
+
+class Summary:
+      _re = re.compile('.*Test summary: (.*) passed, (.*) failed, and (.*) skipped, out of (.*) test\(s\)\.')
+
+      def __init__(self,result):
+            if result != None:
+                  self.passed = int(result.group(1))
+                  self.failed = int(result.group(2))
+                  self.skipped = int(result.group(3))
+                  self.count = int(result.group(4))
+            else:
+                  self.passed = 0
+                  self.failed = 0
+                  self.skipped = 0
+                  self.count = 0
+
+      def __str__(self):
+            return 'summary(passed=' + str(self.passed) + ',failed='+str(self.failed)+',skipped='+str(self.skipped)+',count='+str(self.count)+')'
+
+      def __repr__(self):
+            return self.__str__()
+      
+
+class TestSet:
+      def __init__(self,result,tests,assertions,stdout,stderr):
+            self.summary = Summary(result)
+            if tests != None:
+                  self.tests = tests
+            else:
+                  self.tests = []
+            if len(assertions) > 0:
+                  self.tests.append(Test(None,assertions,stdout,stderr))
+
+      def __str__(self):
+            return 'testset(tests='+str(self.tests)+',summary='+str(self.summary)+')'
+      def __repr__(self):
+            return self.__str__()
+
+class Processor:
+      def __init__(self,parser,stream,isStderr):
+            self.parser = parser
+            self.stream = stream
+            self.isStderr=isStderr
+                  
+      def run(self):
+            for line in self.stream:
+                  line=line.rstrip()
+                  self.parser.parseLine(line,self.isStderr)
+                  
+class Parser:
+      def __init__(self):
+            self.reTest = re.compile('.*Test (.*) (skipped|passed|failed)\.')
+            self.testSets = []
+            self.tests = []
+            self.assertions = []
+            self.stdout = []
+            self.stderr = []            
+
+      def end(self):
+            if len(self.tests) != 0 or len(self.assertions) != 0:
+                  self.testSets.append(TestSet(None,self.tests,self.assertions,self.stdout,self.stderr))
+            self.tests=[]
+            self.assertions=[]
+            self.stdout = []
+            self.stderr = []            
+            
+      def parseLine(self,line,stderr=False):
+            if line == None:
+                  self.end()
+                  return
+            if (stderr == False):
+                  self.stdout.append(line)
+            else:
+                  self.stderr.append(line)                  
+
+            result=Assert._re.match(line)
+            if result:
+                  self.assertions.append(Assert(result))
+            result=Test._re.match(line)
+            if result:
+                  self.tests.append(Test(result,self.assertions,self.stdout,self.stderr))
+                  self.assertions=[]
+                  self.stdout=[]
+                  self.stderr=[]                  
+            result=Summary._re.match(line)
+            if result:
+                  self.testSets.append(TestSet(result,self.tests,self.assertions,self.stdout,self.stderr))
+                  self.tests=[]
+                  self.assertions=[]
+                  self.stdout = []
+                  self.stderr = []            
+
+      def process(self,inFromStdout=sys.stdin,inFromStderr=None):
+            self.testSet = []
+            self.assertions = []
+            self.tests = []
+            self.stdin = []
+            self.stderr = []
+            
+            workers = [Processor(self,inFromStdout,False)]
+            if inFromStderr != None:
+                  worders.append(Processor(self,inFromStderr,True))
+            threads = [threading.Thread(target=workers[i].run) for i in range(len(workers))]
+            for thread in threads:
+                  thread.start()
+            for thread in threads:
+                  thread.join()
+            self.end()
+
+class Summary:
+      _re = re.compile('.*Test summary: (.*) passed, (.*) failed, and (.*) skipped, out of (.*) test\(s\)\.')
+
+      def __init__(self,result):
+            if result != None:
+                  self.passed = int(result.group(1))
+                  self.failed = int(result.group(2))
+                  self.skipped = int(result.group(3))
+                  self.count = int(result.group(4))
+            else:
+                  self.passed = 0
+                  self.failed = 0
+                  self.skipped = 0
+                  self.count = 0
+
+      def __str__(self):
+            return 'summary(passed=' + str(self.passed) + ',failed='+str(self.failed)+',skipped='+str(self.skipped)+',count='+str(self.count)+')'
+
+      def __repr__(self):
+            return self.__str__()
+      
+
+class TestSet:
+      def __init__(self,result,tests,assertions,stdout,stderr):
+            self.summary = Summary(result)
+            if tests != None:
+                  self.tests = tests
+            else:
+                  self.tests = []
+            if len(assertions) > 0:
+                  self.tests.append(Test(None,assertions,stdout,stderr))
+
+      def __str__(self):
+            return 'testset(tests='+str(self.tests)+',summary='+str(self.summary)+')'
+      def __repr__(self):
+            return self.__str__()
+
+class Processor:
+      def __init__(self,parser,stream,isStderr):
+            self.parser = parser
+            self.stream = stream
+            self.isStderr=isStderr
+                  
+      def run(self):
+            for line in self.stream:
+                  line=line.rstrip()
+                  self.parser.parseLine(line,self.isStderr)
+                  
+class Parser:
+      def __init__(self):
+            self.reTest = re.compile('.*Test (.*) (skipped|passed|failed)\.')
+            self.testSets = []
+            self.tests = []
+            self.assertions = []
+            self.stdout = []
+            self.stderr = []            
+
+      def end(self):
+            if len(self.tests) != 0 or len(self.assertions) != 0:
+                  self.testSets.append(TestSet(None,self.tests,self.assertions,self.stdout,self.stderr))
+            self.tests=[]
+            self.assertions=[]
+            self.stdout = []
+            self.stderr = []            
+            
+      def parseLine(self,line,stderr=False):
+            if line == None:
+                  self.end()
+                  return
+            if (stderr == False):
+                  self.stdout.append(line)
+            else:
+                  self.stderr.append(line)                  
+
+            result=Assert._re.match(line)
+            if result:
+                  self.assertions.append(Assert(result))
+            result=Test._re.match(line)
+            if result:
+                  self.tests.append(Test(result,self.assertions,self.stdout,self.stderr))
+                  self.assertions=[]
+                  self.stdout=[]
+                  self.stderr=[]                  
+            result=Summary._re.match(line)
+            if result:
+                  self.testSets.append(TestSet(result,self.tests,self.assertions,self.stdout,self.stderr))
+                  self.tests=[]
+                  self.assertions=[]
+                  self.stdout = []
+                  self.stderr = []            
+
+      def process(self,inFromStdout=sys.stdin,inFromStderr=None):
+            self.testSet = []
+            self.assertions = []
+            self.tests = []
+            self.stdin = []
+            self.stderr = []
+            
+            workers = [Processor(self,inFromStdout,False)]
+            if inFromStderr != None:
+                  worders.append(Processor(self,inFromStderr,True))
+            threads = [threading.Thread(target=workers[i].run) for i in range(len(workers))]
+            for thread in threads:
+                  thread.start()
+            for thread in threads:
+                  thread.join()
+            self.end()
+
+class JUnit4:
+      def __init__(self):
+            pass
+
+      def indent(self, elem, level=0):
+            i = "\n" + level*"  "
+            j = "\n" + (level-1)*"  "
+
+            if len(elem):
+                if not elem.text or not elem.text.strip():
+                    elem.text = i + "  "
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = i
+                for subelem in elem:
+                    self.indent(subelem, level+1)
+                if not elem.tail or not elem.tail.strip():
+                    elem.tail = j
+            else:
+                if level and (not elem.tail or not elem.tail.strip()):
+                    elem.tail = j
+            return elem        
+             
+      def printTestSets(self,testSets,prettyPrint=True):
+            doc = self.addTestSets(testSets)
+            xml = xet.ElementTree(doc)
+            if prettyPrint:
+                  self.indent(doc)
+            xml.write(sys.stdout, xml_declaration=True, encoding='utf-8')
+
+      def addTestSets(self,testSets,parent=None):
+            ans = None
+            if parent != None:
+                  ans =xet.SubElement(parent,"testsuites")
+            else:
+                  ans =xet.Element("testsuites")
+                  
+            for testSet in testSets:
+                  self.addTestSet(testSet,ans)
+            return ans
+
+      def addTestSet(self,testSet,parent=None):
+            ans = None
+            if parent != None:
+                  ans = xet.SubElement(parent,"testsuite")
+            else:
+                  ans = xet.Element("testsuite")
+
+            ans.set("tests",str(len(testSet.tests)))
+
+            for test in testSet.tests:
+                  self.addTest(test,ans)
+
+            return ans
+
+      def addTest(self,test,parent=None):
+            ans = None
+            if parent != None:
+                  ans = xet.SubElement(parent,"testcase")
+            else:
+                  ans = xet.Element("testcase")
+
+            ans.set("name",test.name)
+
+            if test.state == 'skipped':
+                  xet.SubElement(ans,"skipped")
+                  return
+            
+            for assertion in test.assertions:
+                  self.addAssertion(assertion,ans)
+
+            self.addStdout(test.stdout,ans)            
+            self.addStderr(test.stderr,ans)
+
+      def addStdout(Self,stdout,parent=None):
+            if (len(stdout) == 0):
+                  return None
+            ans = None
+            if parent != None:
+                  ans = xet.SubElement(parent,"stdout")
+            else:
+                  ans = xet.Element("stdout")
+                  
+            ans.text = "\n" + "\n".join(stdout) + "\n"
+            return ans
+
+      def addStderr(Self,stderr,parent=None):
+            if (len(stderr) == 0):
+                  return None            
+            ans = None
+            if parent != None:
+                  ans = xet.SubElement(parent,"stderr")
+            else:
+                  ans = xet.Element("stderr")
+                  
+            ans.text = "\n" + "\n".join(stderr)
+            return ans
+      
+      def addAssertion(self,assertion,parent=None):
+            ans = None
+            if (assertion.state == 'passed'):
+                  return None
+
+            if parent != None:
+                  ans = xet.SubElement(parent,"failure")
+            else:
+                  ans = xet.Element("failure")
+
+            message  = assertion.file + ":" + str(assertion.line) + " " + assertion.message
+            ans.set("message",message)
+
+            text = ["\n"]
+            
+            if assertion.file != None:
+                  text.append("File \"" + assertion.file + "\"")
+            else:
+                  text.append("File None")
+            
+            if assertion.line != None:
+                  text.append(", line " + str(assertion.line))
+            else:
+                  text.append(", line unknown")
+            if parent != None:
+                  text.append(", in " + parent.get("name") + "\n")
+            else:
+                  text.append(", in unknown\n")
+            text.append("    Assertion failed: " + assertion.message)
+            if assertion.file != None:
+                  text.append(", file " + assertion.file)
+            if assertion.line != None:
+                  text.append(", line " + str(assertion.line))
+            if (assertion.footnote != None):
+                  text.append(" [" + assertion.footnote + "]")
+            text.append(".")
+            text.append("\n")
+
+            ans.text = "".join(text)
+
+            return ans
+
+def main():
+      p = Parser()
+      p.process()
+      junit4=JUnit4()
+      junit4.printTestSets(p.testSets)
+
+if __name__ == '__main__':
+    main()

@@ -159,6 +159,22 @@ void Test::run()
   current = 0;
 }
 
+void Test::abort()
+{
+  while (root != 0) {
+    current=root;
+    current->state = DONE_FAIL;
+    Test::out->print(ARDUINO_UNIT_STRING("Assertion failed: test "));
+    Test::out->print(current->name);
+    Test::out->print(ARDUINO_UNIT_STRING(" aborted, file ArduinoUnit.cpp, line "));
+    Test::out->print(__LINE__);
+    Test::out->println(ARDUINO_UNIT_STRING("."));
+    root=root->next;
+    current->resolve();
+  }
+  current=0;
+}
+
 Test::~Test()
 {
   remove();

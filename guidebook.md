@@ -106,19 +106,19 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 * `pass()` or `fail()` mark this test as passed or failed.  The current test will continue to the end (which may change it's mind), but it will be resolved. This means a `testing()` environment will not loop again.
 
-#### `assertRelation(between [,foot << note [,retva]])`
+#### Assertions
 
-* `assertRelation(a,b)` or `assertTestStatus(testName)`
+* `assert[Relation](a,b[,foot<<note[,retval]])` or `assertTest[Status](thingFor[,foot<<note[,retval]])`
 
-  * `Relation` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
-  * `Status` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
-  * `testName` is some test/testing name.
-  * The `<<` in the optional `foot << note` separates things you can print.
-  * The optional retval is what is returned if the assertion fails (usually just nothing).
+  * `[Relation]` is one of: `Equal`, `NotEqual`, `Less`, `More`, `LessOrEqual`, `MoreOrEqual`.
+  * `[Status]` is one of: `Done`, `Pass`, `Skip`, `Fail`, `NotDone`, `NotPass`, `NotSkip`, `NotFail`.
+  * `thingFor` is some test/testing name.
+  * The `<<` in the optional `foot<<note` separates things you can print.
+  * The optional `retval` is to control the return value (normally nothing) when an assertion fails.
 
 * For float and double values, `assertNear(a,b,max [,foot << note])` tests `|b-a|<=max`.  If you are working with very large or very small numbers, use `assertRelativelyNear`, which divides the error by the average magnitude, `½(|a|+|b|)`.  Floating point arithmetic is almost never exact so don't expect them to be `Equal`.
 
-* `checkTestStatus(testName)` Just true/false depending on the current status of `testName`.
+* `checkTest[Status](thingFor)` Just true/false depending on the current status of `test/ing(thingFor)`.
 
 The asserts are replaced with code like:
 
@@ -228,7 +228,7 @@ void setup() {
 }
 
 void loop() {
-  idiotLoop();
+  idiotLightLoop();
   
   // ...
   

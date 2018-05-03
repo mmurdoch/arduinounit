@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#
+# Figure out what to test
+#
+if [ $# -gt 0 ]; then
+   ARDUINO_TARGET_INO="$1"
+else
+   ARDUINO_TARGET_INO="$(echo *.ino)"
+fi
+
+if [ ! -f "${ARDUINO_TARGET_INO}" ] ; then
+  echo "must specify ino file"
+  exit 1
+fi
+
+ARDUINO_TARGET_DIR="$(dirname "$ARDUINO_TARGET_INO")"
+ARDUINO_TARGET_BASE="$(basename "$ARDUINO_TARGET_INO")"
+ARDUINO_TARGET_FILE="${ARDUINO_TARGET_BASE%.ino}"
+ARDUINO_TARGET_EXE="$ARDUINO_TARGET_DIR/$ARDUINO_TARGET_FILE"
+
+/bin/rm -rf "${ARDUINO_TARGET_EXE}.log" "${ARDUINO_TARGET_EXE}.xml"
+
+if [ ! -x "${ARDUINO_TARGET_EXE}" ] ; then
+  echo "missing executable '${ARDUINO_TARGET_EXE}' -- did you compile?"
+  exit 1
+fi
+
+if [ "$TMP" = "" ] ; then
+  TMP="$(mktemp -d)"
+  trap '{ /bin/rm -rf "${TMP}"; }' EXIT
+else
+  mkdir -p "$TMP"
+fi
+
+( "${ARDUINO_TARGET_EXE}" "$@"; echo "$?" > "$TMP/status" ) | tee "${ARDUINO_TARGET_EXE}.log"
+
+STATUS="$(cat "$TMP/status")"
+
+if [ -r "${ARDUINO_TARGET_EXE}.log" ]
+then
+        ./au2ju < "${ARDUINO_TARGET_EXE}.log" > "${ARDUINO_TARGET_EXE}.xml"
+fi
+exit $STATUS

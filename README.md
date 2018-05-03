@@ -62,8 +62,8 @@ The following asserts are supported [with an optional footnote and return value]
 | Assertion | Description |
 | --- | --- |
 | `assertEqual(a,b [,footnote [,retval]])` | `a == b`? |
-| `assertNear(a,b,maxerr, [,footnote[,retval]])` | `|b-a|<=maxerr`? |
-| `assertRelativelyNear(a,b,maxerr, [,footnote[,retval]])` | `|b-a|/(½(|a|+|b|))<=maxerr`? |
+| `assertNear(a,b,maxerr, [,footnote[,retval]])` | `abs(b-a)<=maxerr`? |
+| `assertRelativelyNear(a,b,maxerr, [,footnote[,retval]])` | `abs(b-a)/abs(½(abs(a)+abs(b)))<=maxerr`? |
 | `assertNotEqual(a,b [,footnote[,retval]])` | `a != b`? |
 | `assertLess(a,b [,footnote[,retval]])` | `a < b`? |
 | `assertLessOrEqual(a,b [,footnote[,retval]])` | `a <= b`? |

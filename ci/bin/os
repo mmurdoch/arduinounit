@@ -54,7 +54,7 @@ os() {
         then
             echo "linuxarm"
             return
-        elif lscpu | grep "CPU op-modes(s)" | grep -q "64-bit"
+        elif lscpu | grep "CPU op-mode(s)" | grep -q "64-bit"
         then
             echo "linux64"
             return

@@ -9,6 +9,8 @@
 #include <time.h>
 #include <string>
 #include <vector>
+#include <limits.h>
+
 #include "ArduinoUnit.h"
 #include "ArduinoUnitMock.h"
 

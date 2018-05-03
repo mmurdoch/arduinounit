@@ -22,7 +22,7 @@ Building reliable embedded software is a rewarding experience.  Some important c
 
 * Systems are dark.  Larger systems can log everything.  Embedded devices often can just keep up with what they need to do, and spending resources logging events can break what they do.  Stepping through with a debugger may be impossible, or just hard because of all the real-time events the device interacts with.
 
-* Hardware is specific.  A real time clock that drives an interrupt on an 8-bit micro-controller which is controlling a coil that drives a metronome who's position is measured by an analog hall-effect sensor has many points of failure that is not easy to identify as "software".  But are part of the system and can cause the system to fail none the less.
+* Hardware is specific.  A real time clock that drives an interrupt on an 8-bit micro-controller which is controlling a coil that drives a metronome who's position is measured by an analog hall-effect sensor has many points of failure that is not easy to identify as "software".  But are part of the system and can cause the system to fail none the less. [If you think there is a difference between hardware and software, explain why all the transistors your "software" runs on is different philosophically from a hall effect sensor.  (Answer: you may have been trained to ignore one of them)]
 
 * Time and money are short.  Projects are almost universally wanted quickly and cheaply.
 
@@ -93,7 +93,7 @@ Add the library (Sketch->Include Library->Manage Libraries...), find the "basic"
 * `thingFor` can be replaced with any combination of letters, numbers, and underscores (_) but __no spaces__ and must be __unique__ among test/ing().  Good names might be `batteryLevel` and `messageSentOnTime`.
 * All active test & testing blocks are executed in alphabetical order.  If you want to control test order you can use test names like `000_BatteryLevel` and `010_MessageSentOnTime`.
 * By default, if a test finishes, it is a `pass()`.  Usually, tests have assertions (discussed next) which (if they fail) have it finish early with a `fail()` status.
-* Continuous `testing()` tests are called again and again [usually from your `loop()`].  Forever that is your thing.  You can end them by calling `pass()` or `fail()` directly or having an assertion fail.
+* Continuous `testing()` tests are called again and again [usually from your `loop()`].  Forever if that is your thing.  You can end them by calling `pass()` or `fail()` directly or having an assertion fail.
 * If all the tests complete, a summary is printed.
 
 In a test block `{ ... }` you can put code.  Any code really, but some particularly useful code is
@@ -120,7 +120,7 @@ In a test block `{ ... }` you can put code.  Any code really, but some particula
 
 * `checkTest[Status](thingFor)` Just true/false depending on the current status of `test/ing(thingFor)`.
 
-The asserts are replaced with code like
+The asserts are replaced with code like:
 
     if (not assertion) { fail(); return retval; }
 
@@ -157,7 +157,7 @@ Tests that are completed are removed from the list (this is not a dynamic memory
 
 Pejoratives aside, this idea is really useful and we are all idiots most of the time (there are infinitely more things we don't know than we know).  It is important to have a thumbs up/thumbs down status so we can at least decide to look more closely.  If you or your manager puckers when they see your code, replace `idiot` with `status`.  We know what you mean: "Toilet" vs. "Bathroom", it's all the same business.
 
-So lets imagine we are building a controller for a food cart.  I'm not going to bother with the implementation, just the tests.  By default if a test completes it is a `pass()`.  You can put a fail or some simple assertions to see how the output changes.
+So let us imagine we are building a controller for a food cart.  I'm not going to bother with the implementation, just the tests.  By default if a test completes it is a `pass()`.  You can put a fail or some simple assertions to see how the output changes.
 ```c++
 #include <ArduinoUnit.h>
 
@@ -190,6 +190,9 @@ void idiotLightSetup() {
     digitalWrite(idiotLightPin, LOW);
 }
 
+//
+// blink idiot light 1/sec if any tests fail
+//
 void idiotLightLoop() {
   static uint32_t next = 0;
   if (Test::getCurrentFailed() > 0
@@ -205,7 +208,7 @@ void testSetup() {
   // first run sets up tests (usually nothing)
   Test::run();
 
-  idiotLightOn();
+  idiotLightOff();
 }
 
 void testLoop() {
@@ -213,11 +216,11 @@ void testLoop() {
 }
 
 
-void SerialSetup() {
+void setup() {
   Serial.begin(115200L);
   while (!Serial) {} // Leonardo/Due Mantra
 
-  idiotSetup();
+  idiotLightSetup();
   
   // ...
   
@@ -225,7 +228,7 @@ void SerialSetup() {
 }
 
 void loop() {
-  idiotLoop();
+  idiotLightLoop();
   
   // ...
   
@@ -325,7 +328,7 @@ testing(sanity) {
 }
 
 void sanityCheck() {
-  if (checkTestFail(Sanity)) {
+  if (checkTestFail(sanity)) {
     for (int i=5; i>0; --i) {
       idiotLightFlip();
       delay(100*i);
@@ -366,19 +369,29 @@ void testLoop() {
 
 ### Step 4: IO
 
-There is a chicken-and-egg problem with I/O.  If you have input and output errors, how can you tell there are problems?  You can hijack assert footnotes to give a hint by flickering the idiot light:
+There is a chicken-and-egg problem with I/O.  If you have input and output errors, how can you tell there are problems?  You can hijack the return value to flip the idiot light on fail:
 
 ```c++
-const char *io(bool ok) {
-    if (!ok) idiotLightFlip();
-    return "io";
-}
-
 void packetReceive() {
-    assertEqual(packetMessageCrc(), packetComputeCrc(),io(ok));
+    assertEqual(packetMessageCrc(), packetComputeCrc(),"io",idiotLightFlip());
     packetProcess();
 }
 ```
+
+If `packetRecieve` returns somethiing (not just `void`), there's a sneaky notation you can use:
+
+   `(a,b,c)` evaluates `a`, then `b`, then is the value of `c`
+
+So:
+
+```c++
+int packetReceive() {
+    assertEqual(packetMessageCrc(), packetComputeCrc(),"io",(idiotLightFlip(),-1));
+    return packetProcess();
+}
+```
+
+flips the idiot light and returns -1 for `packetRecieve` if the checksum fails.
 
 By passing a stream reference to IO operations, you can test if specific input and output steps work using the MockStream to simulate a serial port.  It is nice to set the default to the actual destination, so you don't have to type it everywhere:
 
@@ -407,6 +420,12 @@ void useInInt() {
 
 ```
 
+Be careful!  MockStream uses dynamic memory to hold the input and output (they have the features of `Print` and `String` if you want to look them up).  Your device probably has very little memory, so:
+
+* Don't create a lot of input or output in your test(s).  Each test should create and check
+  relatively small (compared to the amount of free static RAM you have) amounts of data.
+* Declare MockStreams inside tests/functions (not globals) so they can clean themselves up.
+
 ### Step 5: Time
 
 It is important to know if something takes too long.  The following accounts for your system running long enough to suffer from the 32-bit microsecond counter rolling back through zero.
@@ -432,26 +451,23 @@ void spaceCritical() {
 }
 ```
 
-Note that there is no gaurantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so add to your sanity checks:
+Note that there is no guarantee the space can be allocated in one block.  The free space list may be fragmented, so you should check the outcome of any dynamic allocation to attempt.  Running out of memory is usually a critical failure, so add to your sanity checks:
 
 ```c++
-bool critical = false;
+bool criticalError = false;
 
 test(sanity) {
-  assertFalse(critical);
+  assertFalse(criticalError);
   /* ... */
 }
 
-const char *critical(bool ok) {
-  if (ok) { return "ok"; }
-
-  critical = true;
-  return "critical";
+void critical() {
+     criticalError=true;
 }
 
 void dynamic(int bytes) {
    uint8_t *buf = (uint8_t*) malloc(bytes);
-   assertNotEqual(buf,0,"memory " << critical(ok));
+   assertNotEqual(buf,0,"memory",critical());
    /* ... */
 }
 ```
@@ -466,7 +482,7 @@ Measuring something often changes it, and tests are a kind of observation of sof
 
 But.
 
-More importantly, writing tests changes how you write code.  Tests __observe__ code, and good tests are so valuable that you will want to adjust your habits so you code is easier to observe (hopefully operating correctly) with tests.
+More importantly, writing tests changes how you write code.  Tests __observe__ code, and good tests are so valuable that you will want to adjust your habits so your code is easier to observe (hopefully operating correctly) with tests.
 
 ### Serve, don't rule
 
@@ -556,8 +572,9 @@ Eventually you will be turning your hot dog cart into a taco stand.  Trust me ev
 
 ### A Journey of 1000 Miles Begins With A Map
 
-Planning every detail ahead of time is a waste of effort. So is just charging into the woods. In software you build the map with tests. If you don't know how to make a thing work, try writing the tests that should pass when it does work. The tests will help solidify what the Thing really is, including a lot about what it does not have to be.
+Planning every detail ahead of time is a waste of effort. So is just charging into the woods. In software, you build the map with tests. If you don't know how to make a thing work, try writing the tests that should pass when it does work. The tests will help solidify what the Thing really is, including a lot about what it does not have to be.
 
 ### Your Momma Writes Better Tests Than You
 
 You cannot see past your own design. Have other people suggest what needs to be tested. Have other people test it. Take their advice; your mother is usually right.
+

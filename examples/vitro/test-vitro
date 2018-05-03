@@ -33,7 +33,7 @@ else
   mkdir -p "$TMP"
 fi
 
-( "${ARDUINO_TARGET_EXE}"; echo "$?" > "$TMP/status" ) | tee "${ARDUINO_TARGET_EXE}.log"
+( "${ARDUINO_TARGET_EXE}" "$@"; echo "$?" > "$TMP/status" ) | tee "${ARDUINO_TARGET_EXE}.log"
 
 STATUS="$(cat "$TMP/status")"
 

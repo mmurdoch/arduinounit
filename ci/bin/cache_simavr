@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+cache_simavr() {
+    DIR="$(dir "$@")"
+    
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --reload=*)    RELOAD=${1#--reload=}; shift;;
+            --*=*)         shift;;
+            --)            shift; break;;
+            *)             break;;
+        esac
+    done
+
+    mkdir -p "$DIR/cache"
+    cd "$DIR/cache"
+
+    if [ -d "simavr/.git" -a "$RELOAD" != "true" ]
+    then
+	cd simavr
+	test -d .git && git reset --hard    || /bin/rm -rf .git
+	test -d .git && git checkout master || /bin/rm -rf .git
+	test -d .git && git reset --hard    || /bin/rm -rf .git
+	test -d .git && git pull            || /bin/rm -rf .git
+	cd ..
+    fi
+
+    if [ \( ! -d "simavr/.git" \) -o "$RELOAD" = "true" ]
+    then
+	/bin/rm -rf simavr
+	git clone https://github.com/buserror/simavr.git
+    fi
+
+    if [ ! -d "simavr/.git" ]
+    then
+	/bin/rm -rf simavr	
+	echo "could not obtain simavr repository."
+	exit 1
+    fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    cache_simavr "$@"
+fi

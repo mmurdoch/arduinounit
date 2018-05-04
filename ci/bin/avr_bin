@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ "$(type -t arduino_dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_dir
+fi
+
+avr_bin() {
+    arduino_dir "$@" | while read -r dir
+    do
+	echo "$dir/hardware/tools/avr/bin"
+    done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    avr_bin "$@"
+fi

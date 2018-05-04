@@ -1,0 +1,97 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+if [ "$(type -t os)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
+fi
+
+if [ "$(type -t versions)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+fi
+
+simavr_uno_exit() {
+  for PID in $SIMAVR_UNO_PIDS
+  do
+     if ps $PID >/dev/null
+     then
+        kill $PID
+     fi
+  done
+
+}
+
+simavr_uno() {
+    DIR="$(dir "$@")"
+    OS="$(os "$@")"
+    VERSIONS="$(versions "$@")"
+    HEX=""
+
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --hex=*)    HEX="${1#--hex=}"; shift;;
+            --*=*)      shift;;
+            --)         shift; break;;
+            *)          break;;
+        esac
+    done
+
+    INPUT=( "$@" )
+    
+    if [ "$HEX" = "" ]
+    then
+       HEX="$(echo *.hex)"
+    fi
+
+    if [ ! -r "${HEX}" ] ; then
+      echo "must specify hex file"
+      exit 1
+    fi
+
+    SIMAVR_UNO_PIDS=""
+    trap simavr_uno_exit EXIT
+
+    for VERSION in $VERSIONS
+    do
+	PORT="/tmp/simavr-uart0"
+	"${DIR}/cache/${VERSION}-${OS}/simavr/uno" "${HEX}" &
+	PID=$!
+	if [ "$PID" != "" ]
+	then
+            SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
+	else
+            echo "could not launch simavr/uno"
+            exit 1
+	fi
+        
+	while [ ! -e "$PORT" ] ; do sleep 0.01 ; done
+	
+#	(for input in "${INPUT[@]}" ; do echo -n "$input\r\n" ; done) >> "$PORT" &
+#	PID=$!
+#	if [ "$PID" != "" ]
+#	then
+#            SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
+#	fi
+	
+	cat "$PORT" 2>/dev/null | while read -r line
+	do
+	    echo "$line"
+	    if [[ "$line" =~ "Test summary:" ]]
+	    then
+		simavr_uno_exit
+	    fi
+	done
+    done
+}
+	
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    simavr_uno "$@"
+fi

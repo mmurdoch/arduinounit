@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ "$(type -t dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
+fi
+
+if [ "$(type -t os)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
+fi
+
+if [ "$(type -t versions)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+fi
+
+arduino_dir() {
+    OS="$(os "$@")"
+    DIR="$(dir "$@")"
+    VERSIONS="$(versions "$@")"
+
+    for VERSION in $VERSIONS
+    do
+        if [ "$OS" = "macosx" ]
+        then
+            ARDUINO_DIR="${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/Java"
+	else
+            ARDUINO_DIR="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}"
+        fi
+        echo "$ARDUINO_DIR"
+    done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    arduino_dir "$@"
+fi

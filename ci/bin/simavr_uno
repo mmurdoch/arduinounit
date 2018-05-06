@@ -10,9 +10,9 @@ then
     . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
 fi
 
-if [ "$(type -t versions)" != "function" ]
+if [ "$(type -t version)" != "function" ]
 then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/version
 fi
 
 simavr_uno_exit() {
@@ -29,13 +29,15 @@ simavr_uno_exit() {
 simavr_uno() {
     DIR="$(dir "$@")"
     OS="$(os "$@")"
-    VERSIONS="$(versions "$@")"
+    VERSION="$(version "$@")"
     HEX=""
 
     while [ $# -gt 0 ]
     do
         case "$1"
         in
+            --background=*)  BACKGROUND=${1#--background=}; shift;;
+	    --ino=*)    HEX="${1#--ino=}.hex"; shift;;
             --hex=*)    HEX="${1#--hex=}"; shift;;
             --*=*)      shift;;
             --)         shift; break;;
@@ -58,36 +60,26 @@ simavr_uno() {
     SIMAVR_UNO_PIDS=""
     trap simavr_uno_exit EXIT
 
-    for VERSION in $VERSIONS
+    PORT="/tmp/simavr-uart0"
+    "${DIR}/cache/${VERSION}-${OS}/simavr/uno" "${HEX}" &
+    PID=$!
+    if [ "$PID" != "" ]
+    then
+        SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
+    else
+        echo "could not launch simavr/uno"
+        exit 1
+    fi
+    
+    while [ ! -e "$PORT" ] ; do sleep 0.01 ; done
+    
+    cat "$PORT" 2>/dev/null | while read -r line
     do
-	PORT="/tmp/simavr-uart0"
-	"${DIR}/cache/${VERSION}-${OS}/simavr/uno" "${HEX}" &
-	PID=$!
-	if [ "$PID" != "" ]
+	echo "$line"
+	if [[ "$line" =~ "Test summary:" ]]
 	then
-            SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
-	else
-            echo "could not launch simavr/uno"
-            exit 1
+	    simavr_uno_exit
 	fi
-        
-	while [ ! -e "$PORT" ] ; do sleep 0.01 ; done
-	
-#	(for input in "${INPUT[@]}" ; do echo -n "$input\r\n" ; done) >> "$PORT" &
-#	PID=$!
-#	if [ "$PID" != "" ]
-#	then
-#            SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
-#	fi
-	
-	cat "$PORT" 2>/dev/null | while read -r line
-	do
-	    echo "$line"
-	    if [[ "$line" =~ "Test summary:" ]]
-	    then
-		simavr_uno_exit
-	    fi
-	done
     done
 }
 	

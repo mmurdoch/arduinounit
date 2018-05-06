@@ -1,18 +1,18 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
-
 if [ "$(type -t os)" != "function" ]
 then
     . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
 fi
 
-if [ "$(type -t versions)" != "function" ]
+if [ "$(type -t version)" != "function" ]
 then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/version
+fi
+
+if [ "$(type -t dir_cache)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir_cache
 fi
 
 arduino_exe() {
@@ -21,24 +21,19 @@ arduino_exe() {
         echo "$ARDUINO_EXE"
         return
     fi
-    
     OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    VERSIONS="$(versions "$@")"
+    VERSION="$(version "$@")"    
+    DIR_CACHE="$(dir_cache "$@")"
 
-    for VERSION in $VERSIONS
-    do
-        if [ "$OS" = "macosx" ]
-        then
-            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/MacOS/Arduino"
-        elif [ "$OS" = "windows" ]
-        then
-            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}/arduino.exe"
-        else
-            ARDUINO_EXE="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}/arduino"
-        fi
-        echo "$ARDUINO_EXE"
-    done
+    if [ "$OS" = "macosx" ]
+    then
+	echo "${DIR_CACHE}/Arduino.app/Contents/MacOS/Arduino"
+    elif [ "$OS" = "windows" ]
+    then
+	echo "${DIR_CACHE}/arduino-${VERSION}/arduino.exe"
+    else
+        echo "${DIR_CACHE}/arduino-${VERSION}/arduino"
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]

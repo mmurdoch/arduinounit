@@ -30,72 +30,93 @@ then
     . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/avr_root
 fi
 
+if [ "$(type -t arduino_exe)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_exe
+fi
+
+if [ "$(type -t cache_simavr)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_simavr
+fi
+
 make_simavr_uno() {
     DIR="$(dir "$@")"
     OS="$(os "$@")"
-    VERSIONS="$(versions "$@")"
+    VERSION="$(version "$@")"
+    ARDUINO_EXE="$(arduino_exe "$@")"
+    AVR_ROOT="$(avr_root "$@")"    
 
     while [ $# -gt 0 ]
     do
         case "$1"
         in
             --reload=*)    RELOAD=${1#--reload=}; shift;;
+            --branch=*)    BRANCH=${1#--branch=}; shift;;	    
             --*=*)         shift;;
             --)            shift; break;;
             *)             break;;
         esac
     done
 
-    if [ ! -d "$DIR/cache/simavr" -o "$RELOAD" = "true" ]
+    if [ $BRANCH = "" ]
     then
-	if ! cache_simavr --dir="$DIR" --reload="$RELOAD"
+	BRANCH=master
+    fi
+
+    if [ -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" -a "$RELOAD" != "true" ]
+    then
+	exit 0
+    fi
+
+    if [ ! -r "$ARDUINO_EXE" ]
+    then
+	echo "Arduido executable $ARDUINO_EXE missing (caching)..."
+	if ! cache_ide "$@"
 	then
-	    echo "could not cache simavr"
 	    exit 1
 	fi
     fi
-    
-    for VERSION in $VERSIONS
-    do
-	if [ -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" -a "$RELOAD" != "true" ]
-	then
-	   continue
-	fi
 
-	mkdir -p "$DIR/cache/$VERSION-$OS/simavr"
-	
-	AVR_ROOT="$(avr_root --dir="$DIR" --os="$OS" --version="$VERSION")"
-	if [ ! -d "$AVR_ROOT" ]
+    if [ ! -d "$AVR_ROOT" ]
+    then
+	echo "Missing avr tools directory $AVR_ROOT."
+	exit 1
+    fi
+
+    if [ ! -d "$DIR/cache/simavr" -o "$RELOAD" = "true" ]
+    then
+	echo "Missing simavr repository (caching)..."
+	if ! cache_simavr --dir=$DIR --reload=$RELOAD
 	then
-	    cache_ide --dir="$DIR" --os="$OS" --version="$VERSION" --reload="$RELOAD"
-	fi
-	if [ ! -d "$AVR_ROOT" ]
-	then
-	    echo "could not access avr_root='$AVR_ROOT'"
 	    exit 1
 	fi
+    fi
 
-	if [ ! -d "$DIR/cache/${VERSION}-${OS}/simavr" -o "$RELOAD" = "true" ]
-	then
-	    /bin/rm -rf "$DIR/cache/${VERSION}-${OS}/simavr"
-	    mkdir -p "$DIR/cache/${VERSION}-${OS}/simavr/repo"
-	    tar -C "$DIR/cache/simavr" -cf - . | tar -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" -xf -
-	fi
+    /bin/rm -rf "$DIR/cache/${VERSION}-${OS}/simavr/repo"
+    mkdir -p "$DIR/cache/${VERSION}-${OS}/simavr/repo"
+    tar -C "$DIR/cache/simavr" -cf - . | tar -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" -xf -
+    (cd "$DIR/cache/${VERSION}-${OS}/simavr/repo"; git checkout -f "$BRANCH")
 
-	mkdir -p "$DIR/cache/${VERSION}-${OS}/simavr"
-	if PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
-	then
-	    if PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
-	    then
-		cp "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino/"obj*/simduino.elf "$DIR/cache/${VERSION}-${OS}/simavr/uno"
-	    fi
-	fi
-	if [ ! -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" ]
-	then
-	    echo "build failed."
-	    exit 1
-	fi
-    done
+    if ! PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
+    then
+	echo "build-simavr target failed."
+	exit 1
+    fi
+
+    if ! PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
+    then
+       echo "build board_simduino target failed."
+       exit 1
+    fi
+
+    cp "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino/"obj*/simduino.elf "$DIR/cache/${VERSION}-${OS}/simavr/uno"
+
+    if [ ! -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" ]
+    then
+	echo "build failed."
+	exit 1
+    fi
 }
 	
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]

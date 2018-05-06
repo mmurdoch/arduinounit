@@ -6,10 +6,7 @@ then
 fi
 
 avr_root() {
-    arduino_dir "$@" | while read -r dir
-    do
-	echo "$dir/hardware/tools/avr"
-    done
+    echo "$(arduino_dir "$@")/hardware/tools/avr"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]

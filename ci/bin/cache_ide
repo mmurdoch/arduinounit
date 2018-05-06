@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 for inc in os dir dir_cache version arduino_exe
 do
@@ -6,12 +6,12 @@ do
     then
 	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
     fi
-fi
+done
 
 cache_ide() {
     OS="$(os "$@")"
     DIR="$(dir "$@")"
-    CACHE_DIR="$(cache_dir "$@")"
+    DIR_CACHE="$(dir_cache "$@")"
     VERSION="$(version "$@")"
     ARDUINO_EXE="$(arduino_exe "$@")"    
     
@@ -29,28 +29,28 @@ cache_ide() {
         esac
     done
 
-    if [ -r "$ARDUINO_EXE" && "${RELOAD}" != "true" ]
+    if [ -r "${ARDUINO_EXE}" -a "${RELOAD}" != "true" ]
     then
 	exit 0
     fi
 
-    if [ ! -d "$CACHE_DIR" ]
+    if [ ! -d "${DIR_CACHE}" ]
     then
-	mkdir -p "$CACHE_DIR"
+	mkdir -p "${DIR_CACHE}"
     fi
 
     PORTABLE="${DIR}/portable"
-    if [ ! -d "$PORTABLE" ]
+    if [ ! -d "${PORTABLE}" ]
     then
-        mkdir -p "$PORTABLE"
+        mkdir -p "${PORTABLE}"
     fi
 
-    if [ "$EXTENSION" = "" ]
+    if [ "${EXTENSION}" = "" ]
     then
-        if [ "$OS" = "macosx" -o "$OS" = "windows" ]
+        if [ "${OS}" = "macosx" -o "${OS}" = "windows" ]
         then
             EXTENSION="zip"
-        elif [ "${OS#linux}" != "$OS" ]
+        elif [ "${OS#linux}" != "${OS}" ]
         then
             EXTENSION="tar.xz"
         else
@@ -59,31 +59,33 @@ cache_ide() {
         fi
     fi
 
-    if [ "$TRIES" = "" ]
+    if [ "${TRIES}" = "" ]
     then
         TRIES=3
     fi
     
-    if [ "$RELOAD" = "" ]
+    if [ "${RELOAD}" = "" ]
     then
         RELOAD=false
     fi
     
-    if [ "$TIMEOUT" = "" ]
+    if [ "${TIMEOUT}" = "" ]
     then
         TIMEOUT=10
     fi
     
     ARCHIVE="arduino-${VERSION}-${OS}.${EXTENSION}"
     CHECKSUM="arduino-${VERSION}.sha512sum.txt"
+    CACHE="${DIR}/cache"
+    mkdir -p "${CACHE}"
 
-    if [ $RELOAD = "true" ]
+    if [ "${RELOAD}" = "true" ]
     then
 	/bin/rm -rf "${CACHE}/${CHECKSUM}"
     fi
         
     OK=false
-    for TRY in $(seq $TRIES)
+    for TRY in $(seq "${TRIES}")
     do
         if [ -r "${CACHE}/${CHECKSUM}" ]
         then
@@ -102,44 +104,45 @@ cache_ide() {
 	exit 1
     fi
         
-    if [ ! grep "${ARCHIVE}" "${CACHE}/${CHECKSUM}" > "${CACHE}/${ARCHIVE}.sha512sum.txt" ]
+    if ! grep "${ARCHIVE}" "${CACHE}/${CHECKSUM}" > "${CACHE}/${ARCHIVE}.sha512sum.txt"
     then
-        echo "No checksum for $ARCHIVE in $CHECKSUM."
+        echo "No checksum for ${ARCHIVE} in ${CHECKSUM}."
 	exit 1
     fi
     
     OK=false
-    for TRY in $(seq $TRIES)
+    for TRY in $(seq "${TRIES}")
     do
         if [ -r "${CACHE}/${ARCHIVE}" ]
         then
-            if cd "$CACHE" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt" > /dev/null
+            if cd "${CACHE}" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt" > /dev/null
             then
                 OK=true
                 break
             fi
         fi
         /bin/rm -rf "${CACHE}/${ARCHIVE}"
-        curl --connect-timeout "$TIMEOUT" -o "${CACHE}/${ARCHIVE}" "https://downloads.arduino.cc/${ARCHIVE}"
+        curl --connect-timeout "${TIMEOUT}" -o "${CACHE}/${ARCHIVE}" "https://downloads.arduino.cc/${ARCHIVE}"
     done
         
-    if [ "$OK" != "true" ]
+    if [ "${OK}" != "true" ]
     then
         echo "Download ${ARCHIVE} failed."
 	exit 1
     fi
 
-    pushd "$CACHE_DIR"
+    mkdir -p "${DIR_CACHE}"
+    pushd "${DIR_CACHE}"
     if [ "${EXTENSION}" = "zip" ]
     then
-	unzip -a -o "${ARCHIVE}" > /dev/null
+	unzip -a -o "${CACHE}/${ARCHIVE}" > /dev/null
     else
-	tar -xf "${ARCHIVE}"
+	tar -xf "${CACHE}/${ARCHIVE}"
     fi
     
     if [ "${OS}" = "macosx" ]
     then
-	pushd /Arduino.app/Contents/Java
+	pushd Arduino.app/Contents/Java
 	ln -s ../../../../../portable portable
 	popd
     else
@@ -150,9 +153,9 @@ cache_ide() {
 
     popd
 
-    if [ ! -r "$ARDUINO_EXE" ]
+    if [ ! -r "${ARDUINO_EXE}" ]
     then
-	echo "executable $ARDUINO_EXE missing."
+	echo "executable ${ARDUINO_EXE} missing."
 	exit 1
     fi
 }

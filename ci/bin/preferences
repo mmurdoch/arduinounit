@@ -6,7 +6,7 @@ do
     then
 	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
     fi
-fi
+done
 
 preferences() {
     DIR="$(dir "$@")"
@@ -42,7 +42,7 @@ preferences_self_test() {
 	echo "suffix test failed."
 	exit 1
     fi
-    echo "preferences_self_test: ok"
+    echo "preferences ok"
 }
 
 
@@ -50,6 +50,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
     if [ "$1" == "--self-test" ]
     then
+        shift
 	preferences_self_test "$@"
     else
 	preferences "$@"

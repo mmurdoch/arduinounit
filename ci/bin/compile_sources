@@ -1,0 +1,56 @@
+#!/bin/bash
+
+compile_sources() {
+    if [ "$(uname)" = "Darwin" ]
+    then
+	find -E "$1" -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp|\.h|\.ino)$'
+    else
+	find "$1" -iregex '^.*/[A-Za-z0-9]\([-_A-Za-z0-9]*[_A-Za-z0-9]\)*\(\.cpp\|\.h\|\.ino\)$'    
+    fi
+}
+
+compile_sources_self_test() {
+    TMP="$(mktemp -d)"
+    trap 'rm -rf "$TMP"' EXIT
+    mkdir -p $TMP/s/x
+    mkdir -p $TMP/s/x/y    
+    touch $TMP/s/a
+    touch $TMP/s/a.cpp
+    touch $TMP/s/._a.cpp    
+    touch $TMP/s/b.ino
+    touch $TMP/s/c.txt
+    touch $TMP/s/x/y/c.h
+
+    compile_sources "$TMP/s" > "$TMP/out"
+
+    for has in s/a.cpp s/b.ino s/x/y/c.h
+    do
+        if ! grep -q $has "$TMP/out"
+        then
+            echo $has
+            exit 1
+        fi
+    done
+
+    for miss in ._a.cpp c.txt
+    do
+        if grep -q $miss "$TMP/out"
+        then
+            echo $miss
+            exit 1
+        fi
+    done
+    
+    echo "compile_sources ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	compile_sources_self_test "$@"
+    else
+	compile_sources "$@"
+    fi
+fi

@@ -1,10 +1,9 @@
-#!/bin/bash -x
+#!/bin/bash
 
 for inc in dir
 do
     if [ "$(type -t $inc)" != "function" ]
     then
-	echo "including $inc"
 	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
     fi
 done
@@ -44,7 +43,7 @@ sketchbook_self_test() {
 	exit 1
     fi
     
-    echo "sketchbook_self_test: ok"
+    echo "sketchbook ok"
 
 }
 

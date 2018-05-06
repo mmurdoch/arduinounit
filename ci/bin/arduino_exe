@@ -1,26 +1,14 @@
 #!/bin/bash
 
-if [ "$(type -t os)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
-fi
-
-if [ "$(type -t version)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/version
-fi
-
-if [ "$(type -t dir_cache)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir_cache
-fi
+for inc in os dir_cache version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 arduino_exe() {
-    if [ "$ARDUINO_EXE" != "" ]
-    then
-        echo "$ARDUINO_EXE"
-        return
-    fi
     OS="$(os "$@")"
     VERSION="$(version "$@")"    
     DIR_CACHE="$(dir_cache "$@")"
@@ -36,7 +24,22 @@ arduino_exe() {
     fi
 }
 
+arduino_exe_self_test() {
+    if ! arduino_exe | egrep -i -q "arduino\.[^.]*$"
+    then
+	echo "name test failed."
+	exit 1
+    fi
+    echo "arduino_exe ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    arduino_exe "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	arduino_exe_self_test "$@"
+    else
+	arduino_exe "$@"
+    fi
 fi

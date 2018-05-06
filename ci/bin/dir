@@ -28,7 +28,7 @@ dir_self_test() {
     if [ "$(dir --dir='test me')" != "test me" ]; then exit 1; fi
     if [ "$(dir)" == "test me" ] ; then exit 1; fi
     if [ "$(dir)" == "" ] ; then exit 1; fi
-    echo "dir_self_test: ok"
+    echo "dir ok"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]

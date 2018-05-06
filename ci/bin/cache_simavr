@@ -1,9 +1,12 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
+for inc in dir
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 cache_simavr() {
     DIR="$(dir "$@")"
@@ -46,7 +49,28 @@ cache_simavr() {
     fi
 }
 
+cache_simavr_self_test() {
+    if cache_simavr
+    then
+        if [ ! -r "$(dir)/cache/simavr/.git/config" ]
+        then
+            echo "no git"
+            exit 1
+        fi
+    else
+        echo "cache failed."
+        exit 1
+    fi
+    echo "cache_simavr ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    cache_simavr "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	cache_simavr_self_test "$@"
+    else
+	cache_simavr "$@"
+    fi
 fi

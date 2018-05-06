@@ -1,44 +1,12 @@
 #!/bin/bash -x
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
-
-if [ "$(type -t os)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
-fi
-
-if [ "$(type -t versions)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
-fi
-
-if [ "$(type -t cache_simavr)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_simavr
-fi
-
-if [ "$(type -t avr_root)" != "cache_ide" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_ide
-fi
-
-if [ "$(type -t avr_root)" != "avr_root" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/avr_root
-fi
-
-if [ "$(type -t arduino_exe)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_exe
-fi
-
-if [ "$(type -t cache_simavr)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_simavr
-fi
+for inc in dir os version cache_simavr avr_root arduino_exe 
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 make_simavr_uno() {
     DIR="$(dir "$@")"
@@ -59,14 +27,14 @@ make_simavr_uno() {
         esac
     done
 
-    if [ $BRANCH = "" ]
+    if [ "$BRANCH" = "" ]
     then
 	BRANCH=master
     fi
 
     if [ -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" -a "$RELOAD" != "true" ]
     then
-	exit 0
+	return
     fi
 
     if [ ! -r "$ARDUINO_EXE" ]
@@ -98,13 +66,15 @@ make_simavr_uno() {
     tar -C "$DIR/cache/simavr" -cf - . | tar -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" -xf -
     (cd "$DIR/cache/${VERSION}-${OS}/simavr/repo"; git checkout -f "$BRANCH")
 
-    if ! PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
+    export AVR_ROOT
+    
+    if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
     then
 	echo "build-simavr target failed."
 	exit 1
     fi
 
-    if ! PATH="$AVR_ROOT/bin:$PATH" make -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
+    if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
     then
        echo "build board_simduino target failed."
        exit 1
@@ -118,8 +88,29 @@ make_simavr_uno() {
 	exit 1
     fi
 }
-	
+
+make_simavr_uno_self_test() {
+    if make_simavr_uno
+    then
+        if [ ! -x "$DIR/cache/${VERSION}-${OS}/simavr/uno" ]
+        then
+            echo "no uno"
+            exit 1
+        fi
+    else
+        echo "make failed."
+        exit 1
+    fi
+    echo "make_simavr_uno ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    make_simavr_uno "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	make_simavr_uno_self_test "$@"
+    else
+	make_simavr_uno "$@"
+    fi
 fi

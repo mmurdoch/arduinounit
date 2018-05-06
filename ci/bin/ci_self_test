@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CI_SELF_TESTS=(dir dir_cache preferences sketchbook arduino_exe cache_ide)
+CI_SELF_TESTS=(dir dir_cache preferences sketchbook arduino_exe cache_ide avr_bin avr_root cache_simavr make_simavr_uno simavr_uno compile_sources compile_vitro )
 
 for ci_test in "${CI_SELF_TESTS[@]}"
 do
@@ -23,4 +23,3 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
     ci_self_test "$@"
 fi
-

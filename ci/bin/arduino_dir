@@ -1,19 +1,12 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
-
-if [ "$(type -t os)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
-fi
-
-if [ "$(type -t version)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/version
-fi
+for inc in dir os version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 arduino_dir() {
     OS="$(os "$@")"
@@ -22,13 +15,29 @@ arduino_dir() {
 
     if [ "$OS" = "macosx" ]
     then
-        ARDUINO_DIR="${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/Java"
+        echo "${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/Java"
     else
-        ARDUINO_DIR="${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}"
+        echo "${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}"
     fi
+}
+
+arduino_dir_self_test() {
+    if [ "$(arduino_dir)" = "" ]
+    then
+        echo null
+        exit 1
+    fi
+    
+    echo "arduino_dir ok"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    arduino_dir "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	arduino_dir_self_test "$@"
+    else
+	arduino_dir "$@"
+    fi
 fi

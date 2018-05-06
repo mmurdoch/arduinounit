@@ -1,19 +1,12 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
-
-if [ "$(type -t os)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
-fi
-
-if [ "$(type -t version)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/version
-fi
+for inc in dir os version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 simavr_uno_exit() {
   for PID in $SIMAVR_UNO_PIDS
@@ -82,8 +75,23 @@ simavr_uno() {
 	fi
     done
 }
-	
+
+simavr_uno_self_test() {
+    if ! simavr_uno --hex="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../vitro.hex | grep "Test summary:"
+    then
+       echo "vitro test"
+       exit 1
+    fi
+    echo "simavr_uno ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    simavr_uno "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	simavr_uno_self_test "$@"
+    else
+	simavr_uno "$@"
+    fi
 fi

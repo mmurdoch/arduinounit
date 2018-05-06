@@ -1,24 +1,12 @@
 #!/bin/bash
 
-if [ "$(type -t preferences)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/preferences
-fi
-
-if [ "$(type -t sketchbook)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/sketchbook
-fi
-
-if [ "$(type -t arduino_exe)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_exe
-fi
-
-if [ "$(type -t cache_ide)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_ide
-fi
+for inc in preferences sketchbook arduino_exe cache_ide
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 arduino() {
     OS="$(os "$@")"
@@ -39,7 +27,27 @@ arduino() {
     "$ARDUINO_EXE" --preferences-file "$PREFERENCES" --pref sketchbook.path="$SKETCHBOOK" --pref update.check=false "$@"
 }
 
+arduino_self_test() {
+    arduino "$@" &
+    PID="$!"
+    if [ "${PID}" = "" ]
+    then
+        echo "no launch"
+        exit 1
+    fi
+    kill $PID
+
+    echo "arduino ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    arduino "$@"
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	arduino_self_test "$@"
+    else
+	arduino_ide "$@"
+    fi
 fi
+

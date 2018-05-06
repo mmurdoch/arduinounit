@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 for inc in os dir dir_cache version arduino_exe
 do
@@ -31,7 +31,7 @@ cache_ide() {
 
     if [ -r "${ARDUINO_EXE}" -a "${RELOAD}" != "true" ]
     then
-	exit 0
+        return
     fi
 
     if [ ! -d "${DIR_CACHE}" ]
@@ -161,7 +161,7 @@ cache_ide() {
 }
 
 cache_ide_self_test() {
-    for os in macosx windows linux64 linux32 linuxarm
+    for os in macosx windows linux64
     do
 	if ! cache_ide --os=$os "$@"
 	then
@@ -169,6 +169,7 @@ cache_ide_self_test() {
 	    exit 1
 	fi
     done
+    echo "cache_ide ok"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]

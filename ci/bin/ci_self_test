@@ -1,0 +1,26 @@
+#!/bin/bash
+
+CI_SELF_TESTS=(dir preferences sketchbook cache_ide)
+
+for ci_test in "${CI_SELF_TESTS[@]}"
+do
+    if [ "$(type -t $ci_test)" != "function" ]
+    then	
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$ci_test
+    fi
+done
+
+ci_self_test() {
+    for ci_test in "${CI_SELF_TESTS[@]}"
+    do
+	echo "testing $ci_test."
+	${ci_test}_self_test "$@"
+    done
+    echo "ci_self_test ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    ci_self_test "$@"
+fi
+

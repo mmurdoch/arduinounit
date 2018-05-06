@@ -1,0 +1,96 @@
+#!/bin/bash
+
+#
+# Figure out where arduino libraries are...
+#
+if [ "$(uname)" = "Darwin" ]
+then
+   ARDUINO_LIBS="$HOME/Documents/Arduino/libraries"
+elif [ "$(uname)" = "Linux" ]
+then
+   ARDUINO_LIBS="$HOME/Arduino/libraries"
+else
+   ARDUINO_LIBS="$HOME/My Documents/Arduino/libraries"
+fi
+
+ARDUINO_UNIT_DIR="$ARDUINO_LIBS/ArduinoUnit"
+
+if [ ! -r "$ARDUINO_UNIT_DIR/src/ArduinoUnit.h" ]
+then
+    echo "Cannot find ArduinoUnit library."
+    exit 1
+fi
+
+#
+# Figure out what to compile
+#
+if [ $# -gt 0 ]; then
+   ARDUINO_TARGET_INO="$1"
+else
+   ARDUINO_TARGET_INO="$(echo *.ino)"
+fi
+
+if [ ! -f "${ARDUINO_TARGET_INO}" ] ; then
+  echo "must specify ino file"
+  exit 1
+fi
+
+ARDUINO_TARGET_DIR=$(dirname "$1")
+if [ ! -d "${ARDUINO_TARGET_DIR}" ] ; then
+  echo "missing directory ${ARDUINO_TARGET_DIR}."
+  exit 1
+fi
+
+#
+# Make a temp directory to work in (that is removed)
+#
+if [ "$TMP" = "" ] ; then
+  TMP="$(mktemp -d)"
+  trap '{ /bin/rm -rf "${TMP}"; }' EXIT
+else
+  mkdir -p "$TMP"
+fi
+
+#
+# copy all source files (.ino, .cpp and .h files) into $TMP/src directory
+#
+sources() {
+    if [ "$(uname)" = "Darwin" ]
+    then
+	find -E "$1" -iregex '^.*/[A-Za-z0-9]([-_A-Za-z0-9]*[_A-Za-z0-9])*(\.cpp|\.h|\.ino)$'
+    else
+	find "$1" -iregex '^.*/[A-Za-z0-9]\([-_A-Za-z0-9]*[_A-Za-z0-9]\)*\(\.cpp\|\.h\|\.ino\)$'    
+    fi
+}
+
+cpp_sources() {
+    sources "$@" | egrep '\.cpp$'
+}
+
+mkdir -p "${TMP}/src"
+(cd ${ARDUINO_TARGET_DIR}; tar cf - $(sources .)) | tar -C "${TMP}/src" -xf -
+
+#
+# copy ArduinoUnit files into $TMP/ArduinoUnit/src directory
+#
+mkdir -p "${TMP}/ArduinoUnit/src"
+(cd "${ARDUINO_UNIT_DIR}/src"; tar cf - $(sources .)) | tar -C "${TMP}/ArduinoUnit/src" -xf -
+
+ARDUINO_TARGET_EXE="${ARDUINO_TARGET_INO%.ino}"
+
+#
+# compile everything in the temp directory, relabeling filenames errors so they look like they came from the right place
+#
+
+/bin/rm -rf "${ARDUINO_TARGET_EXE}"
+g++ -g -std=gnu++11 -o "${TMP}/a.out" -isystem "${TMP}/ArduinoUnit/src" $(cpp_sources "${TMP}/src") $(cpp_sources "${TMP}/ArduinoUnit/src") 2>&1 | sed -e "s|${TMP}/src/|${ARDUINO_TARGET_DIR}/|g" | sed -e "s|${TMP}/ArduinoUnit/src/|${ARDUINO_UNIT_DIR}/src/|g"
+
+if [ -x "${TMP}/a.out" ]
+then
+        cp "${TMP}/a.out" "${ARDUINO_TARGET_EXE}"
+fi
+if [ ! -x "${TMP}/a.out" ]
+then
+    echo "compilation failed."
+    exit 1
+fi

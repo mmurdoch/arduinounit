@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 for inc in dir sketchbook compile_sources
 do
@@ -66,7 +66,7 @@ compile_vitro() {
     mkdir -p "${TMP}/ArduinoUnit/src"
     (cd "${ARDUINO_UNIT_DIR}/src"; tar cf - $(compile_sources .)) | tar -C "${TMP}/ArduinoUnit/src" -xf -
 
-    ARDUINO_TARGET_EXE="${ARDUINO_TARGET_INO%.ino}"
+    ARDUINO_TARGET_EXE="${INO%.ino}"
 
     #
     # compile everything in the temp directory, relabeling filenames errors so they look like they came from the right place

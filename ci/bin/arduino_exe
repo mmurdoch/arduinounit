@@ -25,7 +25,7 @@ arduino_exe() {
 }
 
 arduino_exe_self_test() {
-    if ! arduino_exe | egrep -i -q "arduino\.[^.]*$"
+    if ! arduino_exe | egrep -i -q "arduino(\.exe)?$"
     then
 	echo "name test failed."
 	exit 1

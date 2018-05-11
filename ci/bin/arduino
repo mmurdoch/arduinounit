@@ -9,11 +9,6 @@ do
 done
 
 arduino() {
-    OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    VERSION="$(version "$@")"
-    PREFERENCES="$(preferences "$@")"
-    SKETCHBOOK="$(sketchbook "$@")"    
     ARDUINO_EXE="$(arduino_exe "$@")"
 
     if [ ! -r "$ARDUINO_EXE" ]
@@ -24,7 +19,7 @@ arduino() {
 	    exit 1
 	fi
     fi
-    "$ARDUINO_EXE" --preferences-file "$PREFERENCES" --pref sketchbook.path="$SKETCHBOOK" --pref update.check=false "$@"
+    "$ARDUINO_EXE" "$@"
 }
 
 arduino_self_test() {

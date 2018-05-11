@@ -17,7 +17,7 @@ compile_uno_self_test() {
     EXITS+="/bin/rm -rf '${TMP}'"
     trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
 
-    cp -r "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../test-here/faketest "${TMP}"
+    cp -r "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../faketest "${TMP}"
     /bin/rm -rf "$TMP/faketest/*.hex"
 
     if ! compile_uno --ino="$TMP/faketest/faketest.ino"

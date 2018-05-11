@@ -16,7 +16,7 @@ compile_vitro() {
         case "$1"
         in
             --ino=*) INO=${1#--ino=}; shift;;
-            --tmp=*) TMP=${1#--ino=}; shift;;            
+            --tmp=*) TMP=${1#--tmp=}; shift;;
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;

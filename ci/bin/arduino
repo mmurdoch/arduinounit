@@ -47,7 +47,7 @@ then
 	shift
 	arduino_self_test "$@"
     else
-	arduino_ide "$@"
+	arduino "$@"
     fi
 fi
 

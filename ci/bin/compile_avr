@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-for inc in dir arduino_dir packages sketchbook compile_sources
+for inc in dir arduino_dir sketchbook compile_sources
 do
     if [ "$(type -t $inc)" != "function" ]
     then

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+CI_SELF_TESTS=(dir dir_cache preferences sketchbook arduino_exe cache_ide avr_bin avr_root cache_simavr make_simavr_uno simavr_uno compile_sources compile_vitro compile_uno )
+
+for ci_test in "${CI_SELF_TESTS[@]}"
+do
+    if [ "$(type -t $ci_test)" != "function" ]
+    then	
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$ci_test
+    fi
+done
+
+ci_self_test() {
+    for ci_test in "${CI_SELF_TESTS[@]}"
+    do
+	echo "testing $ci_test."
+	${ci_test}_self_test "$@"
+    done
+    echo "ci_self_test ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    ci_self_test "$@"
+fi

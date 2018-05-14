@@ -1,0 +1,29 @@
+#!/bin/bash
+
+for inc in compile_avr
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+compile_mega() {
+    compile_avr --board=arduino:avr:mega:cpu=atmega2560 "$@"
+}
+
+compile_mega_self_test() {
+    echo "no test"
+    echo "compile_mega ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	compile_mega_self_test "$@"
+    else
+	compile_mega "$@"
+    fi
+fi

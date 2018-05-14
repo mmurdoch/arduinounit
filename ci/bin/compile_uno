@@ -1,0 +1,46 @@
+#!/bin/bash
+
+for inc in compile_avr simavr_uno
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+compile_uno() {
+    compile_avr --board=arduino:avr:uno:cpu=atmega328p "$@"
+}
+
+compile_uno_self_test() {
+    local TMP="$(mktemp -d)"
+    EXITS+="/bin/rm -rf '${TMP}'"
+    trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
+
+    cp -r "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../faketest "${TMP}"
+    /bin/rm -rf "$TMP/faketest/*.hex"
+
+    if ! compile_uno --ino="$TMP/faketest/faketest.ino"
+    then
+        echo "compile"
+        exit 1
+    fi
+
+    if ! simavr_uno --hex=$TMP/faketest/faketest.hex | grep -q "Test summary:"
+    then
+        echo "execute"
+        exit 1
+    fi
+    echo "compile_uno ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	compile_uno_self_test "$@"
+    else
+	compile_uno "$@"
+    fi
+fi

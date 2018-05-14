@@ -1,9 +1,9 @@
 #!/bin/bash
 
-versions() {
-    if [ "$VERSIONS" != "" ]
+version() {
+    if [ "$VERSION" != "" ]
     then
-        echo $VERSIONS
+        echo $VERSION
         return
     fi
 
@@ -11,21 +11,21 @@ versions() {
     do
         case "$1"
         in
-            --version=*) VERSIONS="$VERSIONS ${1#--version=}"; shift;;
+            --version=*) VERSION="${1#--version=}"; shift;;
             --*=*)       shift;;
             --)          shift; break;;
             *)           break;;
         esac
     done
 
-    if [ "$VERSIONS" = "" ]
+    if [ "$VERSION" = "" ]
     then
-        VERSIONS="1.8.5"
+        VERSION="1.8.5"
     fi
-    echo $VERSIONS
+    echo $VERSION
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    versions "$@"
+    version "$@"
 fi

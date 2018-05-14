@@ -1,0 +1,107 @@
+#!/bin/bash
+
+for inc in dir os version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+simavr_uno_exit() {
+  for PID in $SIMAVR_UNO_PIDS
+  do
+     if ps $PID >/dev/null
+     then
+        kill $PID
+     fi
+  done
+
+}
+
+simavr_uno() {
+    DIR="$(dir "$@")"
+    OS="$(os "$@")"
+    VERSION="$(version "$@")"
+    HEX=""
+
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --background=*)  BACKGROUND=${1#--background=}; shift;;
+	    --ino=*)    INO="${1#--ino=}"; shift;;
+            --hex=*)    HEX="${1#--hex=}"; shift;;
+            --*=*)      shift;;
+            --)         shift; break;;
+            *)          break;;
+        esac
+    done
+
+    INPUT=( "$@" )
+
+    if [ "${INO}" = "" ]; then
+        if [ -r "$(echo *.ino)" ] ; then
+            INO="$(echo *.ino)"
+        fi
+    fi
+
+    if [ "${HEX}" = "" -a "${INO}" != "" ] ; then
+        HEX="${INO%.ino}".hex
+    fi
+    
+    if [ "$HEX" = "" ]
+    then
+       HEX="$(echo *.hex)"
+    fi
+
+    if [ ! -r "${HEX}" ] ; then
+      echo "must specify hex file"
+      exit 1
+    fi
+
+    SIMAVR_UNO_PIDS=""
+    trap simavr_uno_exit EXIT
+
+    PORT="/tmp/simavr-uart0"
+    "${DIR}/cache/${VERSION}-${OS}/simavr/uno" "${HEX}" &
+    PID=$!
+    if [ "$PID" != "" ]
+    then
+        SIMAVR_UNO_PIDS="$SIMAVR_UNO_PIDS $PID"
+    else
+        echo "could not launch simavr/uno"
+        exit 1
+    fi
+    
+    while [ ! -e "$PORT" ] ; do sleep 0.01 ; done
+    
+    cat "$PORT" 2>/dev/null | while read -r line
+    do
+	echo "$line"
+	if [[ "$line" =~ "Test summary:" ]]
+	then
+	    simavr_uno_exit
+	fi
+    done
+}
+
+simavr_uno_self_test() {
+    if ! simavr_uno --hex="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../vitro.hex | grep "Test summary:"
+    then
+       echo "vitro test"
+       exit 1
+    fi
+    echo "simavr_uno ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	simavr_uno_self_test "$@"
+    else
+	simavr_uno "$@"
+    fi
+fi

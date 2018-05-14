@@ -1,0 +1,29 @@
+#!/bin/bash -x
+
+for inc in upload_avr
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+upload_uno() {
+    upload_avr --board=arduino:avr:uno:cpu=atmega328p "$@"
+}
+
+upload_uno_self_test() {
+    echo "none"
+    echo "upload_avr ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	upload_uno_self_test "$@"
+    else
+	upload_uno "$@"
+    fi
+fi

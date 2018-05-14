@@ -1,19 +1,58 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
+for inc in dir
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 preferences() {
-    if [ "$PREFERENCES" == "" ]
+    DIR="$(dir "$@")"
+    
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --preferences=*) PREFERENCES=${1#--preferences=}; shift;;
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+
+    if [ "$PREFERENCES" = "" ]
     then
         PREFERENCES="$(dir "$@")/portable/preferences.txt"
     fi
+    
     echo "$PREFERENCES"
 }
 
+preferences_self_test() {
+    if [ "$(preferences --preferences='test me')" != "test me" ]
+    then
+	echo "test me failed"
+        exit 1
+    fi
+
+    if ! preferences | egrep -q "preferences.txt$"
+    then
+	echo "suffix test failed."
+	exit 1
+    fi
+    echo "preferences ok"
+}
+
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    preferences "$@"
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	preferences_self_test "$@"
+    else
+	preferences "$@"
+    fi
 fi

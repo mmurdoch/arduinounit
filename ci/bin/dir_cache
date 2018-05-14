@@ -1,0 +1,55 @@
+#!/bin/bash
+
+for inc in dir os version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+dir_cache() {
+    local OS="$(os "$@")"
+    local DIR="$(dir "$@")"
+    local VERSION="$(version "$@")"
+
+    echo "${DIR}/cache/${VERSION}-${OS}"
+}
+
+dir_cache_self_test() {
+    if [ "$(dir_cache)" = "" ]
+    then
+	echo "default failed"
+        exit 1
+    fi
+
+    if [ "$(dir_cache --dir=a)" = "$(dir_cache --dir=b)" ]
+    then
+	echo "dir failed"
+        exit 1
+    fi
+
+    if [ "$(dir_cache --os=a)" = "$(dir_cache --os=b)" ]
+    then
+	echo "os failed"
+        exit 1
+    fi
+
+    if [ "$(dir_cache --version=a)" = "$(dir_cache --version=b)" ]
+    then
+	echo "version  failed"
+        exit 1
+    fi
+
+    echo "dir_cache_self_test: ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	dir_cache_self_test "$@"
+    else
+	dir_cache "$@"
+    fi
+fi

@@ -1,0 +1,120 @@
+#!/bin/bash -x
+
+for inc in dir sketchbook compile_sources
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+compile_vitro() {
+    DIR="$(dir "$@")"
+    SKETCHBOOK="$(sketchbook "$@")"
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --ino=*) INO=${1#--ino=}; shift;;
+            --tmp=*) TMP=${1#--tmp=}; shift;;
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+    ARDUINO_LIBS="${SKETCHBOOK}/libraries"
+    ARDUINO_UNIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.."; pwd)"
+    if [ ! -r "$ARDUINO_UNIT_DIR/src/ArduinoUnit.h" ]
+    then   
+        echo "Cannot find ArduinoUnit library."
+        exit 1
+    fi
+
+    if [ "${INO}" = "" ]; then
+        INO="$(echo *.ino)"
+    fi
+    
+    if [ ! -f "${INO}" ] ; then
+        echo "must specify ino file"
+        exit 1
+    fi
+
+    ARDUINO_TARGET_DIR="$(dirname "${INO}")"
+    if [ ! -d "${ARDUINO_TARGET_DIR}" ] ; then
+        echo "missing directory ${ARDUINO_TARGET_DIR}."
+        exit 1
+    fi
+
+    #
+    # Make a temp directory to work in (that is removed)
+    #
+    if [ "$TMP" = "" ] ; then
+        TMP="$(mktemp -d)"
+        EXITS+="/bin/rm -rf '${TMP}'"
+        trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
+    else
+        mkdir -p "$TMP"
+    fi
+    
+    
+    mkdir -p "${TMP}/src"
+    (cd ${ARDUINO_TARGET_DIR}; tar cf - $(compile_sources .)) | tar -C "${TMP}/src" -xf -
+
+    #
+    # copy ArduinoUnit files into $TMP/ArduinoUnit/src directory
+    #
+    mkdir -p "${TMP}/ArduinoUnit/src"
+    (cd "${ARDUINO_UNIT_DIR}/src"; tar cf - $(compile_sources .)) | tar -C "${TMP}/ArduinoUnit/src" -xf -
+
+    ARDUINO_TARGET_EXE="${INO%.ino}"
+
+    #
+    # compile everything in the temp directory, relabeling filenames errors so they look like they came from the right place
+    #
+
+    /bin/rm -rf "${ARDUINO_TARGET_EXE}"
+    g++ -g -std=gnu++11 -o "${TMP}/a.out" -isystem "${TMP}/ArduinoUnit/src" $(compile_sources "${TMP}/src"|egrep '\.cpp$') $(compile_sources "${TMP}/ArduinoUnit/src" |egrep '\.cpp$') 2>&1 | sed -e "s|${TMP}/src/|${ARDUINO_TARGET_DIR}/|g" | sed -e "s|${TMP}/ArduinoUnit/src/|${ARDUINO_UNIT_DIR}/src/|g"
+
+    if [ -x "${TMP}/a.out" ]
+    then
+        cp "${TMP}/a.out" "${ARDUINO_TARGET_EXE}"
+    fi
+    if [ ! -x "${TMP}/a.out" ]
+    then
+        echo "compilation failed."
+        exit 1
+    fi
+}
+
+compile_vitro_self_test() {
+    local TMP="$(mktemp -d)"
+    EXITS+="/bin/rm -rf '${TMP}'"
+    trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
+
+    cp -r "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/../../examples/vitro "${TMP}"
+    /bin/rm -rf "$TMP/vitro/*.hex"
+
+    if ! compile_vitro --ino="$TMP/vitro/vitro.ino"
+    then
+        echo "compile"
+        exit 1
+    fi
+
+    if ! $TMP/vitro/vitro | grep -q "Test summary:"
+    then
+        echo "execute"
+        exit 1
+    fi
+    echo "compile_vitro ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	compile_vitro_self_test "$@"
+    else
+	compile_vitro "$@"
+    fi
+fi

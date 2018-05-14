@@ -1,0 +1,39 @@
+#!/bin/bash
+
+for inc in arduino_dir
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+
+if [ "$(type -t arduino_dir)" != "function" ]
+then
+    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_dir
+fi
+
+avr_bin() {
+    echo "$(arduino_dir "$@")/hardware/tools/avr/bin"
+}
+
+avr_bin_self_test() {
+    if [ "$(avr_bin)" = "" ]
+    then
+        echo null
+        exit 1
+    fi
+    echo "avr_bin ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	avr_bin_self_test "$@"
+    else
+	avr_bin "$@"
+    fi
+fi

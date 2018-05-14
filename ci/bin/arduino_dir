@@ -1,0 +1,43 @@
+#!/bin/bash
+
+for inc in dir os version
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+arduino_dir() {
+    OS="$(os "$@")"
+    DIR="$(dir "$@")"
+    VERSION="$(version "$@")"
+
+    if [ "$OS" = "macosx" ]
+    then
+        echo "${DIR}/cache/${VERSION}-${OS}/Arduino.app/Contents/Java"
+    else
+        echo "${DIR}/cache/${VERSION}-${OS}/arduino-${VERSION}"
+    fi
+}
+
+arduino_dir_self_test() {
+    if [ "$(arduino_dir)" = "" ]
+    then
+        echo null
+        exit 1
+    fi
+    
+    echo "arduino_dir ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	arduino_dir_self_test "$@"
+    else
+	arduino_dir "$@"
+    fi
+fi

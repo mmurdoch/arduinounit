@@ -1,24 +1,59 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
+for inc in dir
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 sketchbook() {
+    local DIR="$(dir "$@")"
+
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --sketchbook=*) SKETCHBOOK=${1#--sketchbook=}; shift;;
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+    
     if [ "$SKETCHBOOK" == "" ]
     then
         SKETCHBOOK="$(dir "$@")/portable/sketchbook"
     fi
     
-    if [ ! -d "$SKETCHBOOK" ]
-    then
-        mkdir -p "$SKETCHBOOK"
-    fi
     echo "$SKETCHBOOK"
+}
+
+sketchbook_self_test() {
+    if [ "$(sketchbook --sketchbook='test me')" != "test me" ]
+    then
+	echo "test me failed"
+        exit 1
+    fi
+
+    if [ "$(sketchbook)" == "test me" ]
+    then
+	echo "default failed."
+	exit 1
+    fi
+    
+    echo "sketchbook ok"
+
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    sketchbook "$@"
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	sketchbook_self_test "$@"
+    else
+	sketchbook "$@"
+    fi
 fi

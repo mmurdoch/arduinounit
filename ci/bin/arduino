@@ -1,91 +1,48 @@
 #!/bin/bash
 
-if [ "$(type -t dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/dir
-fi
-
-if [ "$(type -t os)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/os
-fi
-
-if [ "$(type -t versions)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/versions
-fi
-
-if [ "$(type -t preferences)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/preferences
-fi
-
-if [ "$(type -t sketchbook)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/sketchbook
-fi
-
-if [ "$(type -t arduino_exe)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_exe
-fi
-
-if [ "$(type -t cache_ide)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/cache_ide
-fi
+for inc in preferences sketchbook arduino_exe cache_ide
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
 arduino() {
-    OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    VERSIONS="$(versions "$@")"
-    PREFERENCES="$(preferences "$@")"
-    SKETCHBOOK="$(sketchbook "$@")"    
-    
-    while [ $# -gt 0 ]
-    do        
-        case "$1"
-        in   
-            --background=*)  BACKGROUND=${1#--background=}; shift;;
-            --*=*)           shift;;
-            --)              shift; break;;
-            *)               break;;
-        esac
-    done
+    ARDUINO_EXE="$(arduino_exe "$@")"
 
-    if [ "$BACKGROUND" = "" ]
+    if [ ! -r "$ARDUINO_EXE" ]
     then
-        BACKGROUND=false
+	echo "Arduido executable $ARDUINO_EXE missing (caching)..."
+	if ! cache_ide "$@"
+	then
+	    exit 1
+	fi
     fi
+    "$ARDUINO_EXE" "$@"
+}
 
-    PIDS=""
-    OK=true
-    for VERSION in $VERSIONS
-    do
-        ARDUINO_EXE="$(arduino_exe --os="$OS" -- $VERSION)"
-        
-        if [ ! -x "$ARDUINO_EXE" ]
-        then
-            if [ "$BACKGROUND" = "true" ]
-            then
-                cache_ide --os="$OS" --version="$VERSION" &&  "$ARDUINO_EXE" --preferences-file "$PREFERENCES" --pref sketchbook.path="$SKETCHBOOK" --pref update.check=false "$@" &
-                PIDS="$PIDS $!"
-            else
-                cache_ide --os="$OS" --version="$VERSION" &&  "$ARDUINO_EXE" --preferences-file "$PREFERENCES" --pref sketchbook.path="$SKETCHBOOK" --pref update.check=false "$@"
-            fi
-        else
-            if [ "$BACKGROUND" = "true" ]
-            then
-                "$ARDUINO_EXE" --preferences-file "$PREFERENCES" --pref sketchbook.path="$SKETCHBOOK" --pref update.check=false "$@" &
-                PIDS="$PIDS $!"
-            else
-                "$ARDUINO_EXE" "$@"
-            fi
-        fi
-    done
+arduino_self_test() {
+    arduino "$@" &
+    PID="$!"
+    if [ "${PID}" = "" ]
+    then
+        echo "no launch"
+        exit 1
+    fi
+    kill $PID
+
+    echo "arduino ok"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    arduino "$@"
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	arduino_self_test "$@"
+    else
+	arduino "$@"
+    fi
 fi
+

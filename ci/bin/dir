@@ -1,6 +1,8 @@
 #!/bin/bash
 
 dir() {
+    local DIR=""
+
     while [ $# -gt 0 ]
     do
         case "$1"
@@ -24,7 +26,19 @@ dir() {
     echo "${DIR}"
 }
 
+dir_self_test() {
+    if [ "$(dir --dir='test me')" != "test me" ]; then exit 1; fi
+    if [ "$(dir)" == "test me" ] ; then exit 1; fi
+    if [ "$(dir)" == "" ] ; then exit 1; fi
+    echo "dir ok"
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
-    dir "$@"
+    if [ "$1" == "--self-test" ]
+    then
+	dir_self_test "$@"
+    else
+	dir "$@"
+    fi
 fi

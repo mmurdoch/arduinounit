@@ -1,0 +1,92 @@
+#!/bin/bash -x
+
+for inc in dir arduino_dir sketchbook compile_sources
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+compile_avr() {
+    DIR="$(dir "$@")"
+    ARDUINO_DIR="$(arduino_dir "$@")"
+    SKETCHBOOK="$(sketchbook "$@")"
+    ARDUINO_HARDWARE="${ARDUINO_DIR}/hardware"
+    ARDUINO_LIBS="${SKETCHBOOK}/libraries"
+    BOARD=arduino:avr:uno:cpu=atmega328p
+    ARDUINO_TARGET_DIR=
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --board=*) BOARD=${1#--board=}; shift;;	
+            --ino=*) INO=${1#--ino=}; shift;;
+            --tmp=*) TMP=${1#--tmp=}; shift;;            
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+    
+    if [ "${INO}" = "" ]; then
+        INO="$(echo *.ino)"
+    fi
+    
+    if [ ! -f "${INO}" ] ; then
+        echo "must specify ino file"
+        exit 1
+    fi
+    ARDUINO_TARGET_DIR="$(dirname "${INO}")"
+    if [ ! -d "${ARDUINO_TARGET_DIR}" ] ; then
+        echo "missing directory ${ARDUINO_TARGET_DIR}."
+        exit 1
+    fi
+
+    #
+    # Make a temp directory to work in (that is removed)
+    #
+    if [ "$TMP" = "" ] ; then
+        TMP="$(mktemp -d)"
+        EXITS+="/bin/rm -rf '${TMP}'"
+        trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
+    else
+        mkdir -p "$TMP"
+    fi
+
+    TMP_HEX="${TMP}/build/$(basename ${INO}).hex"
+    HEX="${INO%.ino}".hex
+    
+    mkdir -p ${TMP}/build
+    mkdir -p ${TMP}/cache
+    mkdir -p ${TMP}/src
+
+    (cd ${ARDUINO_TARGET_DIR}; tar cf - $(compile_sources .)) | tar -C "${TMP}/src" -xf -
+    
+    ARDUINO_TARGET_EXE="${INO%.ino}"
+
+    ${ARDUINO_DIR}/arduino-builder -dump-prefs -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_DIR}/hardware -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.avr-gcc.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.arduinoOTA.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.avrdude.path=${ARDUINO_DIR}/hardware/tools/avr -verbose "${TMP}/src/$(basename ${INO})"  2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
+
+    ${ARDUINO_DIR}/arduino-builder -compile -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_HARDWARE} -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.avr-gcc.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.arduinoOTA.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.avrdude.path=${ARDUINO_DIR}/hardware/tools/avr -verbose "${TMP}/src/$(basename ${INO})" 2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
+    if [ ! -f "${TMP_HEX}" ] ; then
+        echo "compile time error: avr."
+        exit 1
+    fi
+    cp "${TMP_HEX}" "${HEX}"
+}
+
+compile_avr_self_test() {
+    echo "none"
+    echo "compile_avr ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	compile_avr_self_test "$@"
+    else
+	compile_avr "$@"
+    fi
+fi

@@ -9,7 +9,7 @@ do
 done
 
 sketchbook() {
-    DIR="$(dir "$@")"
+    local DIR="$(dir "$@")"
 
     while [ $# -gt 0 ]
     do

@@ -9,9 +9,9 @@ do
 done
 
 dir_cache() {
-    OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    VERSION="$(version "$@")"
+    local OS="$(os "$@")"
+    local DIR="$(dir "$@")"
+    local VERSION="$(version "$@")"
 
     echo "${DIR}/cache/${VERSION}-${OS}"
 }

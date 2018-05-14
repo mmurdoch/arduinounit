@@ -30,7 +30,7 @@ simavr_uno() {
         case "$1"
         in
             --background=*)  BACKGROUND=${1#--background=}; shift;;
-	    --ino=*)    HEX="${1#--ino=}.hex"; shift;;
+	    --ino=*)    INO="${1#--ino=}"; shift;;
             --hex=*)    HEX="${1#--hex=}"; shift;;
             --*=*)      shift;;
             --)         shift; break;;
@@ -39,6 +39,16 @@ simavr_uno() {
     done
 
     INPUT=( "$@" )
+
+    if [ "${INO}" = "" ]; then
+        if [ -r "$(echo *.ino)" ] ; then
+            INO="$(echo *.ino)"
+        fi
+    fi
+
+    if [ "${HEX}" = "" -a "${INO}" != "" ] ; then
+        HEX="${INO%.ino}".hex
+    fi
     
     if [ "$HEX" = "" ]
     then

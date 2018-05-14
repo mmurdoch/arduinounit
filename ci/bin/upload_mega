@@ -1,0 +1,29 @@
+#!/bin/bash -x
+
+for inc in upload_avr
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+upload_mega() {
+    upload_avr --board=arduino:avr:mega:cpu=atmega2560 "$@"
+}
+
+upload_mega_self_test() {
+    echo "none"
+    echo "upload_mega ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	upload_mega_self_test "$@"
+    else
+	upload_mega "$@"
+    fi
+fi

@@ -1,0 +1,89 @@
+#!/bin/bash -x
+
+for inc in dir os arduino_dir packages sketchbook compile_sources
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+compile_avr() {
+    DIR="$(dir "$@")"
+    OS="$(os "$@")"    
+    ARDUINO_DIR="$(arduino_dir "$@")"
+    ARDUINO_PACKAGES="$(packages "$@")"
+    ARDUINO_HARDWARE="${ARDUINO_DIR}/hardware"
+    ARDUINO_LIBS="${SKETCHBOOK}/libraries"
+    BOARD=arduino:avr:uno:cpu=atmega328p
+    ARDUINO_TARGET_DIR=
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --board=*) BOARD=${1#--board=}; shift;;	
+            --ino=*) INO=${1#--ino=}; shift;;
+            --hex=*) HEX=${1#--hex=}; shift;;
+            --port=*) PORT=${1#--port=}; shift;;
+            --baud=*) BAUD=${1#--baud=}; shift;;                        
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+
+    if [ "${PORT}" = "" ] ; then
+      case "${OS}"
+      in
+        macosx)    PORT=$(echo /dev/cu.usb*);;
+        linux*)    PORT=$(echo /dev/ttyACM*);;
+        windows*)  PORT=com4
+        *) echo "unsupported port."; exit 1;;
+      esac
+   fi
+    if [ "${BAUD}" = "" ] ; then
+        BAUD=115200
+    fi
+    
+    if [ "${INO}" = "" ]; then
+        if [ -r "$(echo *.ino)" ] ; then
+            INO="$(echo *.ino)"
+        fi
+    fi
+
+    if [ "${HEX}" = "" -a "${INO}" != "" ] ; then
+        HEX="${INO%.ino}".hex
+    fi
+    
+    if [ "$HEX" = "" ]
+    then
+       HEX="$(echo *.hex)"
+    fi
+
+    if [ ! -r "${HEX}" ] ; then
+      echo "must specify hex file"
+      exit 1
+    fi
+
+    if ! ${ARDUINO_DIR}/hardware/tools/avr/bin/avrdude -C${ARDUINO_DIR}/hardware/tools/avr/etc/avrdude.conf -v -p${BOARD##*cpu=} -cwiring -P"${PORT}" -b${BAUD} -D -Uflash:w:"${HEX}":i
+    then
+        echo "upload error: avr."
+        exit 1
+    fi
+}
+
+upload_avr_self_test() {
+    echo "none"
+    echo "upload_avr ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+	shift
+	upload_avr_self_test "$@"
+    else
+	upload_avr "$@"
+    fi
+fi

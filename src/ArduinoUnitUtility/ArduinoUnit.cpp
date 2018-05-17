@@ -99,12 +99,14 @@ Test::Test(const __FlashStringHelper *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
 {
   insert();
+  ++Test::count;
 }
 
 Test::Test(const char *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
 {
   insert();
+  ++Test::count;
 }
 
 void Test::insert()
@@ -119,7 +121,6 @@ void Test::insert()
     next=(*p);
     (*p)=this;
   }
-  ++Test::count;
 }
 
 void Test::pass() { if (current != 0) current->state = DONE_PASS; }

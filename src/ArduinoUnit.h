@@ -489,6 +489,9 @@ void loop() {
   */
   static void run();
 
+  /** Repeatedly call run until all tests are done */
+  static void runUntilDone();
+
   /** number of tests that have are not done (skipped, passed, or failed) */
   static int remaining();
 

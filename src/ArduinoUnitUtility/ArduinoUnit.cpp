@@ -167,6 +167,11 @@ void Test::run()
   current = 0;
 }
 
+void Test::runUntilDone() {
+  while (Test::root != 0)
+    Test::run();
+}
+
 void Test::abort()
 {
   while (root != 0) {

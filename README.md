@@ -137,6 +137,55 @@ void setup()
 }
 ```
 
+## Re-running tests (advanced)
+Typically, you just want to run all tests once and then show the result.
+If so, you can skip this section.
+
+In more advanced situations, you might want to run the entire test suite
+multiple times (for example if your tests can be configured with
+different parameters). To facilitate this, you can use the
+`Test::resetDoneTests()` function.
+
+Calling this function will reset all completed tests (passed, failed or
+skipped) back to their initial state. For tests that define a `setup`
+method, this will be run again on the next `Test::run()`. If any tests
+were not completed yet, these are unaffected. The statistics (number of
+passed, failed and skipped tests) are also reset to 0.
+
+Note that excluded tests (using `Test::exclude()`) are treated as
+skipped tests, so these are also re-run (you will need to call
+`Test::exclude()` again after `resetDoneTests()` if you want keep these
+tests excluded). Tests removed with their `remove()` method are really
+removed, so not re-run when using `resetDoneTests()`.
+
+Typically, you would use this after all tests are completed (but if you
+call `resetDoneTests()` when some tests are still pending, those
+tests are unaffected). You must never call `resetDoneTests()` from
+inside a test, only between calls to `Test::run()`.
+
+Below is an example that runs all tests once, then changes a global
+variable and runs all tests again. To have a bit more direct control
+over running the tests, this example does not call `Test::run()`
+infinitely in the `loop()`, but instead uses `Test:runUntilDone()` which
+repeatedly calls `Test::run()` until all tests are completed.
+
+```
+bool some_global_setting = false;
+
+void setup() {
+  Serial.begin(9600);
+  while(!Serial) {} // Portability for Leonardo/Micro
+
+  Test::runUntilDone();
+
+  some_global_setting = true;
+  Test::resetDoneTests();
+  Test::runUntilDone();
+}
+
+void loop() { }
+```
+
 # Output
 
 The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 

@@ -13,7 +13,7 @@
          PGM_P ptr;  \
          asm volatile \
          ( \
-           ".pushsection .progmem.data, \"SM\", @progbits, 1" "\n\t" \
+           ".pushsection .progmem.mergeable-strings, \"SM\", @progbits, 1" "\n\t" \
            "0: .string " #str                                 "\n\t" \
            ".popsection"                                      "\n\t" \
          ); \

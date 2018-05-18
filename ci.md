@@ -15,7 +15,6 @@ On a OS X, you will have to install the XCode command line tools, homebrew, libe
 ```bash
 if ! which git ; then xcode-select --install ; fi # xcode cli
 if ! which brew ; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" ; fi # homebrew
-if ! which curl ; then brew install curl ; fi # curl
 if ! which avr-gcc ; then brew tap osx-cross/homebrew-avr && brew install avr-gcc ; fi # avr-gcc
 if [ ! -f /usr/local/lib/libelf.a ] ; then brew install libelf ; fi # libelf
 ```

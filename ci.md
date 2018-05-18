@@ -53,7 +53,7 @@ au() {
   local AU="$HOME/projects/arduinounit"
   local cmd="$1"
   shift
-  "$AU/ci/bin/$cmd"
+  "$AU/ci/bin/$cmd" "$@"
 }
 export -f au
 ```

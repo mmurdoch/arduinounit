@@ -5,6 +5,8 @@ assertFalse	        KEYWORD2
 assertLess	        KEYWORD2
 assertLessOrEqual	  KEYWORD2
 assertEqual	        KEYWORD2
+assertNear	        KEYWORD2
+assertRelativelyNear	        KEYWORD2
 assertNotEqual	    KEYWORD2
 assertMoreOrEqual	  KEYWORD2
 assertMore	        KEYWORD2
@@ -24,6 +26,14 @@ checkTestFail	    KEYWORD2
 checkTestNotFail	  KEYWORD2
 checkTestSkip	    KEYWORD2
 checkTestNotSkip	  KEYWORD2
+checkCurrentTestDone	      KEYWORD2
+checkCurrentTestNotDone	  KEYWORD2
+checkCurrentTestPass	    KEYWORD2
+checkCurrentTestNotPass	  KEYWORD2
+checkCurrentTestFail	    KEYWORD2
+checkCurrentTestNotFail	  KEYWORD2
+checkCurrentTestSkip	    KEYWORD2
+checkCurrentTestNotSkip	  KEYWORD2
 
 TEST_VERBOSITY_ALL	             LITERAL1  
 TEST_VERBOSITY_NONE	             LITERAL1

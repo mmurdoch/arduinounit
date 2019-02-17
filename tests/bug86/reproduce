@@ -1,0 +1,21 @@
+#!/bin/bash
+
+pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
+this_dir="$PWD"
+popd >/dev/null
+
+. $this_dir/../../ci/au
+
+au arduino --pref update.check=false --install-boards arduino:avr:1.6.21
+au arduino --pref update.check=false --install-library ArduinoUnit:3.0.2
+cd $this_dir/../../examples/basic
+au compile_uno
+echo "should be ok:"
+au simavr_uno
+
+au arduino --pref update.check=false --install-boards arduino:avr:1.6.22
+au arduino --pref update.check=false --install-library ArduinoUnit:3.0.2
+cd $this_dir/../../examples/basic
+au compile_uno
+echo "should NOT be ok:"
+au simavr_uno

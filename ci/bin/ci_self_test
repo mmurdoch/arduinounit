@@ -2,6 +2,8 @@
 
 CI_SELF_TESTS=(dir dir_cache preferences sketchbook arduino_exe cache_ide avr_bin avr_root cache_simavr make_simavr_uno simavr_uno compile_sources compile_vitro compile_uno )
 
+CI_SLOW_TESTS=(cache_ide cache_simavr)
+
 for ci_test in "${CI_SELF_TESTS[@]}"
 do
     if [ "$(type -t $ci_test)" != "function" ]
@@ -11,8 +13,26 @@ do
 done
 
 ci_self_test() {
+    local fast=false
+    if [ "$1" == "--fast" ]
+    then
+        fast=true
+    fi
+
     for ci_test in "${CI_SELF_TESTS[@]}"
     do
+        if [ $fast = true ]
+        then
+            for slow in "${CI_SLOW_TESTS[@]}"
+            do
+                if [ "$slow" = "$ci_test" ]
+                then
+                    echo "skipping slow test $ci_test."
+                    continue 2
+                fi
+            done
+        fi
+
 	echo "testing $ci_test."
 	${ci_test}_self_test "$@"
     done

@@ -38,7 +38,7 @@ cache_simavr() {
     if [ \( ! -d "simavr/.git" \) -o "$RELOAD" = "true" ]
     then
 	/bin/rm -rf simavr
-	git clone https://github.com/buserror/simavr.git
+	git clone https://github.com/wmacevoy/simavr.git
     fi
 
     if [ ! -d "simavr/.git" ]

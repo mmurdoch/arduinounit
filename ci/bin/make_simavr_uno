@@ -52,13 +52,9 @@ make_simavr_uno() {
 	exit 1
     fi
 
-    if [ ! -d "$DIR/cache/simavr" -o "$RELOAD" = "true" ]
+    if ! cache_simavr --dir=$DIR --reload=$RELOAD
     then
-	echo "Missing simavr repository (caching)..."
-	if ! cache_simavr --dir=$DIR --reload=$RELOAD
-	then
-	    exit 1
-	fi
+	exit 1
     fi
 
     if [ "$OS" = "macosx" ]
@@ -71,17 +67,16 @@ make_simavr_uno() {
     /bin/rm -rf "$DIR/cache/${VERSION}-${OS}/simavr/repo"
     mkdir -p "$DIR/cache/${VERSION}-${OS}/simavr/repo"
     tar -C "$DIR/cache/simavr" -cf - . | tar -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" -xf -
-    (cd "$DIR/cache/${VERSION}-${OS}/simavr/repo"; git checkout -f "$BRANCH"; git apply "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)/make_simavr_uno.patch" )
+    git -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" checkout -f "$BRANCH"
 
     export AVR_ROOT
+    echo "AVR_ROOT=$AVR_ROOT"
 
     if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
     then
 	echo "build-simavr target failed."
 	exit 1
     fi
-
-    
 
     if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
     then

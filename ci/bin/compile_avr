@@ -65,6 +65,8 @@ compile_avr() {
     
     local ARDUINO_TARGET_EXE="${INO%.ino}"
 
+    mkdir -p "${ARDUINO_LIBS}"
+
     ${ARDUINO_DIR}/arduino-builder -dump-prefs -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_DIR}/hardware -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.avr-gcc.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.arduinoOTA.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.avrdude.path=${ARDUINO_DIR}/hardware/tools/avr -verbose "${TMP}/src/$(basename ${INO})"  2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
 
     ${ARDUINO_DIR}/arduino-builder -compile -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_HARDWARE} -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.avr-gcc.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.arduinoOTA.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.avrdude.path=${ARDUINO_DIR}/hardware/tools/avr -verbose "${TMP}/src/$(basename ${INO})" 2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"

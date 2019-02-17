@@ -19,6 +19,7 @@ ci_self_test() {
         fast=true
     fi
 
+    local ci_test
     for ci_test in "${CI_SELF_TESTS[@]}"
     do
         if [ $fast = true ]

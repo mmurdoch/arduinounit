@@ -9,9 +9,9 @@ do
 done
 
 arduino_exe() {
-    OS="$(os "$@")"
-    VERSION="$(version "$@")"    
-    DIR_CACHE="$(dir_cache "$@")"
+    local OS="$(os "$@")"
+    local VERSION="$(version "$@")"    
+    local DIR_CACHE="$(dir_cache "$@")"
 
     if [ "$OS" = "macosx" ]
     then

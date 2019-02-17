@@ -9,20 +9,19 @@ do
 done
 
 cache_ide() {
-    OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    DIR_CACHE="$(dir_cache "$@")"
-    VERSION="$(version "$@")"
-    ARDUINO_EXE="$(arduino_exe "$@")"    
+    local OS="$(os "$@")"
+    local DIR="$(dir "$@")"
+    local DIR_CACHE="$(dir_cache "$@")"
+    local VERSION="$(version "$@")"
+    local ARDUINO_EXE="$(arduino_exe "$@")"    
     
     while [ $# -gt 0 ]
     do
         case "$1"
         in
-            --extension=*) EXTENSION=${1#--extension=}; shift;;
-            --tries=*)     TRIES=${1#--tries=}; shift;;
-            --reload=*)    RELOAD=${1#--reload=}; shift;;
-            --timeout=*)   TIMEOUT=${1#--timeout=}; shift;;
+            --tries=*)     local TRIES=${1#--tries=}; shift;;
+            --reload=*)    local RELOAD=${1#--reload=}; shift;;
+            --timeout=*)   local TIMEOUT=${1#--timeout=}; shift;;
             --*=*)         shift;;
             --)            shift; break;;
             *)             break;;
@@ -39,7 +38,7 @@ cache_ide() {
 	mkdir -p "${DIR_CACHE}"
     fi
 
-    PORTABLE="${DIR}/portable"
+    local PORTABLE="${DIR}/portable"
     if [ ! -d "${PORTABLE}" ]
     then
         mkdir -p "${PORTABLE}"
@@ -49,10 +48,10 @@ cache_ide() {
     then
         if [ "${OS}" = "macosx" -o "${OS}" = "windows" ]
         then
-            EXTENSION="zip"
+            local EXTENSION="zip"
         elif [ "${OS#linux}" != "${OS}" ]
         then
-            EXTENSION="tar.xz"
+            local EXTENSION="tar.xz"
         else
             echo "Unsupported architecture."
             exit 1
@@ -61,22 +60,22 @@ cache_ide() {
 
     if [ "${TRIES}" = "" ]
     then
-        TRIES=3
+        local TRIES=3
     fi
     
     if [ "${RELOAD}" = "" ]
     then
-        RELOAD=false
+        local RELOAD=false
     fi
     
     if [ "${TIMEOUT}" = "" ]
     then
-        TIMEOUT=10
+        local TIMEOUT=10
     fi
     
-    ARCHIVE="arduino-${VERSION}-${OS}.${EXTENSION}"
-    CHECKSUM="arduino-${VERSION}.sha512sum.txt"
-    CACHE="${DIR}/cache"
+    local ARCHIVE="arduino-${VERSION}-${OS}.${EXTENSION}"
+    local CHECKSUM="arduino-${VERSION}.sha512sum.txt"
+    local CACHE="${DIR}/cache"
     mkdir -p "${CACHE}"
 
     if [ "${RELOAD}" = "true" ]
@@ -84,14 +83,15 @@ cache_ide() {
 	/bin/rm -rf "${CACHE}/${CHECKSUM}"
     fi
         
-    OK=false
+    local OK=false
+    local TRY
     for TRY in $(seq "${TRIES}")
     do
         if [ -r "${CACHE}/${CHECKSUM}" ]
         then
             if grep -q "${ARCHIVE}" "${CACHE}/${CHECKSUM}"
             then
-                OK=true
+                local OK=true
                 break
             else
                 echo "cannot find ${ARCHIVE} in ${CACHE}/${CHECKSUM} (retry)"
@@ -112,14 +112,15 @@ cache_ide() {
 	exit 1
     fi
     
-    OK=false
+    local OK=false
+    local TRY
     for TRY in $(seq "${TRIES}")
     do
         if [ -r "${CACHE}/${ARCHIVE}" ]
         then
             if cd "${CACHE}" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt" > /dev/null
             then
-                OK=true
+                local OK=true
                 break
             fi
         fi
@@ -171,6 +172,7 @@ cache_ide() {
 }
 
 cache_ide_self_test() {
+    local os
     for os in macosx windows linux64
     do
 	if ! cache_ide --os=$os "$@"

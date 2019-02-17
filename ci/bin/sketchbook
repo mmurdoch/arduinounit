@@ -15,7 +15,7 @@ sketchbook() {
     do
         case "$1"
         in
-            --sketchbook=*) SKETCHBOOK=${1#--sketchbook=}; shift;;
+            --sketchbook=*) local SKETCHBOOK=${1#--sketchbook=}; shift;;
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;
@@ -24,7 +24,7 @@ sketchbook() {
     
     if [ "$SKETCHBOOK" == "" ]
     then
-        SKETCHBOOK="$(dir "$@")/portable/sketchbook"
+        local SKETCHBOOK="$(dir "$@")/portable/sketchbook"
     fi
     
     echo "$SKETCHBOOK"

@@ -9,21 +9,21 @@ do
 done
 
 compile_vitro() {
-    DIR="$(dir "$@")"
-    SKETCHBOOK="$(sketchbook "$@")"
+    local DIR="$(dir "$@")"
+    local SKETCHBOOK="$(sketchbook "$@")"
     while [ $# -gt 0 ]
     do
         case "$1"
         in
-            --ino=*) INO=${1#--ino=}; shift;;
-            --tmp=*) TMP=${1#--tmp=}; shift;;
+            --ino=*) local INO=${1#--ino=}; shift;;
+            --tmp=*) local TMP=${1#--tmp=}; shift;;
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;
         esac
     done
-    ARDUINO_LIBS="${SKETCHBOOK}/libraries"
-    ARDUINO_UNIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.."; pwd)"
+    local ARDUINO_LIBS="${SKETCHBOOK}/libraries"
+    local ARDUINO_UNIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.."; pwd)"
     if [ ! -r "$ARDUINO_UNIT_DIR/src/ArduinoUnit.h" ]
     then   
         echo "Cannot find ArduinoUnit library."
@@ -31,7 +31,7 @@ compile_vitro() {
     fi
 
     if [ "${INO}" = "" ]; then
-        INO="$(echo *.ino)"
+        local INO="$(echo *.ino)"
     fi
     
     if [ ! -f "${INO}" ] ; then
@@ -39,7 +39,7 @@ compile_vitro() {
         exit 1
     fi
 
-    ARDUINO_TARGET_DIR="$(dirname "${INO}")"
+    local ARDUINO_TARGET_DIR="$(dirname "${INO}")"
     if [ ! -d "${ARDUINO_TARGET_DIR}" ] ; then
         echo "missing directory ${ARDUINO_TARGET_DIR}."
         exit 1
@@ -49,7 +49,7 @@ compile_vitro() {
     # Make a temp directory to work in (that is removed)
     #
     if [ "$TMP" = "" ] ; then
-        TMP="$(mktemp -d)"
+        local TMP="$(mktemp -d)"
         EXITS+="/bin/rm -rf '${TMP}'"
         trap 'for action in "${EXITS[@]}" ; do $action ; done' EXIT
     else
@@ -66,7 +66,7 @@ compile_vitro() {
     mkdir -p "${TMP}/ArduinoUnit/src"
     (cd "${ARDUINO_UNIT_DIR}/src"; tar cf - $(compile_sources .)) | tar -C "${TMP}/ArduinoUnit/src" -xf -
 
-    ARDUINO_TARGET_EXE="${INO%.ino}"
+    local ARDUINO_TARGET_EXE="${INO%.ino}"
 
     #
     # compile everything in the temp directory, relabeling filenames errors so they look like they came from the right place

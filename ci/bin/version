@@ -11,7 +11,7 @@ version() {
     do
         case "$1"
         in
-            --version=*) VERSION="${1#--version=}"; shift;;
+            --version=*) local VERSION="${1#--version=}"; shift;;
             --*=*)       shift;;
             --)          shift; break;;
             *)           break;;
@@ -20,7 +20,7 @@ version() {
 
     if [ "$VERSION" = "" ]
     then
-        VERSION="1.8.8"
+        local VERSION="1.8.8"
     fi
     echo $VERSION
 }

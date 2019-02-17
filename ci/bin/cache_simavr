@@ -9,13 +9,13 @@ do
 done
 
 cache_simavr() {
-    DIR="$(dir "$@")"
+    local DIR="$(dir "$@")"
     
     while [ $# -gt 0 ]
     do
         case "$1"
         in
-            --reload=*)    RELOAD=${1#--reload=}; shift;;
+            --reload=*)    local RELOAD=${1#--reload=}; shift;;
             --*=*)         shift;;
             --)            shift; break;;
             *)             break;;

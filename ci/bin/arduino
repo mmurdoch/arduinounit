@@ -9,7 +9,7 @@ do
 done
 
 arduino() {
-    ARDUINO_EXE="$(arduino_exe "$@")"
+    local ARDUINO_EXE="$(arduino_exe "$@")"
 
     if [ ! -r "$ARDUINO_EXE" ]
     then
@@ -24,7 +24,7 @@ arduino() {
 
 arduino_self_test() {
     arduino "$@" &
-    PID="$!"
+    local PID="$!"
     if [ "${PID}" = "" ]
     then
         echo "no launch"

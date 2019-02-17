@@ -8,12 +8,6 @@ do
     fi
 done
 
-
-if [ "$(type -t arduino_dir)" != "function" ]
-then
-    . "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/arduino_dir
-fi
-
 avr_bin() {
     echo "$(arduino_dir "$@")/hardware/tools/avr/bin"
 }

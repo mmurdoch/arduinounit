@@ -9,13 +9,13 @@ do
 done
 
 preferences() {
-    DIR="$(dir "$@")"
+    local DIR="$(dir "$@")"
     
     while [ $# -gt 0 ]
     do
         case "$1"
         in
-            --preferences=*) PREFERENCES=${1#--preferences=}; shift;;
+            --preferences=*) local PREFERENCES=${1#--preferences=}; shift;;
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;
@@ -24,7 +24,7 @@ preferences() {
 
     if [ "$PREFERENCES" = "" ]
     then
-        PREFERENCES="$(dir "$@")/portable/preferences.txt"
+        local PREFERENCES="$(dir "$@")/portable/preferences.txt"
     fi
     
     echo "$PREFERENCES"

@@ -7,7 +7,7 @@ dir() {
     do
         case "$1"
         in
-            --dir=*) DIR=${1#--dir=}; shift;;
+            --dir=*) local DIR=${1#--dir=}; shift;;
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;
@@ -16,7 +16,7 @@ dir() {
 
     if [ "$DIR" = "" ]
     then
-        DIR="$HOME/.arduino"
+        local DIR="$HOME/.arduino"
     fi
 
     if [ ! -d "${DIR}" ]

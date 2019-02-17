@@ -10,7 +10,7 @@ compile_sources() {
 }
 
 compile_sources_self_test() {
-    TMP="$(mktemp -d)"
+    local TMP="$(mktemp -d)"
     trap 'rm -rf "$TMP"' EXIT
     mkdir -p $TMP/s/x
     mkdir -p $TMP/s/x/y    
@@ -23,6 +23,7 @@ compile_sources_self_test() {
 
     compile_sources "$TMP/s" > "$TMP/out"
 
+    local has
     for has in s/a.cpp s/b.ino s/x/y/c.h
     do
         if ! grep -q $has "$TMP/out"
@@ -32,6 +33,7 @@ compile_sources_self_test() {
         fi
     done
 
+    local miss
     for miss in ._a.cpp c.txt
     do
         if grep -q $miss "$TMP/out"

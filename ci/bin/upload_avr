@@ -8,24 +8,24 @@ do
     fi
 done
 
-compile_avr() {
-    DIR="$(dir "$@")"
-    OS="$(os "$@")"    
-    ARDUINO_DIR="$(arduino_dir "$@")"
-    ARDUINO_PACKAGES="$(packages "$@")"
-    ARDUINO_HARDWARE="${ARDUINO_DIR}/hardware"
-    ARDUINO_LIBS="${SKETCHBOOK}/libraries"
-    BOARD=arduino:avr:uno:cpu=atmega328p
-    ARDUINO_TARGET_DIR=
+upload_avr() {
+    local DIR="$(dir "$@")"
+    local OS="$(os "$@")"    
+    local ARDUINO_DIR="$(arduino_dir "$@")"
+    local ARDUINO_PACKAGES="$(packages "$@")"
+    local ARDUINO_HARDWARE="${ARDUINO_DIR}/hardware"
+    local ARDUINO_LIBS="${SKETCHBOOK}/libraries"
+    local BOARD=arduino:avr:uno:cpu=atmega328p
+    local ARDUINO_TARGET_DIR=
     while [ $# -gt 0 ]
     do
         case "$1"
         in
-            --board=*) BOARD=${1#--board=}; shift;;	
-            --ino=*) INO=${1#--ino=}; shift;;
-            --hex=*) HEX=${1#--hex=}; shift;;
-            --port=*) PORT=${1#--port=}; shift;;
-            --baud=*) BAUD=${1#--baud=}; shift;;                        
+            --board=*) local BOARD=${1#--board=}; shift;;	
+            --ino=*) local INO=${1#--ino=}; shift;;
+            --hex=*) local HEX=${1#--hex=}; shift;;
+            --port=*) local PORT=${1#--port=}; shift;;
+            --baud=*) local BAUD=${1#--baud=}; shift;;                        
             --*=*)   shift;;
             --)      shift; break;;
             *)       break;;
@@ -35,29 +35,29 @@ compile_avr() {
     if [ "${PORT}" = "" ] ; then
       case "${OS}"
       in
-        macosx)    PORT=$(echo /dev/cu.usb*);;
-        linux*)    PORT=$(echo /dev/ttyACM*);;
-        windows*)  PORT=com4
+        macosx)    local PORT=$(echo /dev/cu.usb*);;
+        linux*)    local PORT=$(echo /dev/ttyACM*);;
+        windows*)  local PORT=com4
         *) echo "unsupported port."; exit 1;;
       esac
    fi
     if [ "${BAUD}" = "" ] ; then
-        BAUD=115200
+        local BAUD=115200
     fi
     
     if [ "${INO}" = "" ]; then
         if [ -r "$(echo *.ino)" ] ; then
-            INO="$(echo *.ino)"
+            local INO="$(echo *.ino)"
         fi
     fi
 
     if [ "${HEX}" = "" -a "${INO}" != "" ] ; then
-        HEX="${INO%.ino}".hex
+        local HEX="${INO%.ino}".hex
     fi
     
     if [ "$HEX" = "" ]
     then
-       HEX="$(echo *.hex)"
+       local HEX="$(echo *.hex)"
     fi
 
     if [ ! -r "${HEX}" ] ; then

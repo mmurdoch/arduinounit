@@ -9,9 +9,9 @@ do
 done
 
 arduino_dir() {
-    OS="$(os "$@")"
-    DIR="$(dir "$@")"
-    VERSION="$(version "$@")"
+    local OS="$(os "$@")"
+    local DIR="$(dir "$@")"
+    local VERSION="$(version "$@")"
 
     if [ "$OS" = "macosx" ]
     then

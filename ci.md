@@ -77,7 +77,7 @@ au simavr_uno | au au2ju
 In the vitro example, you can run tests 3 different ways: on the hardware, on the simulator, or on the dev system:
 
 ```bash
-au compile_mock
+au compile_vitro
 ./vitro 
 ./vitro | au au2ju
 au compile_uno

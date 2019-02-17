@@ -37,7 +37,7 @@ upload_avr() {
       in
         macosx)    local PORT=$(echo /dev/cu.usb*);;
         linux*)    local PORT=$(echo /dev/ttyACM*);;
-        windows*)  local PORT=com4
+        windows*)  local PORT=com4;;
         *) echo "unsupported port."; exit 1;;
       esac
    fi
@@ -65,7 +65,13 @@ upload_avr() {
       exit 1
     fi
 
-    if ! ${ARDUINO_DIR}/hardware/tools/avr/bin/avrdude -C${ARDUINO_DIR}/hardware/tools/avr/etc/avrdude.conf -v -p${BOARD##*cpu=} -cwiring -P"${PORT}" -b${BAUD} -D -Uflash:w:"${HEX}":i
+    local PROGRAMMER_ID=arduino
+    case "${BOARD}"
+    in
+        arduino:avr:mega:*) local PROGRAMMER_ID=wiring;;
+    esac
+
+    if ! ${ARDUINO_DIR}/hardware/tools/avr/bin/avrdude -C${ARDUINO_DIR}/hardware/tools/avr/etc/avrdude.conf -v -p${BOARD##*cpu=} -c${PROGRAMMER_ID} -P"${PORT}" -b${BAUD} -D -Uflash:w:"${HEX}":i
     then
         echo "upload error: avr."
         exit 1

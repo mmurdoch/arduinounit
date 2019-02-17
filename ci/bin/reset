@@ -10,7 +10,7 @@ done
 
 reset() {
     local DIR="$(dir "$@")"
-    find "${DIR}/cache" -mindepth 1 -maxdepth 1 -type d -o -size -1M -exec /bin/rm -rf {} \;
+    find "${DIR}/cache" -mindepth 1 -maxdepth 1 \( -type d -o -size -1M \) -exec /bin/rm -rf {} \;
     /bin/rm -rf "${DIR}/portable"
 }
 

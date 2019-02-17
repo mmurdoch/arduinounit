@@ -20,7 +20,7 @@ version() {
 
     if [ "$VERSION" = "" ]
     then
-        VERSION="1.8.5"
+        VERSION="1.8.8"
     fi
     echo $VERSION
 }

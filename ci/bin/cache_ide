@@ -93,6 +93,8 @@ cache_ide() {
             then
                 OK=true
                 break
+            else
+                echo "cannot find ${ARCHIVE} in ${CACHE}/${CHECKSUM} (retry)"
             fi
         fi
         curl --connect-timeout "$TIMEOUT" -o "${CACHE}/${CHECKSUM}" "https://downloads.arduino.cc/${CHECKSUM}"

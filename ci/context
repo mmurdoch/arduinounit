@@ -4,16 +4,6 @@ pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
 arduinounit_ci_bin="$PWD/bin"
 popd >/dev/null
 
-# remove directory from path
-PATH=":$PATH:"
-while [ "${PATH/:$arduinounit_ci_bin:/:}" != "$PATH" ] ; do PATH="${PATH/:$arduinounit_ci_bin:/:}"; done
-
-# place directory first
-PATH="$arduinounit_ci_bin${PATH%:}"
-
-# invalidate cache
-hash -r
-
 eval 'au() { local cmd="$1"; shift; "'"$arduinounit_ci_bin"'/$cmd" "$@"; }; export -f au;'
 
 

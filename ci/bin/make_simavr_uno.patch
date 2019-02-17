@@ -1,0 +1,36 @@
+diff --git a/examples/board_simduino/Makefile b/examples/board_simduino/Makefile
+index b1e970f..c4e8a85 100644
+--- a/examples/board_simduino/Makefile
++++ b/examples/board_simduino/Makefile
+@@ -31,7 +31,7 @@ VPATH += ../parts
+ 
+ LDFLAGS += -lpthread -lutil
+ 
+-include ../Makefile.opengl
++# include ../Makefile.opengl
+ 
+ all: obj ${firmware} ${target}
+ 
+diff --git a/examples/board_simduino/simduino.c b/examples/board_simduino/simduino.c
+index 007b383..a9c0e0a 100644
+--- a/examples/board_simduino/simduino.c
++++ b/examples/board_simduino/simduino.c
+@@ -27,12 +27,12 @@
+ #include <stdio.h>
+ #include <libgen.h>
+ 
+-#if __APPLE__
+-#include <GLUT/glut.h>
+-#else
+-#include <GL/glut.h>
+-#endif
+-#include <pthread.h>
++// #if __APPLE__
++// #include <GLUT/glut.h>
++// #else
++// #include <GL/glut.h>
++// #endif
++// #include <pthread.h>
+ 
+ #include "sim_avr.h"
+ #include "avr_ioport.h"

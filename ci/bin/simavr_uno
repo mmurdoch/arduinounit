@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for inc in dir os version
+for inc in dir os version make_simavr_uno
 do
     if [ "$(type -t $inc)" != "function" ]
     then
@@ -58,6 +58,17 @@ simavr_uno() {
     if [ ! -r "${HEX}" ] ; then
       echo "must specify hex file"
       exit 1
+    fi
+
+    if [ ! -x "${DIR}/cache/${VERSION}-${OS}/simavr/uno" ]
+    then
+        make_simavr_uno "$@"
+    fi
+
+    if [ ! -x "${DIR}/cache/${VERSION}-${OS}/simavr/uno" ]
+    then
+        echo "could not make simavr/uno"
+        exit 1
     fi
 
     SIMAVR_UNO_PIDS=""

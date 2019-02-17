@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-for inc in dir os version cache_simavr avr_root arduino_exe 
+for inc in dir os version cache_simavr avr_root arduino_exe package_install
 do
     if [ "$(type -t $inc)" != "function" ]
     then
@@ -61,18 +61,27 @@ make_simavr_uno() {
 	fi
     fi
 
+    if [ "$OS" = "macosx" ]
+    then
+        package_install libelf
+    else
+        package_install libelf-dev || package_install libelf-devel
+    fi
+
     /bin/rm -rf "$DIR/cache/${VERSION}-${OS}/simavr/repo"
     mkdir -p "$DIR/cache/${VERSION}-${OS}/simavr/repo"
     tar -C "$DIR/cache/simavr" -cf - . | tar -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" -xf -
-    (cd "$DIR/cache/${VERSION}-${OS}/simavr/repo"; git checkout -f "$BRANCH")
+    (cd "$DIR/cache/${VERSION}-${OS}/simavr/repo"; git checkout -f "$BRANCH"; git apply "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)/make_simavr_uno.patch" )
 
     export AVR_ROOT
-    
+
     if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo" clean build-simavr
     then
 	echo "build-simavr target failed."
 	exit 1
     fi
+
+    
 
     if ! PATH="$AVR_ROOT/bin:$PATH" make -e -B -C "$DIR/cache/${VERSION}-${OS}/simavr/repo/examples/board_simduino" clean all
     then

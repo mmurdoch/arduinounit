@@ -10,25 +10,20 @@ There really is nothing to install.  The CI tools are bash scripts that can be r
 
 #### macosx
 
-On a OS X, you will have to install the XCode command line tools, homebrew, libelf and the avr-gcc tools.  You will need an internet connection and some time (20 minutes):
+On a OS X, you will have to install the XCode command line tools and homebrew:
 
 ```bash
 if ! which git ; then xcode-select --install ; fi # xcode cli
 if ! which brew ; then /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" ; fi # homebrew
-if ! which curl ; then brew install curl ; fi # curl
-if ! which avr-gcc ; then brew tap osx-cross/homebrew-avr && brew install avr-gcc ; fi # avr-gcc
-if [ -f /usr/local/lib/libelf.a ] ; then brew install libelf ; fi # libelf
 ```
 
 #### linux
 
-In linux, you need the gcc compiler, make git and curl:
+In linux, you need git make g++ unzip and curl:
 
 ```bash
-sudo apt install -y g++ make git curl
+sudo apt install -y git make g++ unzip curl
 ```
-
-or similar...
 
 #### windows
 
@@ -49,10 +44,11 @@ git clone https://github.com/mmurdoch/arduinounit.git
 
 To make the tools easier to use, you can define the `au` bash function by sourcing `au` in the `ci` directory (notice the dot with a space):
 
-```
+```bash
 . "$HOME/projects/arduinounit/ci/au"
 
 ```
+
 You can put this in your `.profile` if you like, so it is set every time you log in.  
 
 To test (you may have to log out and log back in), try:
@@ -113,9 +109,8 @@ ${HOME}/.arduino/
 
 The CI tools install the IDE in "portable" mode so they do not use or modify your default IDE. When making a "clean install test", do NOT delete the zip/tar files in the cache.  These are checked against the very secure sha512 (and will be re-downloaded if they checksum fails).  Downloading these again is very slow and a waste of bandwidth.
 
-A clean (cached) install can be started with:
+A clean (except the ide cache which is pointless and slow) install can be started with:
 
 ```bash
-/bin/rm -rf "$(au dir_cache)"
-/bin/rm -rf "$(au dir)/portable"
+au reset
 ```

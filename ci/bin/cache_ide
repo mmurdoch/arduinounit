@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for inc in os dir dir_cache version arduino_exe
+for inc in os dir dir_cache version arduino_exe package_install
 do
     if [ "$(type -t $inc)" != "function" ]
     then
@@ -137,8 +137,16 @@ cache_ide() {
     pushd "${DIR_CACHE}"
     if [ "${EXTENSION}" = "zip" ]
     then
+	if ! which unzip
+	then
+	    package_install unzip
+	fi
 	unzip -a -o "${CACHE}/${ARCHIVE}" > /dev/null
     else
+	if ! which tar
+	then
+	    package_install tar
+	fi
 	tar -xf "${CACHE}/${ARCHIVE}"
     fi
     

@@ -41,23 +41,19 @@ This has not been tested in windows.  I believe using the Windows Subsystem for 
 Copy the arduinounit (or at least the ci sub-folder) and its contents to clone this repository in your projects folder, as in:
 
 ```bash
+# the directory is where you keep your projects...
 mkdir -p "$HOME/projects"
 cd "$HOME/projects"
 git clone https://github.com/mmurdoch/arduinounit.git
 ```
 
-Create a bash function to quickly use the CI tools (don't put them in your path, it will be confusing about which versions of tools you are using).  This might go in your "$HOME/.profile", for example:
+To make the tools easier to use, you can define the `au` bash function by sourcing `au` in the `ci` directory (notice the dot with a space):
 
-```bash
-au() {
-  # use your location here.
-  local AU="$HOME/projects/arduinounit"
-  local cmd="$1"
-  shift
-  "$AU/ci/bin/$cmd"
-}
-export -f au
 ```
+. "$HOME/projects/arduinounit/ci/au"
+
+```
+You can put this in your `.profile` if you like, so it is set every time you log in.  
 
 To test (you may have to log out and log back in), try:
 
@@ -66,7 +62,7 @@ au dir
 au dir_cache
 au arduino_dir
 au sketchbook
-au arduino --pref update.check=true --install-library ArduinoUnit
+au arduino --pref update.check=false --install-library ArduinoUnit
 ```
 
 In the `examples/basic` arduinounit folder, try,

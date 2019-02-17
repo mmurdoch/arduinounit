@@ -1,0 +1,40 @@
+#!/bin/bash
+
+package_install() {
+    local package_installer=()
+
+    # https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
+
+    if [ -f /etc/debian_version ]
+    then
+        package_installer=("sudo" "/usr/bin/apt-get" "-y" "install")
+    elif [ -f /etc/redhat-release ]
+    then
+        package_installer=("sudo" "/usr/bin/yum" "-y" "install")
+    elif [ -f /etc/SuSE-release ]
+    then
+        package_installer=("sudo" "/usr/bin/zypper" "--non-interactive" "install")
+    elif [ -f /etc/alpine-release ]
+    then
+        package_installer=("sudo" "/usr/bin/apk" "add")
+    elif [ -f /usr/local/bin/brew ]
+    then
+        package_installer=("/usr/local/bin/brew" "install")
+    elif [ -f /opt/local/lib/port ]
+    then
+        package_installer=("sudo" "port" "install")
+    fi
+
+    if [ ${#package_installer[@]} -eq 0 ]
+    then
+        echo "could not determine package installer."
+        exit 1
+    fi
+
+    "${package_installer[@]}" "$@"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    package_install "$@"
+fi

@@ -133,5 +133,12 @@ MockPrint::MockPrint(const String &_initial) : String(_initial) {}
 MockPrint::~MockPrint() {}
 
 size_t MockPrint::write(uint8_t x) { concat((char) x); return 1; }
-size_t MockPrint::write(const uint8_t *buffer, size_t size) { concat((const char *)buffer,size); return size; }
+size_t MockPrint::write(const uint8_t *buffer, size_t size) {
+#ifdef TEENSYDUINO
+  append((const char *)buffer, size);
+#else
+  concat((const char *)buffer, size);
+#endif  // TEENSYDUINO
+  return size;
+}
 int MockPrint::availableForWrite() { return INT_MAX; }

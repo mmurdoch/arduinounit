@@ -53,3 +53,5 @@
 	* Provide preliminary Continuous Integration Testing support (ci)
 ## 3.0.2
 	* Data deduplication bug fix patch.
+## 3.0.3
+        * Support for Teensy (#87)

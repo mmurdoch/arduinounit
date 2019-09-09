@@ -117,7 +117,7 @@ au reset
 
 ## debug
 
-*Warning* this is a hack.  But stepping through code is amazingly useful.  I have only worked out steps on Ubuntu 18.04, and depends on the simavr tool, which gives no uart output.  Still it is better than nothging.
+*Warning* this is a hack.  But stepping through code is amazingly useful.  I have only worked out steps on Ubuntu 18.04, and depends on the simavr tool, which gives no uart output.  Still it is better than nothing.
 
 1. Install simavr (sudo apt install simavr).  This should also install avr-gcc.
 1. Install this toolset in in Ubunutu: run `au arduino` to spin up the basic working cache of the ide.

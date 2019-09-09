@@ -125,10 +125,13 @@ au reset
 1. Compile the project with `au compile_avr` in the project directory.  The build residue should be in TMP.
 1. Look in the TMP directory, and find the build folder.
 1. Open two terminals here; one to run the program and one to debug from.
-1. In your run terminal, type `simavr simavr -g -m atmega328p -f 16000000 basic.ino.elf`
+1. In your run terminal, type
+```bash
+simavr -g -m atmega328p -f 16000000 basic.ino.elf
+```
 1. In your debug terminal, type `avr-gdb` to start the avr debugger, then in th prompts type
 ```bash
-enable tui
+tui enable
 file basic.ino.elf
 target remote :1234
 b setup

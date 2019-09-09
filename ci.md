@@ -114,3 +114,24 @@ A clean (except the ide cache which is pointless and slow) install can be starte
 ```bash
 au reset
 ```
+
+## debug
+
+~Warning~ this is a hack.  But stepping through code is amazingly useful.  I have only tested it on Ubuntu; but should work on 
+
+1. Install simavr (sudo apt install simavr).  This should also install avr-gcc.
+1. Install this toolset in in Ubunutu: run `au arduino` to spin up the basic working cache of the ide.
+1. Create and set the TMP environment variable so the system does not build and erase a temporary file.  I used "<project>/tmpdir" and made that folder.
+1. Compile the project with `au compile_avr` in the project directory.  The build residue should be in TMP.
+1. Look in the TMP directory, and find the build folder.
+1. Open two terminals here; one to run the program and one to debug from.
+1. In your run terminal, type `simavr simavr -g -m atmega328p -f 16000000 basic.ino.elf`
+1. In your debug terminal, type `avr-gdb` to start the avr debugger, then in th prompts type
+```bash
+enable tui
+file basic.ino.elf
+target remote :1234
+b setup
+c
+s
+```

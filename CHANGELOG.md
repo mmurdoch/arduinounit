@@ -55,3 +55,7 @@
 	* Data deduplication bug fix patch.
 ## 3.0.3
         * Support for Teensy (#87)
+## 3.0.4
+	* Skipped message bug fixed (#86)
+	* Debug (alpha) documented for simavr/avr-gdb (ci.md)
+	

@@ -466,6 +466,8 @@ Note that `Test::run()` only calls the active unresolved tests.
 
 * The `assertCurrentTestXXXX([,footnote [,retval])` macros do not compile on ESP8266 boards with no footnote.  Use an empty footnote `assertCurrentTestXXXX("")`, or use `assertCurrentTestXXXX_0()` for no footnote.  You do not have to specify a return value.
 
+* The current release prints "skipped" for all tests, although assertions are correctly reported. (#86)
+
 ## FAQ
 
 Q. The line number of the asserts do not match the source file.

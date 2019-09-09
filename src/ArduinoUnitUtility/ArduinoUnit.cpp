@@ -29,6 +29,19 @@ static CppStreamPrint Serial;
 
 Print* Test::out = &Serial;
 
+#if ARDUINO_UNIT_USE_FLASH > 0
+#define ARDUINO_UNIT_PROGMEM PROGMEM
+#else
+#define ARDUINO_UNIT_PROGMEM
+#endif
+
+const char CONST_SKIPPED[] ARDUINO_UNIT_PROGMEM = "skipped";
+const char CONST_PASSED[]  ARDUINO_UNIT_PROGMEM = "passed";
+const char CONST_FAILED[]  ARDUINO_UNIT_PROGMEM = "failed";
+
+ARDUINO_UNIT_DECLARE_STRING SKIPPED = (ARDUINO_UNIT_DECLARE_STRING) CONST_SKIPPED;
+ARDUINO_UNIT_DECLARE_STRING PASSED = (ARDUINO_UNIT_DECLARE_STRING) CONST_PASSED;
+ARDUINO_UNIT_DECLARE_STRING FAILED = (ARDUINO_UNIT_DECLARE_STRING) CONST_FAILED;
 
 void Test::noMessage(bool ok) { (void) ok; }
 
@@ -38,11 +51,12 @@ void Test::resolve()
   bool fail = state==DONE_FAIL;
   bool skip = state==DONE_SKIP;
   bool done = (pass || fail || skip);
+  ARDUINO_UNIT_DECLARE_STRING  message = 0;
   
   if (done) {
-    if (pass) ++Test::passed;
-    if (fail) ++Test::failed;
-    if (skip) ++Test::skipped;
+    if (pass) { message=PASSED; ++Test::passed; }
+    if (fail) { message=FAILED; ++Test::failed; }
+    if (skip) { message=SKIPPED; ++Test::skipped; }
     
 #if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED) || TEST_VERBOSITY_EXISTS(TESTS_PASSED) || TEST_VERBOSITY_EXISTS(TESTS_FAILED)
     
@@ -55,17 +69,9 @@ void Test::resolve()
     if (output) {
       Test::out->print(ARDUINO_UNIT_STRING("Test "));
       Test::out->print(name);
-#if TEST_VERBOSITY_EXISTS(TESTS_SKIPPED)
-      if (skip) { Test::out->println(ARDUINO_UNIT_STRING(" skipped.")); }
-#endif
-      
-#if TEST_VERBOSITY_EXISTS(TESTS_PASSED)
-      if (pass) { Test::out->println(ARDUINO_UNIT_STRING(" passed.")); }
-#endif
-      
-#if TEST_VERBOSITY_EXISTS(TESTS_FAILED)
-      if (fail) { Test::out->println(ARDUINO_UNIT_STRING(" failed.")); }
-#endif
+      Test::out->print(' ');  
+      Test::out->print(message);
+      Test::out->println();
     }
 #endif
   }
@@ -73,11 +79,17 @@ void Test::resolve()
   if (root == 0 && TEST_VERBOSITY(TESTS_SUMMARY)) {
     Test::out->print(ARDUINO_UNIT_STRING("Test summary: "));
     Test::out->print(passed);
-    Test::out->print(ARDUINO_UNIT_STRING(" passed, "));
+    Test::out->print(' ');
+    Test::out->print(PASSED);
+    Test::out->print(ARDUINO_UNIT_STRING(", "));
     Test::out->print(failed);
-    Test::out->print(ARDUINO_UNIT_STRING(" failed, and "));
+    Test::out->print(' ');
+    Test::out->print(FAILED);
+    Test::out->print(ARDUINO_UNIT_STRING(", "));    
     Test::out->print(skipped);
-    Test::out->print(ARDUINO_UNIT_STRING(" skipped, out of "));
+    Test::out->print(' ');
+    Test::out->print(SKIPPED);
+    Test::out->print(ARDUINO_UNIT_STRING(", out of "));
     Test::out->print(count);
     Test::out->println(ARDUINO_UNIT_STRING(" test(s)."));
   }

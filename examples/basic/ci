@@ -25,15 +25,20 @@ do
     fi
 done
 
-au compile_uno --tmp="$CI_DIR/../$(basename "$CI_DIR")-ci" "$@"
+# compile using a specific tmp directory (instead of a random one that is deleted)
+au compile_uno --tmp="$CI_TMP" "$@"
+
+# get a time stamp to distinguish the results
 STAMP=$(date "+%Y.%m.%d-%H.%M.%S")
 # run the simulation, replace the \r\n end-of-line with unix \n style, and record result
 au simavr_uno "$@" | tr -d '\r' | tee "$CI_TMP/result-$STAMP"
+
+# create a file with expected content
 cat >"$CI_TMP/expected-$STAMP" <<EOF
 Test correct passed
 Assertion failed: (x=1) != (1=1), file basic.ino, line 13.
 Test incorrect failed
-test summary: 1 passed, 1 failed, 0 skipped, out of 2 test(s).
+Test summary: 1 passed, 1 failed, 0 skipped, out of 2 test(s).
 EOF
 
 cd "$CI_TMP"
@@ -44,7 +49,5 @@ else
     echo "fail <expected >result"
     exit 1
 fi
-
-
 
 

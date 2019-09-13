@@ -97,6 +97,10 @@ cache_ide() {
                 echo "cannot find ${ARCHIVE} in ${CACHE}/${CHECKSUM} (retry)"
             fi
         fi
+	if ! which curl
+	then
+	    package_install curl
+	fi
         curl --connect-timeout "$TIMEOUT" -o "${CACHE}/${CHECKSUM}" "https://downloads.arduino.cc/${CHECKSUM}"
     done
     
@@ -125,6 +129,10 @@ cache_ide() {
             fi
         fi
         /bin/rm -rf "${CACHE}/${ARCHIVE}"
+	if ! which curl
+	then
+	    package_install curl
+	fi
         curl --connect-timeout "${TIMEOUT}" -o "${CACHE}/${ARCHIVE}" "https://downloads.arduino.cc/${ARCHIVE}"
     done
         

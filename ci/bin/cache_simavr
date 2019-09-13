@@ -23,7 +23,7 @@ cache_simavr() {
     done
 
     mkdir -p "$DIR/cache"
-    cd "$DIR/cache"
+    pushd "$DIR/cache"
 
     if [ -d "simavr/.git" -a "$RELOAD" != "true" ]
     then
@@ -47,6 +47,7 @@ cache_simavr() {
 	echo "could not obtain simavr repository."
 	exit 1
     fi
+    popd
 }
 
 cache_simavr_self_test() {

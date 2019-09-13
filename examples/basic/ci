@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#
+#  illustration of using the ci tools to build & run this using command line and simavr
+# 
+
+# directory of this source
+pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
+CI_DIR="$PWD"
+popd >/dev/null
+
+# au helper
+. ../../ci/au
+
+# load missing libraries
+
+for library in ArduinoUnit
+do
+    if [ ! -d $(au sketchbook "$@")/libraries/$library ]
+    then
+	au arduino "$@" --pref update.check=false --install-library $library
+    fi
+done
+
+# tmp cannot be a subdirectory of this directory (creates tar recursion)
+au compile_uno --tmp="$CI_DIR/../$(basename "$CI_DIR")-ci" "$@"
+au simavr_uno "$@"
+
+

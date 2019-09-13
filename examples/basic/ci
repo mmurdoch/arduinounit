@@ -9,6 +9,9 @@ pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
 CI_DIR="$PWD"
 popd >/dev/null
 
+# tmp cannot be a subdirectory of this directory (creates tar recursion)
+CI_TMP="$CI_DIR/../$(basename "$CI_DIR")-ci"
+
 # au helper
 . ../../ci/au
 
@@ -22,8 +25,26 @@ do
     fi
 done
 
-# tmp cannot be a subdirectory of this directory (creates tar recursion)
 au compile_uno --tmp="$CI_DIR/../$(basename "$CI_DIR")-ci" "$@"
-au simavr_uno "$@"
+STAMP=$(date "+%Y.%m.%d-%H.%M.%S")
+# run the simulation, replace the \r\n end-of-line with unix \n style, and record result
+au simavr_uno "$@" | tr -d '\r' | tee "$CI_TMP/result-$STAMP"
+cat >"$CI_TMP/expected-$STAMP" <<EOF
+Test correct passed
+Assertion failed: (x=1) != (1=1), file basic.ino, line 13.
+Test incorrect failed
+test summary: 1 passed, 1 failed, 0 skipped, out of 2 test(s).
+EOF
+
+cd "$CI_TMP"
+if diff "expected-$STAMP" "result-$STAMP"
+then
+    echo "ok"
+else
+    echo "fail <expected >result"
+    exit 1
+fi
+
+
 
 

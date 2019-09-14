@@ -1,6 +1,6 @@
-#!/bin/bash -x
+#!/bin/bash
 
-for inc in dir arduino_dir sketchbook compile_sources
+for inc in dir cache_ide arduino_exe arduino_dir sketchbook compile_sources
 do
     if [ "$(type -t $inc)" != "function" ]
     then
@@ -28,7 +28,7 @@ compile_avr() {
             *)       break;;
         esac
     done
-    
+
     if [ "${INO}" = "" ]; then
         local INO="$(echo *.ino)"
     fi
@@ -61,11 +61,24 @@ compile_avr() {
     mkdir -p ${TMP}/cache
     mkdir -p ${TMP}/src
 
-    (cd ${ARDUINO_TARGET_DIR}; tar cf - $(compile_sources .)) | tar -C "${TMP}/src" -xf -
+    local ABS_TMP="$(cd "$TMP"; pwd)"
+    local ABS_ARDUINO_TARGET_DIR="$(cd "$ARDUINO_TARGET_DIR"; pwd)"
+    local EXCLUDE_TMP=""
+    case "${ABS_TMP}"
+    in
+	"${ABS_ARDUINO_TARGET_DIR}"*)
+	    EXCLUDE_TMP=--exclude="${ABS_TMP#"${ABS_ARDUINO_TARGET_DIR}/"}" ;;
+    esac
+    (cd ${ARDUINO_TARGET_DIR}; tar "${EXCLUDE_TMP}" -cf - $(compile_sources .)) | tar -C "${TMP}/src" -xf -
     
     local ARDUINO_TARGET_EXE="${INO%.ino}"
 
     mkdir -p "${ARDUINO_LIBS}"
+
+    if [ ! -x "${ARDUINO_DIR}/arduino-builder" ]
+    then
+	cache_ide "$@"
+    fi
 
     ${ARDUINO_DIR}/arduino-builder -dump-prefs -logger=machine -hardware ${ARDUINO_DIR}/hardware -hardware ${ARDUINO_DIR}/hardware -tools ${ARDUINO_DIR}/tools-builder -tools ${ARDUINO_DIR}/hardware/tools/avr -built-in-libraries ${ARDUINO_DIR}/libraries -libraries ${ARDUINO_LIBS} -fqbn=${BOARD} -ide-version=10802 -build-path ${TMP}/build -warnings=all -build-cache ${TMP}/cache -prefs=build.warn_data_percentage=75 -prefs=runtime.tools.avr-gcc.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.arduinoOTA.path=${ARDUINO_DIR}/hardware/tools/avr -prefs=runtime.tools.avrdude.path=${ARDUINO_DIR}/hardware/tools/avr -prefs="compiler.cpp.extra_flags=-g" -verbose "${TMP}/src/$(basename ${INO})"  2>&1 | sed -e "s|${TMP}/build/sketch/|${ARDUINO_TARGET_DIR}/|g"
 

@@ -1,4 +1,0 @@
-Test correct passed
-Assertion failed: (x=1) != (1=1), file basic.ino, line 13.
-Test incorrect failed
-Test summary: 1 passed, 1 failed, 0 skipped, out of 2 test(s).

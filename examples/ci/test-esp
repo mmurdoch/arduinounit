@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# directory containing this ci source file
+pushd $(dirname "${BASH_SOURCE[0]}") >/dev/null
+CI_DIR="$PWD"
+popd >/dev/null
+
+# au helper
+. "$CI_DIR/../../ci/au"
+
+if ! which python
+then
+    au package_install python
+fi
+if ! echo "import serial" | python
+then
+    au package_install python-serial
+fi
+		      
+au arduino "$@" --pref update.check=false --save-prefs
+au arduino "$@" --pref boardsmanager.additional.urls="https://arduino.esp8266.com/stable/package_esp8266com_index.json,https://dl.espressif.com/dl/package_esp32_index.json" --save-prefs
+if [ ! -d "$(au dir)/portable/packages/esp32" ]
+then
+    au arduino "$@" --install-boards esp32:esp32
+fi
+
+if [ ! -d "$(au dir)/portable/packages/esp8266" ]
+then
+    au arduino "$@" --install-boards esp8266:esp8266
+fi
+
+for library in ArduinoUnit
+do
+    if [ ! -d $(au sketchbook "$@")/libraries/$library ]
+    then
+	au arduino "$@" --pref update.check=false --install-library $library
+    fi
+done
+if (cd "$CI_DIR" && au arduino --verify --board "esp32:esp32:esp32" ci.ino)
+then
+    echo "esp32 compile ok."
+else
+    echo "fail: esp32 compile failed."
+    exit 1
+fi
+
+if (cd "$CI_DIR" && au arduino --verify --board "esp8266:esp8266:generic" ci.ino)
+then
+    echo "esp8266 compile ok"
+else
+    echo "fail: esp8266 compile failed."
+    exit 1
+fi
+
+

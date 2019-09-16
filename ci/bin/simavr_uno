@@ -12,10 +12,7 @@ simavr_uno_exit() {
     local PID
     for PID in $SIMAVR_UNO_PIDS
     do
-        if ps $PID >/dev/null
-        then
-            kill $PID
-        fi
+	{ kill $PID && wait $PID; } 1>/dev/null 2>&1
     done
 }
 
@@ -86,12 +83,13 @@ simavr_uno() {
     fi
     
     while [ ! -e "$PORT" ] ; do sleep 0.01 ; done
-    
+
     cat "$PORT" 2>/dev/null | while read -r line
     do
 	echo "$line"
 	if [[ "$line" =~ "Test summary:" ]]
 	then
+	    echo "terminating simulation." 1>&2
 	    simavr_uno_exit
 	fi
     done

@@ -86,7 +86,7 @@ simavr_uno() {
 
     cat "$PORT" 2>/dev/null | while read -r line
     do
-	echo "$line"
+	echo "tx0> $line"
 	if [[ "$line" =~ "Test summary:" ]]
 	then
 	    echo "terminating simulation." 1>&2

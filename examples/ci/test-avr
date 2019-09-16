@@ -32,10 +32,11 @@ then
     exit 1
 fi
 
-# run the simulation, and print and record the output
+# run the simulation, and print and record the uart0 output
 au simavr_uno "$@" | tee "$CI_DIR/result.txt"
 
-if diff --strip-trailing-cr "$CI_DIR/expect.txt" "$CI_DIR/result.txt"
+# look at tx0> (uart0 output) and compare to expected output
+if sed -e '/^tx0> /!d' -e '/^tx0> / s/^tx0> //'<"$CI_DIR/result.txt" | diff --strip-trailing-cr "$CI_DIR/expect.txt" -
 then
     echo ok: result.txt and expect.txt match.
 else

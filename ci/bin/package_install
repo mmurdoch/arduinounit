@@ -1,6 +1,22 @@
 #!/bin/bash
 
 package_install() {
+    local package
+    local ok
+    ok=true
+    for package in "$@"
+    do
+	if [[ ! "$package" =~ [A-Za-z0-9]([-_]?[A-Za-z0-9])* ]]
+	then
+	    ok=false
+	fi
+    done
+    if [ "$ok" != "true" ]
+    then
+	echo "odd package list. aborting."
+	exit 1
+    fi
+
     local package_installer=()
 
     # https://unix.stackexchange.com/questions/46081/identifying-the-system-package-manager
@@ -19,7 +35,14 @@ package_install() {
         package_installer=("sudo" "/usr/bin/apk" "add")
     elif [ -f /usr/local/bin/brew ]
     then
-        package_installer=("/usr/local/bin/brew" "install")
+	if [ -w /usr/local/HomeBrew ]
+	then
+            package_installer=("/usr/local/bin/brew" "install")
+	else
+	    local owner
+	    owner="$(stat -f '%Su' /usr/local/Homebrew/)"
+            package_installer=("sudo" "-u" "$owner" "-H" "/usr/local/bin/brew" "install")
+	fi
     elif [ -f /opt/local/lib/port ]
     then
         package_installer=("sudo" "port" "install")

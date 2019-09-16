@@ -9,6 +9,7 @@ do
 done
 
 make_simavr_uno() {
+    set -x
     local DIR="$(dir "$@")"
     local OS="$(os "$@")"
     local VERSION="$(version "$@")"

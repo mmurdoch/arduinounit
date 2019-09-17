@@ -122,7 +122,7 @@ cache_ide() {
     do
         if [ -r "${CACHE}/${ARCHIVE}" ]
         then
-            if cd "${CACHE}" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt" > /dev/null
+            if (cd "${CACHE}" && shasum -a512 -c "${ARCHIVE}.sha512sum.txt") > /dev/null
             then
                 local OK=true
                 break

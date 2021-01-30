@@ -137,6 +137,44 @@ void setup()
 }
 ```
 
+## Re-running tests
+If you want to run test multiple times, for example with different
+settings, you can use the `Test::resetDoneTests()` function.
+
+Calling this function will reset all completed tests (passed, failed or
+skipped) back to their initial state. For tests that define a `setup`
+method, this will be run again on the next `Test::run()`. If any tests
+were not completed yet, these are unaffected. The statistics (number of
+passed, failed and skipped tests) are also reset to 0.
+
+Typically, you would use this after all tests are completed (but if you
+call `resetDoneTests()` when some tests are still pending, those
+tests are unaffected). You must never call `resetDoneTests()` from
+inside a test, only between calls to `Test::run()`.
+
+Below is an example that runs all tests once, then changes a global
+variable and runs all tests again. To have a bit more direct control
+over running the tests, this example does not call `Test::run()`
+infinitely in the `loop()`, but instead uses `Test:runUntilDone()` which
+repeatedly calls `Test::run()` until all tests are completed.
+
+```
+bool some_global_setting = false;
+
+void setup() {
+  Serial.begin(9600);
+  while(!Serial) {} // Portability for Leonardo/Micro
+
+  Test::runUntilDone();
+
+  some_global_setting = true;
+  Test::resetDoneTests();
+  Test::runUntilDone();
+}
+
+void loop() { }
+```
+
 # Output
 
 The `Test::out` value is the *shared* value for all tests describing where output for all tests goes.  The default is 

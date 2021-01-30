@@ -14,6 +14,7 @@ const uint8_t Test::DONE_FAIL = 4;
 
 
 Test* Test::root = 0;
+Test* Test::done = 0;
 Test* Test::current = 0;
 
 uint16_t Test::count = 0;
@@ -110,12 +111,14 @@ Test::Test(const __FlashStringHelper *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
 {
   insert();
+  ++Test::count;
 }
 
 Test::Test(const char *_name, uint8_t _verbosity)
   : name(_name), verbosity(_verbosity)
 {
   insert();
+  ++Test::count;
 }
 
 void Test::insert()
@@ -130,7 +133,6 @@ void Test::insert()
     next=(*p);
     (*p)=this;
   }
-  ++Test::count;
 }
 
 void Test::pass() { if (current != 0) current->state = DONE_PASS; }
@@ -158,7 +160,13 @@ void Test::run()
     }
 
     if (current->state != LOOPING) {
+      // Remove from root list
       (*p)=((*p)->next);
+
+      // Add to done list
+      current->next = done;
+      done = current;
+
       current->resolve();
     } else {
       p=&((*p)->next);
@@ -169,6 +177,11 @@ void Test::run()
 #endif
   }
   current = 0;
+}
+
+void Test::runUntilDone() {
+  while (Test::root != 0)
+    Test::run();
 }
 
 void Test::abort()
@@ -182,6 +195,8 @@ void Test::abort()
     Test::out->print(__LINE__);
     Test::out->println(ARDUINO_UNIT_STRING("."));
     root=root->next;
+    current->next = done;
+    done = current;
     current->resolve();
   }
   current=0;
@@ -190,6 +205,17 @@ void Test::abort()
 Test::~Test()
 {
   remove();
+}
+
+void Test::resetDoneTests() {
+  Test::passed = Test::failed = Test::skipped = 0;
+  Test *p = done;
+  while (p != 0) {
+    Test *next = p->next;
+    p->insert();
+    p = next;
+  }
+  done = 0;
 }
 
 void Test::include(const char *pattern)

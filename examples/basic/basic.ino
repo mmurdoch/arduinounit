@@ -1,7 +1,7 @@
 #line 2 "basic.ino"
 #include <ArduinoUnit.h>
 
-xtest(correct)
+test(correct)
 {
   int x=1;
   assertEqual(x,1);

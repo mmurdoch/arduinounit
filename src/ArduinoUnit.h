@@ -293,6 +293,9 @@ class Test
  private:
   // linked list structure for active tests
   static Test* root;
+  // linked list structure for done tests. This includes skipped tests,
+  // though they are only moved after Test::run() finds them.
+  static Test* done;
   Test *next;
 
   // static statistics for tests
@@ -427,6 +430,16 @@ class Test
   /** Run a test.  Test::loop() will be called on each Test::run() until a pass(), fail() or skip(). */
   virtual void loop() = 0;
 
+  /**
+   * Reset all done tests (including skipped tests), so they can be run
+   * again, and reset the counters to reflect this. Any tests that are
+   * not completed are unaffected.
+   *
+   * Should never be called from inside a test, but only between calls
+   * to Test::run() (and typically only when all tests are done).
+   */
+  static void resetDoneTests();
+
   /** include (use) currently excluded (skipped) tests that match some
   wildcard (*) pattern like,
   
@@ -475,6 +488,9 @@ void loop() {
 }
   */
   static void run();
+
+  /** Repeatedly call run until all tests are done */
+  static void runUntilDone();
 
   /** number of tests that have are not done (skipped, passed, or failed) */
   static int remaining();

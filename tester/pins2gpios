@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#
+# This maps the physical pin to gpio pin.  For RPi 3 & RPi 4, the header is
+# like so (looking down from the top of the board
+#
+# +------------------------------+
+# |O                        O +---
+# |       1111122222333334    |USB
+# |   24680246802468024680    +---
+# |   ||||||||||||||||||||       |
+# |  [oooooooooooooooooooo]   +---
+# |  [oooooooooooooooooooo]   |USB
+# |   ||||||||||||||||||||    +---
+# |        111112222233333       |
+# |   13579135791357913579       |
+# |                              |
+# 
+#
+#  Not all pins are connected to gpio. For such pins this reports "-"
+#
+
+pins2gpios() {
+  if [ -z "$PINS2GPIOS_PINOUT" ]
+  then
+    PINS2GPIOS_PINOUT="$(pinout)"
+  fi
+
+  local -a gpios=()
+  local gpio
+  
+  for pin in "$@"
+  do
+    if [ $(($pin % 2)) -eq 0 ]
+    then
+       gpio=$(echo "$PINS2GPIOS_PINOUT" | egrep "\($pin\) *GPIO" | sed -e "s/^.*(\($pin\)) *GPIO\([0-9]*\).*$/\2/")
+    else
+       gpio=$(echo "$PINS2GPIOS_PINOUT" | egrep "GPIO[0-9]+ *\($pin\)" | sed -e "s/^.*GPIO\([0-9]*\) *(\($pin\)).*$/\1/")
+    fi
+    if [[ "$gpio" =~ ^[0-9]+$ ]]
+    then
+	gpios+=($gpio)
+    else
+	gpios+=("-")
+    fi
+  done
+  
+  echo ${gpios[@]}
+}
+
+if [ "$(basename $0)" == "pins2gpios" ]
+then
+    pins2gpios "$@"
+fi

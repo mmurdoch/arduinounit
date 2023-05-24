@@ -1,75 +1,31 @@
 #!/bin/bash
 
-#
-# If you connect a gpio pin (see pinout command) to the reset pin of an arduino,
-# this script sets that pin low for 10 ms, then back to input mode.
-#
-# This should reset the corresponding device.
-#
-#     (connect top right pin of RPi to reset pin on Arduino board)
-# Ex: resetArduinoFromRPi 40
-#
+for inc in pins2gpios gpio 
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
 
-pins2gpios() {
-  if [ -z "$PINOUT" ]
-  then
-    PINOUT="$(pinout)"
-  fi
+resetArduinoFromRPi() {
+  declare -a gpios=()
+  gpios=$(pins2gpios "$@")
 
-  local -a gpios=()
-  local gpio
-  
-  for pin in "$@"
+  for gpio_pin in ${gpios[@]}
   do
-    if [ $(($pin % 2)) -eq 0 ]
-    then
-       gpio=$(echo "$PINOUT" | egrep "\($pin\) *GPIO" | sed -e "s/^.*(\($pin\)) *GPIO\([0-9]*\).*$/\2/")
-    else
-       gpio=$(echo "$PINOUT" | egrep "GPIO[0-9]+ *\($pin\)" | sed -e "s/^.*GPIO\([0-9]*\) *(\($pin\)).*$/\1/")
-    fi
-    if [[ "$gpio" =~ ^[0-9]+$ ]]
-    then
-	gpios+=($gpio)
-    else
-	gpios+=("-")
-    fi
+      gpio_set $gpio_pin 0
   done
-  
-  echo ${gpios[@]}
+
+  sleep 0.010
+
+  for gpio_pin in ${gpios[@]}
+  do
+      unused=$(gpio_get $gpio_pin)
+  done
 }
 
-exportPin()
-{
-    if [ ! -e /sys/class/gpio/gpio$1 ]
-    then
-        echo "$1" > /sys/class/gpio/export
-    fi
-}
-
-setOutput()
-{
-    exportPin $1
-    echo "out" > /sys/class/gpio/gpio$1/direction
-    echo $2 > /sys/class/gpio/gpio$1/value    
-}
-
-setInput()
-{
-    exportPin $1    
-    echo "in" > /sys/class/gpio/gpio$1/direction
-}
-
-declare -a gpios=()
-gpios=$(pins2gpios "$@")
-
-for gpio in ${gpios[@]}
-do
-    setOutput $gpio 0
-done
-
-sleep 0.010
-
-for gpio in ${gpios[@]}
-do
-    setInput $gpio
-done
+if [ "$(basename $0)" == "resetArduinoFromRPi" ]
+then
+    resetArduinoFromRPi "$@"
+fi

@@ -1,0 +1,53 @@
+gpio_export()
+{
+    if [ ! -e /sys/class/gpio/gpio$1 ]
+    then
+        echo "$1" > /sys/class/gpio/export
+    fi
+}
+
+gpio_set()
+{
+    gpio_export $1
+    echo "out" > /sys/class/gpio/gpio$1/direction
+    echo $2 > /sys/class/gpio/gpio$1/value    
+}
+
+gpio_get()
+{
+    gpio_export $1    
+    echo "in" > /sys/class/gpio/gpio$1/direction
+    cat /sys/class/gpio/gpio$1/value
+}
+
+gpio()
+{
+  while [ $# -gt 0 ]
+  do
+    case $1
+    in
+	set)
+	    pin=$2; value=$3; shift; shift; shift;
+	    gpio_set $pin $value;
+	    ;;
+	get)
+	    pin=$2; shift; shift;
+            gpio_get $pin;
+	    ;;
+	delay)
+	    secs=$2; shift; shift;
+            sleep $secs;
+	    ;;
+	*)
+	    echo "unknown argument $1";
+	    exit 1;
+	    ;;
+    esac
+  done
+}
+
+if [ "$(basename $0)" == "gpio" ]
+then
+    gpio "$@"
+fi
+

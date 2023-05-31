@@ -1,0 +1,3 @@
+au arduino --pref update.check=false --install-library ArduinoUnit
+au preferences_add --key=boardsmanager.additional.urls --value=https://espressif.github.io/arduino-esp32/package_esp32_index.json
+au arduino --pref update.check=false --install-boards esp32:esp32

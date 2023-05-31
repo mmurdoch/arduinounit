@@ -1,0 +1,72 @@
+#!/bin/bash
+
+for inc in preferences
+do
+    if [ "$(type -t $inc)" != "function" ]
+    then
+	. "$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"/$inc
+    fi
+done
+
+preferences_add() {
+    local PREFERENCES="$(preferences "$@")"
+
+    while [ $# -gt 0 ]
+    do
+        case "$1"
+        in
+            --key=*)   local KEY=${1#--key=}; shift;;
+            --value=*) local VALUE=${1#--value=}; shift;;	    
+            --*=*)   shift;;
+            --)      shift; break;;
+            *)       break;;
+        esac
+    done
+    
+    local RE_KEY=${KEY//./\\.}
+    local RE_VALUE=${VALUE//./\\.}
+    if ! egrep -q "^${RE_KEY}=(.*,)?${RE_VALUE}(,.*)?\$" "$PREFERENCES"
+    then
+        if ! egrep -q "^$RE_KEY=.*$" "$PREFERENCES"
+        then
+            echo "$KEY=$VALUE" >> "$PREFERENCES"
+        else
+            sed -i- "$PREFERENCES" -e "s|^${RE_KEY}=\(.*\)$|${KEY}=\1,${VALUE}|"
+        fi
+    fi
+}
+
+preferences_add_self_test() {
+    echo "" > preferences_mock.txt
+    preferences_add --preferences='preferences_mock.txt' --key='test.key' --value='test.value'
+    if ! egrep -q "^test.key=test.value$" preferences_mock.txt
+    then
+	echo "add key failed"
+        exit 1
+    fi
+    preferences_add --preferences='preferences_mock.txt' --key='test.key' --value='test.value2'
+    if ! egrep -q "^test.key=test.value,test.value2$" preferences_mock.txt
+    then
+	echo "add key failed"
+        exit 1
+    fi
+
+    preferences_add --preferences='preferences_mock.txt' --key='test.key' --value='test.value2'
+    if ! egrep -q "^test.key=test.value,test.value2$" preferences_mock.txt
+    then
+	echo "add same key failed"
+        exit 1
+    fi
+    echo "preferences_add ok"
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
+then
+    if [ "$1" == "--self-test" ]
+    then
+        shift
+	preferences_add_self_test "$@"
+    else
+	preferences_add "$@"
+    fi
+fi
